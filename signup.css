@@ -1,0 +1,236 @@
+/* Plik: signup.css (Style specyficzne TYLKO dla Strony Rejestracji) */
+
+/* Styl dla <main>, aby zapewnić minimalną wysokość i padding */
+main.signup-page { /* Zmieniono klasę */
+    min-height: calc(100vh - 80px - 95px); /* Dostosuj wysokość footera! */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+}
+
+/* Układ dwukolumnowy */
+.signup-layout-grid { /* Zmieniono klasę */
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    max-width: 1100px;
+    width: 100%;
+    margin: 0 auto;
+    gap: 4rem;
+    align-items: center;
+}
+
+/* Lewa kolumna z formularzem */
+.signup-panel { /* Zmieniono klasę */
+    display: flex;
+    justify-content: center;
+}
+
+/* Kontener formularza (tło, padding, cień itp.) */
+.signup-container { /* Zmieniono klasę */
+    max-width: 480px; /* Może być nieco szerszy niż logowanie */
+    width: 100%;
+    padding: clamp(2rem, 5vw, 3rem);
+    background-color: var(--background-light-dark);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.signup-container h2 { /* Zmieniono klasę */
+    margin-bottom: 2.5rem;
+    color: var(--text-primary);
+    font-size: clamp(1.8rem, 5vw, 2.2rem);
+}
+
+/* Style formularza */
+#signup-form .form-group { /* Zmieniono ID */
+    margin-bottom: 1.2rem; /* Mniejszy margines między polami */
+    text-align: left;
+}
+
+#signup-form label { /* Zmieniono ID */
+    display: block;
+    margin-bottom: 0.5rem; /* Mniejszy margines */
+    color: var(--text-secondary);
+    font-weight: 400;
+    font-size: 0.9rem; /* Nieco mniejsza etykieta */
+}
+
+/* Styl dla inputów */
+#signup-form input[type="text"], /* Dodano typ text */
+#signup-form input[type="email"],
+#signup-form input[type="password"] { /* Zmieniono ID */
+    width: 100%;
+    padding: 0.8rem 1rem; /* Mniejszy padding */
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: var(--background-dark);
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#signup-form input[type="text"]:focus, /* Dodano typ text */
+#signup-form input[type="email"]:focus,
+#signup-form input[type="password"]:focus { /* Zmieniono ID */
+    outline: none;
+    border-color: var(--accent-teal);
+    box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.15);
+}
+
+#signup-form input::placeholder { /* Zmieniono ID */
+    color: #666;
+    opacity: 1;
+}
+
+/* Styl dla checkboxa i jego etykiety */
+#signup-form .form-group.terms { /* Zmieniono ID */
+    display: flex;
+    align-items: flex-start; /* Wyrównaj do góry */
+    margin-top: 1rem;
+    margin-bottom: 1.5rem; /* Większy odstęp pod checkboxem */
+}
+
+#signup-form .form-group.terms input[type="checkbox"] { /* Zmieniono ID */
+    margin-top: 0.2em; /* Lekkie przesunięcie w dół dla lepszego wyrównania */
+    margin-right: 0.6rem;
+    width: auto; /* Reset szerokości */
+    flex-shrink: 0; /* Zapobiegaj kurczeniu się */
+    appearance: none; /* Ukryj domyślny wygląd */
+    background-color: var(--background-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    width: 1.1em;
+    height: 1.1em;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+#signup-form .form-group.terms input[type="checkbox"]:checked { /* Zmieniono ID */
+    background-color: var(--accent-teal);
+    border-color: var(--accent-teal);
+}
+/* Dodanie "ptaszka" do zaznaczonego checkboxa */
+#signup-form .form-group.terms input[type="checkbox"]:checked::after { /* Zmieniono ID */
+     content: '';
+     display: block;
+     width: 0.3em;
+     height: 0.6em;
+     border: solid var(--background-dark); /* Kolor ptaszka */
+     border-width: 0 2px 2px 0;
+     transform: rotate(45deg) translate(-50%, -50%);
+     position: absolute;
+     left: 50%;
+     top: 45%; /* Dopasowanie pozycji ptaszka */
+}
+
+
+#signup-form .form-group.terms label { /* Zmieniono ID */
+    margin-bottom: 0; /* Usuń margines pod etykietą checkboxa */
+    font-size: 0.85rem; /* Mniejsza czcionka dla zgody */
+    line-height: 1.4;
+    flex-grow: 1; /* Pozwól etykiecie zająć resztę miejsca */
+}
+#signup-form .form-group.terms label a { /* Zmieniono ID */
+    color: var(--accent-teal); /* Linki w etykiecie */
+    text-decoration: underline;
+}
+#signup-form .form-group.terms label a:hover { /* Zmieniono ID */
+    color: var(--accent-teal-darker);
+}
+
+
+/* Przycisk rejestracji */
+#signup-form .cta-button { /* Zmieniono ID */
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0.9rem 1rem;
+    /* Dziedziczy styl .cta-button z style.css */
+}
+
+/* Link do logowania */
+.signup-container .signin-link { /* Zmieniono klasy */
+    margin-top: 2.5rem;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+}
+.signup-container .signin-link a { /* Zmieniono klasy */
+    color: var(--accent-teal);
+    font-weight: 600;
+    text-decoration: none;
+}
+.signup-container .signin-link a:hover { /* Zmieniono klasy */
+    text-decoration: underline;
+}
+
+/* Prawa kolumna z obrazem (style te same co w signin.css) */
+.image-panel {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.image-panel img {
+    max-width: 100%;
+    max-height: 70vh;
+    height: auto;
+    border-radius: 10px;
+    object-fit: contain;
+}
+
+/* Styl aktywnego przycisku "Zarejestruj się" w nawigacji */
+/* Specyficzne dla tej strony */
+.nav-button-primary.active-page {
+    background-color: var(--accent-teal-darker); /* Ciemniejszy jako aktywny */
+    box-shadow: 0 0 15px 5px var(--glow-color); /* Dodaj poświatę od razu */
+    /* Można dodać delikatną ramkę dla wyróżnienia */
+    /* border: 1px solid var(--accent-teal); */
+}
+
+
+/* === Media Query dla Responsywności === */
+@media (max-width: 992px) {
+    main.signup-page {
+        padding: 2rem 1rem;
+        align-items: flex-start;
+        min-height: calc(100vh - 68px - 85px);
+    }
+
+    .signup-layout-grid {
+        grid-template-columns: 1fr; /* Jedna kolumna */
+        gap: 3rem; /* Zwiększony odstęp pionowy */
+        margin: 1rem auto;
+    }
+
+     .image-panel {
+         order: -1; /* Obrazek na górze */
+         margin-bottom: 0;
+     }
+
+     .signup-panel {
+         justify-content: center;
+     }
+
+     .signup-container {
+         padding: clamp(1.5rem, 4vw, 2.5rem);
+     }
+}
+
+@media (max-width: 576px) {
+    .image-panel {
+         display: none; /* Ukryj obrazek */
+    }
+    main.signup-page {
+        align-items: center; /* Wycentruj sam formularz w pionie */
+    }
+}
+
+/* Aktywny przycisk w menu mobilnym */
+@media (max-width: 992px) {
+    a.nav-button-primary.active-page {
+        background-color: var(--accent-teal-darker); /* Ciemniejsze tło */
+        /* Dodaj ewentualne inne style dla wyróżnienia w mobile */
+    }
+}

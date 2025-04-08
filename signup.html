@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Zarejestruj się w SmartSaver i zacznij mądrze zarządzać swoimi finansami.">
+    <title>Rejestracja - SmartSaver</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="signup.css">
+
+</head>
+<body>
+
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="index.html#hero">SmartSaver</a>
+            </div>
+            <ul>
+                <li><a href="index.html#hero">Start</a></li>
+                <li><a href="index.html#features">Funkcje</a></li>
+                <li><a href="index.html#how-it-works">Jak to działa?</a></li>
+                <li class="nav-item-testimonials"><a href="index.html#testimonials">Opinie</a></li>
+                <li class="nav-item-signin"><a href="signin.html" class="nav-link-secondary">Zaloguj</a></li>
+                <li class="nav-item-signup"><a href="signup.html" class="nav-button-primary active-page">Zarejestruj się</a></li>
+            </ul>
+            <button class="hamburger" id="hamburger-button" aria-label="Open menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </nav>
+    </header>
+
+    <main class="page-container signup-page">
+        <div class="signup-layout-grid">
+
+            
+            <div class="signup-panel"> 
+                <div class="signup-container"> 
+                    <h2>Zarejestruj się</h2>
+                    <form id="signup-form" action="#" method="post"> 
+                        <div class="form-group">
+                            <label for="username">Nazwa użytkownika:</label>
+                            <input type="text" id="username" name="username" required placeholder="Wybierz nazwę użytkownika">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Adres E-mail:</label>
+                            <input type="email" id="email" name="email" required placeholder="Wpisz swój email">
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Hasło:</label>
+                            <input type="password" id="password" name="password" required placeholder="Wprowadź hasło">
+                        </div>
+                        <div class="form-group">
+                            <label for="confirm-password">Potwierdź hasło:</label>
+                            <input type="password" id="confirm-password" name="confirm-password" required placeholder="Powtórz hasło">
+                        </div>
+                        <div class="form-group terms">
+                            <input type="checkbox" id="terms" name="terms" required>
+                            <label for="terms">Akceptuję <a href="terms.html" target="_blank">Regulamin</a> i <a href="privacy.html" target="_blank">Politykę Prywatności</a>.</label>
+                        </div>
+                        <button type="submit" class="cta-button">Zarejestruj się</button>
+                    </form>
+                    <p class="signin-link"> 
+                        Masz już konto? <a href="signin.html">Zaloguj się tutaj</a>
+                    </p>
+                </div>
+            </div>
+
+           
+            <div class="image-panel"> 
+                <img src="images/phone.png" alt="SmartSaver App Interface Mockup">
+            </div>
+
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; <span id="current-year"></span> SmartSaver. Wszelkie prawa zastrzeżone.</p>
+        <div class="footer-links">
+            <a href="#">Polityka Prywatności</a>
+            <a href="#">Warunki Usługi</a>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
