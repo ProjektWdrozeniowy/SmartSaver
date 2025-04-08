@@ -1,0 +1,497 @@
+/* --- Globalne Ustawienia --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --background-dark: #121212; /* Główny ciemny kolor tła */
+    --background-light-dark: #1a1a1a; /* Nieco jaśniejszy ciemny (dla kart itp.) */
+    --text-primary: #ffffff;    /* Główny kolor tekstu (biały) */
+    --text-secondary: #b0b0b0;  /* Drugorzędny kolor tekstu (jasnoszary) */
+    --accent-teal: #00f0ff;    /* Główny kolor akcentu (cyjan/turkus) */
+    --accent-teal-darker: #00c0cc; /* Ciemniejszy odcień do hover */
+    --glow-color: rgba(0, 240, 255, 0.3); /* Kolor poświaty */
+    --border-color: #333333; /* Kolor subtelnych ramek */
+
+    --font-primary: 'Poppins', sans-serif; /* Główna czcionka */
+}
+
+html {
+    scroll-behavior: smooth;
+    font-family: var(--font-primary);
+    background-color: var(--background-dark); /* Ustaw tło dla całego html */
+}
+
+body {
+    background-color: var(--background-dark);
+    color: var(--text-secondary); /* Domyślny tekst jasnoszary */
+    line-height: 1.7;
+    font-weight: 300; /* Lżejsza czcionka dla body */
+    overflow-x: hidden; /* Zapobiegaj poziomemu przewijaniu */
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-primary); /* Nagłówki białe */
+    font-weight: 600; /* Grubsze nagłówki */
+    margin-bottom: 1rem;
+}
+
+h1 {
+    font-size: clamp(2.5rem, 5vw, 3.8rem); /* Responsywny rozmiar czcionki */
+    line-height: 1.2;
+    font-weight: 700;
+}
+
+h2 {
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+h3 {
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+}
+
+p {
+    margin-bottom: 1rem;
+    max-width: 65ch; /* Ogranicz szerokość dla lepszej czytelności */
+}
+
+a {
+    color: var(--accent-teal);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--accent-teal-darker);
+}
+
+section {
+    padding: clamp(4rem, 8vw, 6rem) 2rem; /* Responsywny padding */
+    overflow: hidden; /* Zapobiega wychodzeniu elementów poza sekcję */
+}
+
+/* --- Nagłówek --- */
+header {
+    background-color: rgba(18, 18, 18, 0.8); /* Lekko przezroczyste tło */
+    backdrop-filter: blur(10px); /* Efekt rozmycia tła */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    border-bottom: 1px solid var(--border-color); /* Subtelna linia oddzielająca */
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1300px; /* Większy kontener */
+    margin: 0 auto;
+    padding: 1rem 2rem;
+    flex-wrap: wrap;
+}
+
+.logo a {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-decoration: none;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+nav ul li {
+    margin-left: 1.5rem;
+}
+
+nav ul li a {
+    color: var(--text-secondary);
+    font-weight: 400;
+    text-decoration: none;
+    padding: 0.5rem 0.2rem; /* Dodano padding dla łatwiejszego klikania */
+    position: relative; /* Dla pseudo-elementu podkreślenia */
+    transition: color 0.3s ease;
+}
+nav ul li a::after { /* Subtelne podkreślenie na hover */
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: var(--accent-teal);
+    transition: width 0.3s ease;
+}
+
+nav ul li a:hover,
+nav ul li a.active /* Dla aktywnego linku (można dodać JS) */
+{
+    color: var(--text-primary);
+}
+nav ul li a:hover::after {
+    width: 100%;
+}
+
+
+/* Style dla przycisków w nawigacji */
+.nav-link-secondary {
+    color: var(--text-secondary);
+    margin-right: 0.5rem; /* Odstęp przed głównym przyciskiem */
+}
+.nav-link-secondary:hover {
+     color: var(--text-primary);
+}
+
+.nav-button-primary {
+    background-color: var(--accent-teal);
+    color: var(--background-dark); /* Ciemny tekst na jasnym tle */
+    padding: 0.6rem 1.4rem;
+    border-radius: 25px; /* Bardziej zaokrąglone */
+    font-weight: 600;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 0 8px 0px rgba(0, 240, 255, 0); /* Początkowy brak poświaty */
+}
+
+.nav-button-primary:hover {
+    background-color: var(--accent-teal-darker);
+    color: var(--background-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 0 15px 5px var(--glow-color); /* Poświata na hover */
+}
+
+/* Hamburger dla mobile */
+.hamburger {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+.hamburger span {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background-color: var(--text-primary);
+    margin: 5px 0;
+    transition: all 0.3s ease-in-out;
+}
+/* Style dla otwartego hamburgera (dodaj JS) */
+.hamburger.open span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+
+/* --- Sekcja Hero --- */
+#hero {
+    display: flex;
+    flex-direction: column; /* Domyślnie na mobile */
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: calc(90vh - 80px); /* Dostosuj wysokość */
+    background: linear-gradient(rgba(18, 18, 18, 0.8), rgba(18, 18, 18, 1)), url('hero-background.jpg') center/cover no-repeat; /* Przykładowe tło z gradientem */
+    /* Upewnij się, że masz obraz tła lub usuń url() */
+     padding-top: 80px; /* Uwzględnij wysokość nagłówka */
+}
+
+.hero-content {
+    max-width: 700px;
+    margin-bottom: 2rem;
+}
+.hero-content h1 {
+     color: var(--text-primary);
+}
+.hero-content p {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+}
+.hero-image img {
+    max-width: 90%;
+    height: auto;
+    margin-top: 2rem;
+     opacity: 0.9; /* Lekka przezroczystość dla placeholderów */
+}
+
+
+/* Ogólny styl przycisków CTA */
+.cta-button {
+    display: inline-block;
+    padding: 0.8rem 2rem;
+    background: var(--accent-teal);
+    color: var(--background-dark); /* Ciemny tekst */
+    text-decoration: none;
+    border-radius: 30px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px 2px rgba(0, 240, 255, 0); /* Start glow */
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+}
+.cta-button:hover {
+    background-color: var(--accent-teal-darker);
+    transform: translateY(-3px) scale(1.03); /* Lekkie powiększenie */
+    box-shadow: 0 0 20px 8px var(--glow-color); /* Mocniejsza poświata */
+}
+
+/* Drugorzędny styl przycisku (np. przezroczysty z ramką) */
+.cta-button-secondary {
+    display: inline-block;
+    padding: 0.7rem 1.8rem;
+    background: transparent;
+    color: var(--accent-teal);
+    border: 2px solid var(--accent-teal);
+    text-decoration: none;
+    border-radius: 30px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+.cta-button-secondary:hover {
+    background-color: var(--accent-teal);
+    color: var(--background-dark);
+    transform: translateY(-2px);
+}
+
+
+/* --- Sekcja Funkcje --- */
+#features {
+    background-color: var(--background-light-dark); /* Lekko inne tło dla sekcji */
+}
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2.5rem;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+}
+.feature-item {
+    background-color: var(--background-dark); /* Tło karty ciemniejsze */
+    padding: 2.5rem 2rem;
+    border-radius: 10px;
+    border: 1px solid var(--border-color); /* Subtelna ramka */
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.feature-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+.feature-icon { /* Placeholder dla ikony */
+    width: 50px;
+    height: 50px;
+    background-color: var(--accent-teal);
+    border-radius: 50%;
+    margin: 0 auto 1.5rem auto;
+    /* Tutaj dodasz stylizację ikony lub obrazek w tle */
+    box-shadow: 0 0 15px 3px var(--glow-color);
+}
+.feature-item h3 {
+    color: var(--text-primary);
+    font-size: 1.3rem;
+}
+.feature-item p {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    max-width: none; /* Usuń ograniczenie szerokości dla kart */
+}
+
+
+/* --- Sekcje Naprzemienne (Alternating) --- */
+.alternating-section {
+    display: flex;
+    flex-direction: column; /* Domyślnie na mobile */
+    align-items: center;
+    justify-content: center;
+    gap: 3rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    text-align: center; /* Centrowanie tekstu na mobile */
+}
+.alternating-section .section-content {
+    max-width: 500px;
+}
+.alternating-section .section-content h2 {
+    text-align: inherit; /* Dziedzicz wyrównanie */
+     font-size: clamp(1.8rem, 3.5vw, 2.5rem); /* Mniejszy nagłówek w tych sekcjach */
+}
+.alternating-section .section-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+     opacity: 0.9;
+}
+
+
+/* --- Sekcja Testimonials --- */
+#testimonials {
+     background-color: var(--background-light-dark);
+     position: relative; /* Dla potencjalnego tła z planetami */
+     /* background: url('images/space-background.jpg') center/cover no-repeat; */
+}
+.testimonial-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+.testimonial-item {
+    background-color: rgba(30, 30, 30, 0.7); /* Lekko przezroczyste tło karty */
+    padding: 2rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    backdrop-filter: blur(5px); /* Rozmycie tła pod kartą */
+}
+.testimonial-item p {
+    font-style: italic;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    max-width: none;
+}
+.testimonial-item span {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* --- Sekcja CTA na dole --- */
+#bottom-cta {
+    background: linear-gradient(45deg, #0d1a2a, #1a0d1f); /* Przykładowy gradient */
+    text-align: center;
+}
+#bottom-cta h2 {
+    color: var(--text-primary);
+}
+#bottom-cta p {
+    color: var(--text-secondary);
+    margin: 0 auto 2rem auto;
+}
+
+
+/* --- Stopka --- */
+footer {
+    background-color: #0a0a0a; /* Najciemniejsze tło */
+    color: var(--text-secondary);
+    text-align: center;
+    padding: 2rem 1rem;
+    margin-top: auto;
+    border-top: 1px solid var(--border-color);
+    font-size: 0.9rem;
+}
+.footer-links {
+    margin-top: 0.5rem;
+}
+.footer-links a {
+    color: var(--text-secondary);
+    margin: 0 0.75rem;
+    font-size: 0.85rem;
+}
+.footer-links a:hover {
+    color: var(--accent-teal);
+}
+
+
+/* --- Media Queries (Responsywność) --- */
+
+/* Układ dla większych ekranów (tablety i desktopy) */
+@media (min-width: 768px) {
+    #hero {
+        flex-direction: row; /* Układ obok siebie */
+        text-align: left;
+        justify-content: space-between;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    .hero-content {
+        max-width: 55%;
+        margin-bottom: 0;
+         margin-right: 2rem; /* Odstęp od obrazka */
+    }
+     .hero-image {
+        max-width: 40%;
+    }
+     .hero-image img {
+         margin-top: 0;
+     }
+
+    .alternating-section {
+        flex-direction: row;
+        text-align: left; /* Wyrównanie do lewej na większych ekranach */
+        justify-content: space-between;
+        gap: 4rem;
+    }
+    .alternating-section .section-content {
+         width: 45%; /* Zajmuje mniej niż połowę */
+         max-width: none; /* Usuń ograniczenie szerokości */
+    }
+     .alternating-section .section-content h2 {
+         text-align: left;
+     }
+    .alternating-section .section-image {
+         width: 45%;
+    }
+    /* Układ naprzemienny */
+    .alternating-section .text-first {
+        order: 1; /* Tekst po lewej */
+    }
+     .alternating-section .text-first + .section-image {
+         order: 2; /* Obraz po prawej */
+     }
+    .alternating-section .image-first {
+        order: 1; /* Obraz po lewej */
+    }
+     .alternating-section .image-first + .section-content {
+         order: 2; /* Tekst po prawej */
+     }
+
+}
+
+/* Ukrywanie/Pokazywanie menu mobilnego */
+@media (max-width: 992px) { /* Dostosuj breakpoint, jeśli potrzeba */
+    nav ul {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background-color: rgba(26, 26, 26, 0.95); /* Ciemne tło dla menu mobilnego */
+        box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+        padding: 1rem 0;
+        border-top: 1px solid var(--border-color);
+    }
+    nav ul.active {
+        display: flex;
+    }
+    nav ul li {
+        margin: 0.8rem 0;
+        width: 100%;
+        text-align: center;
+    }
+    nav ul li a::after {
+         display: none; /* Ukryj podkreślenie w menu mobilnym */
+    }
+    .nav-button-primary, .nav-link-secondary {
+        display: block;
+        width: 80%;
+        margin: 0.8rem auto;
+        text-align: center;
+    }
+    .hamburger {
+        display: block; /* Pokaż hamburger */
+    }
+}
