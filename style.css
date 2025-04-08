@@ -105,6 +105,12 @@ nav {
     text-decoration: none;
 }
 
+.logo-accent {
+    color: #00f0ff;
+    font-size: 1.2em; 
+    font-weight: 700;
+}
+
 nav ul {
     list-style: none;
     display: flex;
@@ -403,6 +409,25 @@ footer {
 .footer-links a:hover {
     color: var(--accent-teal);
 }
+/* --- Ikony w funkcjach --- */
+.feature-icon { 
+    width: 60px;
+    height: 60px;
+    background-color: var(--accent-teal);
+    border-radius: 50%;
+    margin: 0 auto 1.5rem auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 15px 3px var(--glow-color);
+}
+
+.feature-icon img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+}
+
 
 
 /* --- Media Queries (Responsywność) --- */
