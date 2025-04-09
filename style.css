@@ -90,114 +90,143 @@ header {
 
 nav {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1300px; /* Większy kontener */
+    align-items: center; /* Wyrównanie w pionie */
+    max-width: 1300px;
     margin: 0 auto;
     padding: 1rem 2rem;
-    flex-wrap: wrap;
+    /* Usunięto justify-content i flex-wrap z głównego nav */
+    position: relative; /* Dla pozycjonowania menu mobilnego */
 }
 
+.logo {
+    flex-shrink: 0; /* Nie zmniejszaj logo */
+    margin-right: 1rem; /* Odstęp od środkowych linków */
+}
 .logo a {
     font-size: 1.8rem;
     font-weight: 700;
     color: var(--text-primary);
     text-decoration: none;
 }
-
 .logo-accent {
     color: #00f0ff;
     font-size: 1.2em; 
     font-weight: 700;
 }
 
-nav ul {
-    list-style: none;
-    display: flex;
+/* 2. Główne linki (wyśrodkowane) */
+.main-nav-links {
+    flex-grow: 1; /* Zajmij dostępną przestrzeń */
+    display: flex; /* Użyj Flexbox do wyśrodkowania wewnętrznej listy */
+    justify-content: center; /* Wyśrodkuj listę UL */
+}
+.main-nav-links ul {
+    display: flex; /* Linki obok siebie */
     align-items: center;
-    flex-wrap: wrap;
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
-
-nav ul li {
-    margin-left: 1.5rem;
+.main-nav-links ul li {
+    margin: 0 1.5rem; /* Odstęp MIĘDZY głównymi linkami */
 }
-
-nav ul li a {
+.main-nav-links ul li a { /* Style dziedziczone z ogólnego 'a', ale można dostosować */
     color: var(--text-secondary);
     font-weight: 400;
     text-decoration: none;
-    padding: 0.5rem 0.2rem; /* Dodano padding dla łatwiejszego klikania */
-    position: relative; /* Dla pseudo-elementu podkreślenia */
+    padding: 0.5rem 0.2rem;
+    position: relative;
     transition: color 0.3s ease;
 }
-nav ul li a::after { /* Subtelne podkreślenie na hover */
+.main-nav-links ul li a::after { /* Podkreślenie */
     content: '';
     position: absolute;
-    width: 0;
-    height: 2px;
-    bottom: -2px;
-    left: 0;
+    width: 0; height: 2px; bottom: -2px; left: 0;
     background-color: var(--accent-teal);
     transition: width 0.3s ease;
 }
+.main-nav-links ul li a:hover { color: var(--text-primary); }
+.main-nav-links ul li a:hover::after { width: 100%; }
 
-nav ul li a:hover,
-nav ul li a.active /* Dla aktywnego linku (można dodać JS) */
-{
-    color: var(--text-primary);
+
+/* 3. Linki Akcji (po prawej) */
+.action-nav-links {
+    flex-shrink: 0; /* Nie zmniejszaj tej sekcji */
+    margin-left: 1rem; /* Odstęp od środkowych linków */
 }
-nav ul li a:hover::after {
-    width: 100%;
+.action-nav-links ul {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.action-nav-links ul li {
+    margin-left: 0; /* Reset marginesu li */
+    /* Odstępy między Zaloguj/Zarejestruj się są kontrolowane przez style linków/przycisków poniżej */
 }
 
-
-/* Style dla przycisków w nawigacji */
+/* Styl linku "Zaloguj" (klasa z <a>) */
 .nav-link-secondary {
     color: var(--text-secondary);
-    margin-right: 0.5rem; /* Odstęp przed głównym przyciskiem */
+    margin-right: 1rem; /* Odstęp przed przyciskiem Rejestracji */
+    font-weight: 400;
+    text-decoration: none;
+    padding: 0.5rem 0.2rem;
+    position: relative;
+    transition: color 0.3s ease;
+    display: inline-block; /* Dla poprawnego marginesu */
 }
-.nav-link-secondary:hover {
-     color: var(--text-primary);
+.nav-link-secondary::after { /* Podkreślenie */
+    content: '';
+    position: absolute;
+    width: 0; height: 2px; bottom: -2px; left: 0;
+    background-color: var(--accent-teal);
+    transition: width 0.3s ease;
 }
+.nav-link-secondary:hover { color: var(--text-primary); }
+.nav-link-secondary:hover::after { width: 100%; }
 
+/* Styl przycisku "Zarejestruj się" (klasa z <a>) */
 .nav-button-primary {
     background-color: var(--accent-teal);
-    color: var(--background-dark); /* Ciemny tekst na jasnym tle */
+    color: var(--background-dark);
     padding: 0.6rem 1.4rem;
-    border-radius: 25px; /* Bardziej zaokrąglone */
+    border-radius: 25px;
     font-weight: 600;
     transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
-    box-shadow: 0 0 8px 0px rgba(0, 240, 255, 0); /* Początkowy brak poświaty */
+    box-shadow: 0 0 8px 0px rgba(0, 240, 255, 0);
+    text-decoration: none;
+    display: inline-block;
+    border: none;
 }
-
 .nav-button-primary:hover {
     background-color: var(--accent-teal-darker);
     color: var(--background-dark);
     transform: translateY(-2px);
-    box-shadow: 0 0 15px 5px var(--glow-color); /* Poświata na hover */
+    box-shadow: 0 0 15px 5px var(--glow-color);
 }
 
-/* Hamburger dla mobile */
+
+/* 4. Hamburger dla mobile */
 .hamburger {
-    display: none;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0.5rem;
+    display: none; /* Ukryty na desktopie */
+    background: none; border: none; cursor: pointer; padding: 0.5rem;
+    margin-left: 1rem; /* Odstęp od linków akcji */
+    order: 3; /* Umieść go na końcu w kolejności flex */
 }
 .hamburger span {
-    display: block;
-    width: 25px;
-    height: 3px;
-    background-color: var(--text-primary);
-    margin: 5px 0;
-    transition: all 0.3s ease-in-out;
+    display: block; width: 25px; height: 3px; background-color: var(--text-primary);
+    margin: 5px 0; transition: all 0.3s ease-in-out;
 }
-/* Style dla otwartego hamburgera (dodaj JS) */
 .hamburger.open span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
 .hamburger.open span:nth-child(2) { opacity: 0; }
 .hamburger.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
 
+/* 5. Wrapper menu mobilnego */
+.nav-menu-wrapper {
+     display: none; /* Ukryty na desktopie */
+}
 
 /* --- Sekcja Hero --- */
 #hero {
@@ -251,6 +280,7 @@ nav ul li a:hover::after {
     background-color: var(--accent-teal-darker);
     transform: translateY(-3px) scale(1.03); /* Lekkie powiększenie */
     box-shadow: 0 0 20px 8px var(--glow-color); /* Mocniejsza poświata */
+    color: var(--background-dark);
 }
 
 /* Drugorzędny styl przycisku (np. przezroczysty z ramką) */

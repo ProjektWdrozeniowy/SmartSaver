@@ -1,45 +1,42 @@
 // Obsługa menu mobilnego (hamburger)
 const hamburgerButton = document.getElementById('hamburger-button');
-const navUl = document.querySelector('nav ul');
+const navElement = document.querySelector('nav'); // Zmieniono selektor na <nav>
+// const navMenuWrapper = document.querySelector('.nav-menu-wrapper'); // Alternatywny selektor
 
-if (hamburgerButton && navUl) {
+if (hamburgerButton && navElement) { // Sprawdź istnienie navElement
     hamburgerButton.addEventListener('click', () => {
-        navUl.classList.toggle('active'); // Pokaż/Ukryj menu
-        hamburgerButton.classList.toggle('open'); // Dodaj/Usuń klasę dla animacji X
+        // Przełącz klasę na elemencie <nav>
+        navElement.classList.toggle('mobile-menu-active');
+
+        // Przełącz klasę na przycisku hamburgera dla animacji X
+        hamburgerButton.classList.toggle('open');
+
+        // Alternatywa: przełączanie klasy na wrapperze menu
+        // navMenuWrapper.classList.toggle('active');
     });
 
-    // Zamykanie menu po kliknięciu na link (dla stron typu one-page)
-    navUl.querySelectorAll('a').forEach(link => {
-        // Dodajemy warunek, aby nie zamykać menu dla linków do zewnętrznych stron (np. Sign In/Sign Up)
-        if (link.getAttribute('href').startsWith('#')) {
-             link.addEventListener('click', () => {
-                if (navUl.classList.contains('active')) {
-                    navUl.classList.remove('active');
-                    hamburgerButton.classList.remove('open');
-                }
-            });
-        }
-    });
+    // Opcjonalnie: Zamknij menu po kliknięciu linku w trybie mobilnym
+    // (Może wymagać dostosowania selektorów do nowej struktury)
+    const navLinks = navElement.querySelectorAll('.nav-menu-wrapper a'); // Znajdź linki wewnątrz wrappera
+    if (navLinks.length > 0) {
+      navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+          // Sprawdź czy menu jest aktywne (czy nav ma klasę)
+          if (navElement.classList.contains('mobile-menu-active')) {
+            // Jeśli tak, usuń klasę z nav i hamburgera
+            navElement.classList.remove('mobile-menu-active');
+            hamburgerButton.classList.remove('open');
+          }
+        });
+      });
+    }
 }
 
-
-// Dynamiczne ustawienie roku w stopce
+// Dynamiczne ustawienie roku w stopce (bez zmian)
 const currentYearSpan = document.getElementById('current-year');
 if (currentYearSpan) {
     currentYearSpan.textContent = new Date().getFullYear();
 }
-
-// Prosta obsługa formularza kontaktowego (jeśli zdecydujesz się go dodać z powrotem)
-/*
-const contactForm = document.getElementById('contact-form');
-if (contactForm) {
-    contactForm.addEventListener('submit', (event) => {
-        event.preventDefault();
-        alert('Thank you for your message! (This is a demo - message not sent).');
-        contactForm.reset();
-    });
-}
-*/
 
 // Opcjonalnie: Zmiana stylu nagłówka podczas przewijania (dostosowana do dark mode)
 const header = document.querySelector('header');
