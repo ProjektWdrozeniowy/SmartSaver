@@ -48,32 +48,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Sprawdzenie, czy nie ma błędów walidacji
     if (empty($errors)) {
-        // Haszuj hasło i zapisz użytkownika do bazy danych
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
         $insert_query = "INSERT INTO accounts (login, password, email) VALUES (?, ?, ?)";
         $stmt_insert = $conn->prepare($insert_query);
-        $stmt_insert->bind_param("sss", $username, $hashed_password, $email);
-
-        if ($stmt_insert->execute()) {
-            // Rejestracja udana - ustaw zmienną sesji z komunikatem
-            $_SESSION['registration_success'] = "Rejestracja zakończona pomyślnie! Możesz się teraz zalogować.";
-        
-            // Przekierowanie na stronę logowania
-            header("Location: signin.html");
-            exit(); // Ważne, aby zakończyć wykonywanie skryptu po przekierowaniu
-        }
+    
+        if ($stmt_insert) {
+            $stmt_insert->bind_param("sss", $username, $hashed_password, $email);
+    
+            if ($stmt_insert->execute()) {
+                $_SESSION['registration_success'] = "Rejestracja zakończona pomyślnie! Możesz się teraz zalogować.";
+                header("Location: signin.html");
+                exit();
+            } else {
+                echo '<p style="color: red;">Błąd podczas rejestracji: ' . $stmt_insert->error . '</p>';
+            }
+    
+            $stmt_insert->close(); // ✔️ Tylko jeśli $stmt_insert istnieje
         } else {
-            echo '<p style="color: red;">Wystąpił błąd podczas rejestracji. Spróbuj ponownie później.</p>';
-            // Możesz dodać logowanie błędów: error_log("Błąd rejestracji: " . $stmt_insert->error);
+            echo '<p style="color: red;">Błąd przygotowania zapytania: ' . $conn->error . '</p>';
         }
-        $stmt_insert->close();
     } else {
-        // Wyświetlenie błędów walidacji
         foreach ($errors as $error) {
             echo '<p style="color: red;">' . $error . '</p>';
         }
     }
+}
 
 
 $conn->close();
