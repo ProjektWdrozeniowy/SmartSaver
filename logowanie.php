@@ -45,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION["username"] = $row["login"];
 
                 // Przekierowanie na stronę główną (zmień na właściwy adres)
-                header("Location: index.html"); // Możesz przekierować gdziekolwiek chcesz po zalogowaniu
+                header("Location: main.html"); // Możesz przekierować gdziekolwiek chcesz po zalogowaniu
                 exit();
             } else {
                 $error = "Nieprawidłowy adres e-mail lub hasło.";
