@@ -56,9 +56,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt_insert->bind_param("sss", $username, $hashed_password, $email);
 
         if ($stmt_insert->execute()) {
-            // Rejestracja udana - możesz przekierować użytkownika na stronę logowania lub wyświetlić komunikat
-            echo '<p style="color: green;">Rejestracja zakończona pomyślnie! Możesz się teraz <a href="signin.html">zalogować</a>.</p>';
-            // Możesz też użyć header("Location: signin.html"); exit();
+            // Rejestracja udana - ustaw zmienną sesji z komunikatem
+            $_SESSION['registration_success'] = "Rejestracja zakończona pomyślnie! Możesz się teraz zalogować.";
+        
+            // Przekierowanie na stronę logowania
+            header("Location: signin.html");
+            exit(); // Ważne, aby zakończyć wykonywanie skryptu po przekierowaniu
+        }
         } else {
             echo '<p style="color: red;">Wystąpił błąd podczas rejestracji. Spróbuj ponownie później.</p>';
             // Możesz dodać logowanie błędów: error_log("Błąd rejestracji: " . $stmt_insert->error);
@@ -70,7 +74,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo '<p style="color: red;">' . $error . '</p>';
         }
     }
-}
+
 
 $conn->close();
 ?>
