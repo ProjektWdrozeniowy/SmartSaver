@@ -4,9 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Box } from '@mui/material';
 import LandingPage from './views/LandingPage';
 import SignInPage from './views/SignInPage';
-
-
-// import SignUpPage from './views/SignUpPage';
+import SignUpPage from './views/SignUpPage';
 
 function App() {
     return (
@@ -21,11 +19,12 @@ function App() {
                 <Routes>
                     <Route path="/" element={<LandingPage />} />
 
-
                      <Route path="/signin" element={<SignInPage />} />
-                    {/* <Route path="/signup" element={<SignUpPage />} /> */}
-                    {/* <Route path="/regulamin" element={<TermsPage />} /> */}
-                    {/* <Route path="/pp" element={<PrivacyPolicyPage />} /> */}
+                     <Route path="/signup" element={<SignUpPage />} />
+                    {/* Legal Pages */}
+                    {/*<Route path="/regulamin" element={<TermsPage />} />*/}
+                    {/*<Route path="/pp" element={<PrivacyPolicyPage />} />*/}
+                    {/*<Route path="/warunki" element={<TermsOfServicePage />} />*/}
                 </Routes>
             </Box>
         </Router>
