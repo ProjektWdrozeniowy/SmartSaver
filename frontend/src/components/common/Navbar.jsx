@@ -16,13 +16,14 @@ import {
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 const Navbar = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const [drawerOpen, setDrawerOpen] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
 
     // Linki nawigacyjne
     const navLinks = [
@@ -37,9 +38,15 @@ const Navbar = () => {
         setDrawerOpen(false);
 
         if (href.startsWith('#')) {
-            const element = document.querySelector(href);
-            if (element) {
-                element.scrollIntoView({ behavior: 'smooth' });
+            // Jeśli NIE jesteśmy na stronie głównej, najpierw przekieruj
+            if (location.pathname !== '/') {
+                navigate('/', { state: { scrollTo: href } });
+            } else {
+                // Jeśli jesteśmy na głównej, po prostu scrolluj
+                const element = document.querySelector(href);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                }
             }
         }
     };
