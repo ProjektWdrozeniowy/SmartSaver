@@ -14,7 +14,7 @@ import Navbar from "../components/common/Navbar.jsx";
 const LandingPage = () => {
     return (
         <Box>
-            
+
              <Navbar />
 
             <Box component="main">
