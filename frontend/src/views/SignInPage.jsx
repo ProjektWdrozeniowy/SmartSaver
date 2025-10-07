@@ -66,10 +66,14 @@ const SignInPage = () => {
             // TODO: Integracja z backendem
             console.log('Form submitted:', formData);
 
-            // Tymczasowo: przekierowanie do dashboard (gdy będzie gotowy)
-            // navigate('/dashboard');
-
+            // Tymczasowo - tylko komunikat
             alert('Logowanie - integracja z backendem będzie dodana później');
+
+            // Po integracji z backendem będzie:
+            // const response = await fetch('/api/login', { ... });
+            // if (response.ok) {
+            //   navigate('/dashboard');
+            // }
         }
     };
 
