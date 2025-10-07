@@ -4,12 +4,13 @@ import { Box } from '@mui/material';
 
 // Importy komponentów (dodamy je krok po kroku)
 import Navbar from "../components/common/Navbar.jsx";
-// import HeroSection from '../components/landing/HeroSection';
-// import FeaturesSection from '../components/landing/FeaturesSection';
-// import HowItWorksSection from '../components/landing/HowItWorksSection';
-// import TestimonialsSection from '../components/landing/TestimonialsSection';
-// import BottomCTA from '../components/landing/BottomCTA';
-// import Footer from '../components/common/Footer';
+import HeroSection from '../components/landing/HeroSection';
+import FeaturesSection from '../components/landing/FeaturesSection';
+import HowItWorksSection from '../components/landing/HowItWorksSection';
+import TestimonialsSection from '../components/landing/TestimonialsSection';
+import BottomCTA from '../components/landing/BottomCTA';
+import Footer from '../components/common/Footer';
+import ScrollToTop from "../components/common/ScrollToTop.jsx";
 
 const LandingPage = () => {
     return (
@@ -18,39 +19,21 @@ const LandingPage = () => {
              <Navbar />
 
             <Box component="main">
-                {/* Hero Section */}
-                {/* <HeroSection /> */}
 
-                {/* Features Section */}
-                {/* <FeaturesSection /> */}
+                <HeroSection />
 
-                {/* How It Works Section */}
-                {/* <HowItWorksSection /> */}
+                <FeaturesSection />
 
-                {/* Testimonials Section */}
-                {/* <TestimonialsSection /> */}
+                <HowItWorksSection />
 
-                {/* Bottom CTA */}
-                {/* <BottomCTA /> */}
+                <TestimonialsSection />
+
+                 <BottomCTA />
             </Box>
 
-            {/* Footer */}
-            {/* <Footer /> */}
+             <Footer />
 
-            {/* Tymczasowy tekst dla testów */}
-            <Box
-                sx={{
-                    minHeight: '100vh',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'text.primary',
-                    fontSize: '2rem',
-                    fontWeight: 700,
-                }}
-            >
-                SmartSaver - React App Started! 🚀
-            </Box>
+            <ScrollToTop/>
         </Box>
     );
 };
