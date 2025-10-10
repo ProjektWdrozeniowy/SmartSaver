@@ -8,7 +8,7 @@ import Navbar from '../components/common/Navbar';
 import HeroSection from '../components/landing/HeroSection';
 import FeaturesSection from '../components/landing/FeaturesSection';
 import HowItWorksSection from '../components/landing/HowItWorksSection';
-import TestimonialsSection from '../components/landing/TestimonialsSection';
+import QuotesSection from '../components/landing/QuotesSection.jsx';
 import BottomCTA from '../components/landing/BottomCTA';
 import Footer from '../components/common/Footer';
 import ScrollToTop from '../components/common/ScrollToTop';
@@ -46,7 +46,7 @@ const LandingPage = () => {
                 <HowItWorksSection />
 
                 {/* Testimonials Section */}
-                <TestimonialsSection />
+                <QuotesSection />
 
                 {/* Bottom CTA */}
                 <BottomCTA />
