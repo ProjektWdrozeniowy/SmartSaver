@@ -106,6 +106,21 @@ const Footer = () => {
                     >
                         Warunki Usługi
                     </Box>
+                    <Box
+                        component={Link}
+                        to="/kontakt"
+                        sx={{
+                            color: 'text.secondary',
+                            fontSize: '0.85rem',
+                            textDecoration: 'none',
+                            transition: 'color 0.3s ease',
+                            '&:hover': {
+                                color: 'primary.main',
+                            },
+                        }}
+                    >
+                        Kontakt
+                    </Box>
                 </Box>
             </Container>
         </Box>

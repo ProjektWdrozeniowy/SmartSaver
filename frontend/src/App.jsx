@@ -8,6 +8,7 @@ import SignUpPage from './views/SignUpPage';
 import TermsPage from './views/TermsPage';
 import PrivacyPolicyPage from './views/PrivacyPolicyPage';
 import TermsOfServicePage from './views/TermsOfServicePage';
+import ContactPage from './views/ContactPage.jsx';
 import DashboardPage from './views/DashboardPage';
 
 function App() {
@@ -29,6 +30,8 @@ function App() {
                     <Route path="/regulamin" element={<TermsPage />} />
                     <Route path="/pp" element={<PrivacyPolicyPage />} />
                     <Route path="/warunki" element={<TermsOfServicePage />} />
+
+                    <Route path="/kontakt" element={<ContactPage />} />
 
                     <Route path="/dashboard" element={<DashboardPage />} />
 
