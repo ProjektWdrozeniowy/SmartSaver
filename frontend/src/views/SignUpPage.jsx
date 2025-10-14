@@ -1,4 +1,5 @@
 // src/views/SignUpPage.jsx
+import { registerUser } from '../api/auth';
 import React, { useState } from 'react';
 import {
     Box,
@@ -17,6 +18,7 @@ import { motion } from 'framer-motion';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import phoneImage from '../assets/images/phone.png';
+
 
 const SignUpPage = () => {
     const navigate = useNavigate();
@@ -84,19 +86,25 @@ const SignUpPage = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-        if (validateForm()) {
-            // TODO: Integracja z backendem
-            console.log('Form submitted:', formData);
+  if (validateForm()) {
+    try {
+      const { username, email, password } = formData;
 
-            // Tymczasowo: przekierowanie do strony logowania
-            // navigate('/signin');
+      // wysyłamy dane do backendu (http://localhost:4000/api/register)
+      const res = await registerUser({ username, email, password });
 
-            alert('Rejestracja - integracja z backendem będzie dodana później');
-        }
-    };
+      if (res?.ok) {
+        alert('Konto utworzone ✅');
+        navigate('/signin'); // po rejestracji np. do logowania
+      }
+    } catch (err) {
+      alert(err.message || 'Błąd rejestracji');
+    }
+  }
+};
 
     const fadeIn = {
         hidden: { opacity: 0, y: 20 },
