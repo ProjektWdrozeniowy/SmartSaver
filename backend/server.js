@@ -68,18 +68,13 @@ app.post('/api/register', async (req, res) => {
     console.log('Received registration request:', req.body);
     const { username, email, password } = RegisterSchema.parse(req.body);
 
-    // Sprawdź czy użytkownik już istnieje
-    const existingUser = await prisma.account.findFirst({
-      where: {
-        OR: [
-          { username: username },
-          { email: email }
-        ]
-      }
+    // Sprawdź czy email już istnieje (username może się powtarzać)
+    const existingUser = await prisma.account.findUnique({
+      where: { email }
     });
 
     if (existingUser) {
-      return res.status(409).json({ ok: false, message: 'Użytkownik już istnieje' });
+      return res.status(409).json({ ok: false, message: 'Użytkownik z tym adresem email już istnieje' });
     }
 
     const passwordHash = await argon2.hash(password);
