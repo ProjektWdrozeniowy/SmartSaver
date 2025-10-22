@@ -1,4 +1,5 @@
 // src/views/SignInPage.jsx
+import { loginUser } from '../api/auth';
 import React, { useState } from 'react';
 import {
     Box,
@@ -13,6 +14,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
+import AuthModal from '../components/common/AuthModal';
 import phoneImage from '../assets/images/phone.png';
 
 const SignInPage = () => {
@@ -22,6 +24,12 @@ const SignInPage = () => {
         password: '',
     });
     const [errors, setErrors] = useState({});
+    const [modalOpen, setModalOpen] = useState(false);
+    const [modalConfig, setModalConfig] = useState({
+        type: 'success',
+        title: '',
+        message: '',
+    });
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -51,29 +59,45 @@ const SignInPage = () => {
         // Walidacja hasła
         if (!formData.password) {
             newErrors.password = 'Hasło jest wymagane';
-        } else if (formData.password.length < 6) {
-            newErrors.password = 'Hasło musi mieć minimum 6 znaków';
+        } else if (formData.password.length < 8) {
+            newErrors.password = 'Hasło musi mieć minimum 8 znaków';
         }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (validateForm()) {
-            // TODO: Integracja z backendem
-            console.log('Form submitted:', formData);
+            try {
+                const { email, password } = formData;
 
-            // Tymczasowo - tylko komunikat
-            alert('Logowanie - integracja z backendem będzie dodana później');
+                // wysyłamy dane do backendu (http://localhost:4000/api/login)
+                const data = await loginUser({ email, password });
 
-            // Po integracji z backendem będzie:
-            // const response = await fetch('/api/login', { ... });
-            // if (response.ok) {
-            //   navigate('/dashboard');
-            // }
+                // loginUser już sprawdza res.ok i rzuca błąd jeśli !res.ok
+                // więc tutaj wiemy że wszystko ok
+                setModalConfig({
+                    type: 'success',
+                    title: 'Zalogowano pomyślnie!',
+                    message: `Witaj ${data.user.username}! Logowanie przebiegło pomyślnie. Za chwilę zostaniesz przekierowany do dashboardu.`,
+                });
+                setModalOpen(true);
+
+                // Po 2 sekundach przekieruj do dashboardu
+                setTimeout(() => {
+                    navigate('/dashboard');
+                }, 2000);
+            } catch (err) {
+                setModalConfig({
+                    type: 'error',
+                    title: 'Błąd logowania',
+                    message: err.message || 'Wystąpił błąd podczas logowania. Sprawdź swoje dane i spróbuj ponownie.',
+                });
+                setModalOpen(true);
+            }
         }
     };
 
@@ -326,6 +350,15 @@ const SignInPage = () => {
             </Box>
 
             <Footer />
+
+            {/* Auth Modal */}
+            <AuthModal
+                open={modalOpen}
+                onClose={() => setModalOpen(false)}
+                type={modalConfig.type}
+                title={modalConfig.title}
+                message={modalConfig.message}
+            />
         </Box>
     );
 };
