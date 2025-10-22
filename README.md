@@ -122,26 +122,6 @@ npm run build --workspace=frontend
 npm run migrate --workspace=backend
 ```
 
-## 🔐 Funkcjonalności
-
-### Zaimplementowane:
-- ✅ Rejestracja użytkowników
-- ✅ Logowanie z JWT
-- ✅ Chronione route'y (Dashboard)
-- ✅ Autoryzacja tokenem
-- ✅ Walidacja danych (Zod)
-- ✅ Hashowanie haseł (Argon2)
-- ✅ Baza danych MySQL (Prisma ORM)
-- ✅ Responsywny design (Material-UI)
-- ✅ Ładne modale dla komunikatów
-
-### W planach:
-- 📊 Śledzenie wydatków
-- 💰 Zarządzanie budżetem
-- 📈 Raporty finansowe
-- 🎯 Cele oszczędnościowe
-- 📱 Aplikacja mobilna
-
 ## 🔧 Technologie
 
 ### Frontend:
@@ -175,22 +155,8 @@ JWT_EXPIRES_IN=7d           # Ważność tokenu
 Frontend używa zmiennych z `import.meta.env`:
 - `VITE_API_URL` - URL backendu (opcjonalne, domyślnie localhost:4000)
 
-## 🤝 Współpraca
-
-1. Fork repozytorium
-2. Stwórz branch (`git checkout -b feature/AmazingFeature`)
-3. Commit zmian (`git commit -m 'Add some AmazingFeature'`)
-4. Push do brancha (`git push origin feature/AmazingFeature`)
-5. Otwórz Pull Request
-
-## 📄 Licencja
-
-ISC
 
 ## 👥 Autorzy
 
 Zespół ProjektWdrozeniowy
 
-## 🐛 Zgłaszanie błędów
-
-Zgłoś błąd: [Issues](https://github.com/ProjektWdrozeniowy/SmartSaver/issues)
