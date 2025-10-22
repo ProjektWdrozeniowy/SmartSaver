@@ -1,26 +1,40 @@
 {
-  "name": "projekt",
+  "name": "smartsaver-monorepo",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "SmartSaver - Aplikacja do zarządzania finansami osobistymi",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "npm run start --workspace=backend",
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "install:all": "npm install && npm install --workspaces",
+    "build": "npm run build --workspace=frontend",
+    "start:backend": "npm run start --workspace=backend",
+    "start:frontend": "npm run preview --workspace=frontend",
+    "prisma:migrate": "npm run migrate --workspace=backend",
+    "prisma:studio": "npx prisma studio --workspace=backend"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ProjektWdrozeniowy/SmartSaver.git"
   },
-  "keywords": [],
+  "keywords": [
+    "finance",
+    "budget",
+    "savings",
+    "expense-tracker"
+  ],
   "author": "",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/ProjektWdrozeniowy/SmartSaver/issues"
   },
   "homepage": "https://github.com/ProjektWdrozeniowy/SmartSaver#readme",
-  "dependencies": {
-    "argon2": "^0.44.0",
-    "cors": "^2.8.5",
-    "express": "^5.1.0",
-    "zod": "^4.1.12"
+  "devDependencies": {
+    "concurrently": "^9.1.2"
   }
 }
