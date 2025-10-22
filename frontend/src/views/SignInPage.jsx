@@ -14,6 +14,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
+import AuthModal from '../components/common/AuthModal';
 import phoneImage from '../assets/images/phone.png';
 
 const SignInPage = () => {
@@ -23,6 +24,12 @@ const SignInPage = () => {
         password: '',
     });
     const [errors, setErrors] = useState({});
+    const [modalOpen, setModalOpen] = useState(false);
+    const [modalConfig, setModalConfig] = useState({
+        type: 'success',
+        title: '',
+        message: '',
+    });
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -72,12 +79,27 @@ const SignInPage = () => {
 
                 // loginUser już sprawdza res.ok i rzuca błąd jeśli !res.ok
                 // więc tutaj wiemy że wszystko ok
-                alert(`Witaj ${data.user.username}! Logowanie pomyślne ✅`);
+                setModalConfig({
+                    type: 'success',
+                    title: 'Zalogowano pomyślnie!',
+                    message: `Witaj ${data.user.username}! Logowanie przebiegło pomyślnie. Za chwilę zostaniesz przekierowany.`,
+                });
+                setModalOpen(true);
+
                 // TODO: Zapisz token/dane użytkownika w localStorage lub Context
                 // localStorage.setItem('user', JSON.stringify(data.user));
-                navigate('/'); // przekierowanie do strony głównej
+
+                // Po 2 sekundach przekieruj do strony głównej
+                setTimeout(() => {
+                    navigate('/');
+                }, 2000);
             } catch (err) {
-                alert(err.message || 'Błąd logowania');
+                setModalConfig({
+                    type: 'error',
+                    title: 'Błąd logowania',
+                    message: err.message || 'Wystąpił błąd podczas logowania. Sprawdź swoje dane i spróbuj ponownie.',
+                });
+                setModalOpen(true);
             }
         }
     };
@@ -331,6 +353,15 @@ const SignInPage = () => {
             </Box>
 
             <Footer />
+
+            {/* Auth Modal */}
+            <AuthModal
+                open={modalOpen}
+                onClose={() => setModalOpen(false)}
+                type={modalConfig.type}
+                title={modalConfig.title}
+                message={modalConfig.message}
+            />
         </Box>
     );
 };

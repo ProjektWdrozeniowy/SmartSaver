@@ -17,6 +17,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
+import AuthModal from '../components/common/AuthModal';
 import phoneImage from '../assets/images/phone.png';
 
 
@@ -30,6 +31,12 @@ const SignUpPage = () => {
         terms: false,
     });
     const [errors, setErrors] = useState({});
+    const [modalOpen, setModalOpen] = useState(false);
+    const [modalConfig, setModalConfig] = useState({
+        type: 'success',
+        title: '',
+        message: '',
+    });
 
     const handleChange = (e) => {
         const { name, value, checked, type } = e.target;
@@ -98,10 +105,24 @@ const handleSubmit = async (e) => {
 
       // registerUser już sprawdza res.ok i rzuca błąd jeśli !res.ok
       // więc tutaj wiemy że wszystko ok
-      alert('Konto utworzone ✅');
-      navigate('/signin'); // po rejestracji np. do logowania
+      setModalConfig({
+        type: 'success',
+        title: 'Konto utworzone!',
+        message: `Witaj ${username}! Twoje konto zostało pomyślnie utworzone. Możesz teraz się zalogować.`,
+      });
+      setModalOpen(true);
+
+      // Po 2 sekundach przekieruj do strony logowania
+      setTimeout(() => {
+        navigate('/signin');
+      }, 2000);
     } catch (err) {
-      alert(err.message || 'Błąd rejestracji');
+      setModalConfig({
+        type: 'error',
+        title: 'Błąd rejestracji',
+        message: err.message || 'Wystąpił błąd podczas rejestracji. Spróbuj ponownie.',
+      });
+      setModalOpen(true);
     }
   }
 };
@@ -464,6 +485,15 @@ const handleSubmit = async (e) => {
             </Box>
 
             <Footer />
+
+            {/* Auth Modal */}
+            <AuthModal
+                open={modalOpen}
+                onClose={() => setModalOpen(false)}
+                type={modalConfig.type}
+                title={modalConfig.title}
+                message={modalConfig.message}
+            />
         </Box>
     );
 };
