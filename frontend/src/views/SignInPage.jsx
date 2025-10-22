@@ -82,16 +82,13 @@ const SignInPage = () => {
                 setModalConfig({
                     type: 'success',
                     title: 'Zalogowano pomyślnie!',
-                    message: `Witaj ${data.user.username}! Logowanie przebiegło pomyślnie. Za chwilę zostaniesz przekierowany.`,
+                    message: `Witaj ${data.user.username}! Logowanie przebiegło pomyślnie. Za chwilę zostaniesz przekierowany do dashboardu.`,
                 });
                 setModalOpen(true);
 
-                // TODO: Zapisz token/dane użytkownika w localStorage lub Context
-                // localStorage.setItem('user', JSON.stringify(data.user));
-
-                // Po 2 sekundach przekieruj do strony głównej
+                // Po 2 sekundach przekieruj do dashboardu
                 setTimeout(() => {
-                    navigate('/');
+                    navigate('/dashboard');
                 }, 2000);
             } catch (err) {
                 setModalConfig({

@@ -10,6 +10,7 @@ import PrivacyPolicyPage from './views/PrivacyPolicyPage';
 import TermsOfServicePage from './views/TermsOfServicePage';
 import ContactPage from './views/ContactPage.jsx';
 import DashboardPage from './views/DashboardPage';
+import ProtectedRoute from './components/common/ProtectedRoute';
 
 function App() {
     return (
@@ -33,8 +34,14 @@ function App() {
 
                     <Route path="/kontakt" element={<ContactPage />} />
 
-                    <Route path="/dashboard" element={<DashboardPage />} />
-
+                    <Route
+                        path="/dashboard"
+                        element={
+                            <ProtectedRoute>
+                                <DashboardPage />
+                            </ProtectedRoute>
+                        }
+                    />
 
                 </Routes>
             </Box>

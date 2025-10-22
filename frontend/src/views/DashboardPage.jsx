@@ -1,5 +1,5 @@
 // src/views/DashboardPage.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Box,
     Drawer,
@@ -31,6 +31,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import { useNavigate } from 'react-router-dom';
+import { getUser, logout } from '../api/auth';
 
 const drawerWidth = 260;
 
@@ -39,16 +40,35 @@ const DashboardPage = () => {
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const [mobileOpen, setMobileOpen] = useState(false);
     const [selectedMenu, setSelectedMenu] = useState('dashboard');
+    const [user, setUser] = useState(null);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        // Pobierz dane użytkownika z localStorage
+        const userData = getUser();
+        if (userData) {
+            setUser(userData);
+        }
+    }, []);
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
     };
 
     const handleLogout = () => {
-        // TODO: Dodaj logikę wylogowania (usuń token, wyczyść stan)
-        alert('Wylogowanie - integracja z backendem');
+        // Wyloguj użytkownika (usuń token i dane z localStorage)
+        logout();
         navigate('/signin');
+    };
+
+    // Funkcja do wygenerowania inicjałów
+    const getInitials = (name) => {
+        if (!name) return '?';
+        const names = name.split(' ');
+        if (names.length >= 2) {
+            return `${names[0][0]}${names[1][0]}`.toUpperCase();
+        }
+        return name.substring(0, 2).toUpperCase();
     };
 
     // Menu items
@@ -205,10 +225,10 @@ const DashboardPage = () => {
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                         <Box sx={{ textAlign: 'right', display: { xs: 'none', sm: 'block' } }}>
                             <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 600 }}>
-                                Jan Kowalski
+                                {user?.username || 'Użytkownik'}
                             </Typography>
                             <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                                jan.kowalski@example.com
+                                {user?.email || 'email@example.com'}
                             </Typography>
                         </Box>
                         <Avatar
@@ -219,7 +239,7 @@ const DashboardPage = () => {
                                 cursor: 'pointer',
                             }}
                         >
-                            JK
+                            {getInitials(user?.username)}
                         </Avatar>
                     </Box>
                 </Toolbar>
@@ -283,7 +303,7 @@ const DashboardPage = () => {
                     {/* Welcome message */}
                     <Box sx={{ mb: 4 }}>
                         <Typography variant="h4" sx={{ fontWeight: 600, mb: 1, color: 'text.primary' }}>
-                            Witaj, Jan! 👋
+                            Witaj, {user?.username || 'Użytkowniku'}! 👋
                         </Typography>
                         <Typography variant="body1" sx={{ color: 'text.secondary' }}>
                             Oto Twoje podsumowanie finansowe
