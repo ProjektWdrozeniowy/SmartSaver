@@ -17,3 +17,18 @@ export async function registerUser({ username, email, password }) {
   if (!res.ok) throw new Error(data?.message || `Błąd ${res.status}`);
   return data;
 }
+
+export async function loginUser({ email, password }) {
+  const url = `${BASE_URL}/api/login`;
+  console.log('Login URL ->', url);
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data?.message || `Błąd ${res.status}`);
+  return data;
+}

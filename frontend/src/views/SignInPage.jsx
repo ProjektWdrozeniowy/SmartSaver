@@ -1,4 +1,5 @@
 // src/views/SignInPage.jsx
+import { loginUser } from '../api/auth';
 import React, { useState } from 'react';
 import {
     Box,
@@ -51,29 +52,33 @@ const SignInPage = () => {
         // Walidacja hasła
         if (!formData.password) {
             newErrors.password = 'Hasło jest wymagane';
-        } else if (formData.password.length < 6) {
-            newErrors.password = 'Hasło musi mieć minimum 6 znaków';
+        } else if (formData.password.length < 8) {
+            newErrors.password = 'Hasło musi mieć minimum 8 znaków';
         }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (validateForm()) {
-            // TODO: Integracja z backendem
-            console.log('Form submitted:', formData);
+            try {
+                const { email, password } = formData;
 
-            // Tymczasowo - tylko komunikat
-            alert('Logowanie - integracja z backendem będzie dodana później');
+                // wysyłamy dane do backendu (http://localhost:4000/api/login)
+                const data = await loginUser({ email, password });
 
-            // Po integracji z backendem będzie:
-            // const response = await fetch('/api/login', { ... });
-            // if (response.ok) {
-            //   navigate('/dashboard');
-            // }
+                // loginUser już sprawdza res.ok i rzuca błąd jeśli !res.ok
+                // więc tutaj wiemy że wszystko ok
+                alert(`Witaj ${data.user.username}! Logowanie pomyślne ✅`);
+                // TODO: Zapisz token/dane użytkownika w localStorage lub Context
+                // localStorage.setItem('user', JSON.stringify(data.user));
+                navigate('/'); // przekierowanie do strony głównej
+            } catch (err) {
+                alert(err.message || 'Błąd logowania');
+            }
         }
     };
 

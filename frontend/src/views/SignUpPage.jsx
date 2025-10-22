@@ -66,8 +66,8 @@ const SignUpPage = () => {
         // Walidacja hasła
         if (!formData.password) {
             newErrors.password = 'Hasło jest wymagane';
-        } else if (formData.password.length < 6) {
-            newErrors.password = 'Hasło musi mieć minimum 6 znaków';
+        } else if (formData.password.length < 8) {
+            newErrors.password = 'Hasło musi mieć minimum 8 znaków';
         }
 
         // Walidacja potwierdzenia hasła
@@ -94,12 +94,12 @@ const handleSubmit = async (e) => {
       const { username, email, password } = formData;
 
       // wysyłamy dane do backendu (http://localhost:4000/api/register)
-      const res = await registerUser({ username, email, password });
+      const data = await registerUser({ username, email, password });
 
-      if (res?.ok) {
-        alert('Konto utworzone ✅');
-        navigate('/signin'); // po rejestracji np. do logowania
-      }
+      // registerUser już sprawdza res.ok i rzuca błąd jeśli !res.ok
+      // więc tutaj wiemy że wszystko ok
+      alert('Konto utworzone ✅');
+      navigate('/signin'); // po rejestracji np. do logowania
     } catch (err) {
       alert(err.message || 'Błąd rejestracji');
     }
