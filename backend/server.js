@@ -1,11 +1,31 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const argon2 = require('argon2');
+const jwt = require('jsonwebtoken');
 const { z } = require('zod');
 const { PrismaClient } = require('@prisma/client');
+const { authenticateToken } = require('./middleware/auth');
 
 const prisma = new PrismaClient();
 const app = express();
+
+const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
+
+// Funkcja pomocnicza do generowania JWT
+function generateToken(user) {
+  return jwt.sign(
+    {
+      id: user.id,
+      username: user.username,
+      email: user.email
+    },
+    JWT_SECRET,
+    { expiresIn: JWT_EXPIRES_IN }
+  );
+}
+
 // Elastyczna konfiguracja CORS dla development
 app.use(cors({
   origin: (origin, callback) => {
@@ -71,8 +91,15 @@ app.post('/api/register', async (req, res) => {
       }
     });
 
+    // Generuj JWT token
+    const token = generateToken(newUser);
+
     console.log('User registered successfully:', { id: newUser.id, username, email });
-    res.status(201).json({ ok: true, user: { id: newUser.id, username, email } });
+    res.status(201).json({
+      ok: true,
+      token,
+      user: { id: newUser.id, username, email }
+    });
   } catch (err) {
     console.error('Registration error:', err);
     if (err.name === 'ZodError') {
@@ -100,14 +127,44 @@ app.post('/api/login', async (req, res) => {
       return res.status(401).json({ ok: false, message: 'Nieprawidłowy email lub hasło' });
     }
 
+    // Generuj JWT token
+    const token = generateToken(user);
+
     console.log('User logged in successfully:', { id: user.id, username: user.username });
-    res.status(200).json({ ok: true, user: { id: user.id, username: user.username, email: user.email } });
+    res.status(200).json({
+      ok: true,
+      token,
+      user: { id: user.id, username: user.username, email: user.email }
+    });
   } catch (err) {
     console.error('Login error:', err);
     if (err.name === 'ZodError') {
       return res.status(400).json({ ok: false, message: 'Nieprawidłowe dane: ' + err.errors.map(e => e.message).join(', ') });
     }
     res.status(400).json({ ok: false, message: err.message });
+  }
+});
+
+// Przykładowy chroniony endpoint - wymaga JWT
+app.get('/api/me', authenticateToken, async (req, res) => {
+  try {
+    const user = await prisma.account.findUnique({
+      where: { id: req.user.id },
+      select: {
+        id: true,
+        username: true,
+        email: true
+      }
+    });
+
+    if (!user) {
+      return res.status(404).json({ ok: false, message: 'Użytkownik nie znaleziony' });
+    }
+
+    res.json({ ok: true, user });
+  } catch (err) {
+    console.error('Get user error:', err);
+    res.status(500).json({ ok: false, message: 'Błąd serwera' });
   }
 });
 
