@@ -15,6 +15,7 @@ backend/dist/
 
 # IDE
 .idea/
+.claude/
 .vscode/
 *.swp
 *.swo
