@@ -1,5 +1,5 @@
 // src/components/dashboard/WydatkiSection.jsx
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
     Box,
     Typography,
@@ -24,12 +24,17 @@ import {
     DialogActions,
     InputAdornment,
     Chip,
+    CircularProgress,
+    Alert,
+    Snackbar,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CategoryIcon from '@mui/icons-material/Category';
+import { getExpenses, createExpense, updateExpense, deleteExpense } from '../../api/expenses';
+import { getCategories, createCategory } from '../../api/categories';
 
 const WydatkiSection = () => {
     // Available icons for categories
@@ -39,65 +44,22 @@ const WydatkiSection = () => {
         '🎵', '📚', '🐕', '💊', '🚌', '🍺', '🏋️', '🎨'
     ];
 
-    // Mock data - będzie zastąpione danymi z backendu
-    const [categories, setCategories] = useState([
-        { id: 1, name: 'Jedzenie', color: '#ff6b9d', icon: '🍕' },
-        { id: 2, name: 'Transport', color: '#00f0ff', icon: '🚗' },
-        { id: 3, name: 'Rozrywka', color: '#a8e6cf', icon: '🎬' },
-        { id: 4, name: 'Rachunki', color: '#ffd93d', icon: '⚡' },
-        { id: 5, name: 'Zakupy', color: '#c77dff', icon: '🛒' },
-    ]);
+    // Data states
+    const [categories, setCategories] = useState([]);
+    const [expenses, setExpenses] = useState([]);
 
-    const [expenses, setExpenses] = useState([
-        {
-            id: 1,
-            name: 'Zakupy spożywcze',
-            categoryId: 1,
-            date: '2025-10-23',
-            description: 'Zakupy w Biedronce',
-            amount: 125.50,
-        },
-        {
-            id: 2,
-            name: 'Netflix',
-            categoryId: 3,
-            date: '2025-10-19',
-            description: 'Subskrypcja miesięczna',
-            amount: 49.99,
-        },
-        {
-            id: 3,
-            name: 'Prąd',
-            categoryId: 4,
-            date: '2025-10-18',
-            description: 'Rachunek za prąd',
-            amount: 230.00,
-        },
-        {
-            id: 4,
-            name: 'Restauracja',
-            categoryId: 1,
-            date: '2025-10-17',
-            description: '',
-            amount: 89.50,
-        },
-        {
-            id: 5,
-            name: 'Benzyna',
-            categoryId: 2,
-            date: '2025-10-15',
-            description: 'Tankowanie',
-            amount: 180.00,
-        },
-    ]);
-
-    // States
+    // UI states
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('all');
-    const [selectedMonth, setSelectedMonth] = useState('2025-10');
+    const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7)); // YYYY-MM
     const [openExpenseDialog, setOpenExpenseDialog] = useState(false);
     const [openCategoryDialog, setOpenCategoryDialog] = useState(false);
     const [editingExpense, setEditingExpense] = useState(null);
+
+    // Loading and notification states
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
     // Form states for new/edit expense
     const [expenseForm, setExpenseForm] = useState({
@@ -114,6 +76,51 @@ const WydatkiSection = () => {
         color: '#ff6b9d',
         icon: '🍕',
     });
+
+    // Fetch categories on mount
+    useEffect(() => {
+        fetchCategories();
+    }, []);
+
+    // Fetch expenses when month changes
+    useEffect(() => {
+        if (selectedMonth) {
+            fetchExpenses();
+        }
+    }, [selectedMonth]);
+
+    // API functions
+    const fetchCategories = async () => {
+        try {
+            const data = await getCategories();
+            setCategories(data.categories || []);
+        } catch (err) {
+            console.error('Error fetching categories:', err);
+            showSnackbar('Nie udało się pobrać kategorii', 'error');
+        }
+    };
+
+    const fetchExpenses = async () => {
+        try {
+            setLoading(true);
+            const data = await getExpenses(selectedMonth);
+            setExpenses(data.expenses || []);
+        } catch (err) {
+            console.error('Error fetching expenses:', err);
+            showSnackbar('Nie udało się pobrać wydatków', 'error');
+            setExpenses([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const showSnackbar = (message, severity = 'success') => {
+        setSnackbar({ open: true, message, severity });
+    };
+
+    const handleCloseSnackbar = () => {
+        setSnackbar({ ...snackbar, open: false });
+    };
 
     // Filter expenses
     const filteredExpenses = useMemo(() => {
@@ -161,31 +168,48 @@ const WydatkiSection = () => {
     };
 
     // Handle save expense
-    const handleSaveExpense = () => {
-        if (editingExpense) {
-            // Update existing
-            setExpenses(expenses.map(exp =>
-                exp.id === editingExpense.id
-                    ? { ...exp, ...expenseForm, categoryId: parseInt(expenseForm.categoryId), amount: parseFloat(expenseForm.amount) }
-                    : exp
-            ));
-        } else {
-            // Add new
-            const newExpense = {
-                id: Math.max(...expenses.map(e => e.id), 0) + 1,
-                ...expenseForm,
+    const handleSaveExpense = async () => {
+        try {
+            setSaving(true);
+            const expenseData = {
+                name: expenseForm.name,
                 categoryId: parseInt(expenseForm.categoryId),
+                date: expenseForm.date,
                 amount: parseFloat(expenseForm.amount),
+                description: expenseForm.description,
             };
-            setExpenses([...expenses, newExpense]);
+
+            if (editingExpense) {
+                // Update existing
+                await updateExpense(editingExpense.id, expenseData);
+                showSnackbar('Wydatek został zaktualizowany', 'success');
+            } else {
+                // Add new
+                await createExpense(expenseData);
+                showSnackbar('Wydatek został dodany', 'success');
+            }
+
+            setOpenExpenseDialog(false);
+            fetchExpenses(); // Refresh list
+        } catch (err) {
+            console.error('Error saving expense:', err);
+            showSnackbar(err.message || 'Nie udało się zapisać wydatku', 'error');
+        } finally {
+            setSaving(false);
         }
-        setOpenExpenseDialog(false);
     };
 
     // Handle delete expense
-    const handleDeleteExpense = (id) => {
+    const handleDeleteExpense = async (id) => {
         if (window.confirm('Czy na pewno chcesz usunąć ten wydatek?')) {
-            setExpenses(expenses.filter(exp => exp.id !== id));
+            try {
+                await deleteExpense(id);
+                showSnackbar('Wydatek został usunięty', 'success');
+                fetchExpenses(); // Refresh list
+            } catch (err) {
+                console.error('Error deleting expense:', err);
+                showSnackbar(err.message || 'Nie udało się usunąć wydatku', 'error');
+            }
         }
     };
 
@@ -196,13 +220,19 @@ const WydatkiSection = () => {
     };
 
     // Handle save category
-    const handleSaveCategory = () => {
-        const newCategory = {
-            id: Math.max(...categories.map(c => c.id), 0) + 1,
-            ...categoryForm,
-        };
-        setCategories([...categories, newCategory]);
-        setOpenCategoryDialog(false);
+    const handleSaveCategory = async () => {
+        try {
+            setSaving(true);
+            await createCategory(categoryForm);
+            showSnackbar('Kategoria została dodana', 'success');
+            setOpenCategoryDialog(false);
+            fetchCategories(); // Refresh list
+        } catch (err) {
+            console.error('Error saving category:', err);
+            showSnackbar(err.message || 'Nie udało się dodać kategorii', 'error');
+        } finally {
+            setSaving(false);
+        }
     };
 
     // Generate month options (last 12 months)
@@ -491,9 +521,9 @@ const WydatkiSection = () => {
                     <Button
                         onClick={handleSaveExpense}
                         variant="contained"
-                        disabled={!expenseForm.name || !expenseForm.categoryId || !expenseForm.amount}
+                        disabled={!expenseForm.name || !expenseForm.categoryId || !expenseForm.amount || saving}
                     >
-                        {editingExpense ? 'Zapisz' : 'Dodaj'}
+                        {saving ? <CircularProgress size={24} /> : (editingExpense ? 'Zapisz' : 'Dodaj')}
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -582,12 +612,24 @@ const WydatkiSection = () => {
                     <Button
                         onClick={handleSaveCategory}
                         variant="contained"
-                        disabled={!categoryForm.name}
+                        disabled={!categoryForm.name || saving}
                     >
-                        Dodaj
+                        {saving ? <CircularProgress size={24} /> : 'Dodaj'}
                     </Button>
                 </DialogActions>
             </Dialog>
+
+            {/* Snackbar for notifications */}
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={4000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 };
