@@ -212,7 +212,7 @@ const DashboardPage = () => {
 
                     {/* Title */}
                     <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, color: 'text.primary' }}>
-                        Dashboard
+                        {menuItems.find(item => item.id === selectedMenu)?.label || 'Dashboard'}
                     </Typography>
 
                     {/* User profile */}
