@@ -14,24 +14,30 @@ import {
     ListItemIcon,
     ListItemText,
     Container,
-    Grid,
-    Card,
-    CardContent,
     Avatar,
     useTheme,
     useMediaQuery,
-    Button,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import AssessmentIcon from '@mui/icons-material/Assessment';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import ReceiptIcon from '@mui/icons-material/Receipt';
+import TrackChangesIcon from '@mui/icons-material/TrackChanges';
+import BarChartIcon from '@mui/icons-material/BarChart';
 import { useNavigate } from 'react-router-dom';
 import { getUser, logout } from '../api/auth';
+
+// Import dashboard sections
+import PulpitSection from '../components/dashboard/PulpitSection';
+import WydatkiSection from '../components/dashboard/WydatkiSection';
+import BudzetSection from '../components/dashboard/BudzetSection';
+import RachunkiSection from '../components/dashboard/RachunkiSection';
+import CeleSection from '../components/dashboard/CeleSection';
+import AnalizySection from '../components/dashboard/AnalizySection';
+import UstawieniaSection from '../components/dashboard/UstawieniaSection';
 
 const drawerWidth = 260;
 
@@ -39,7 +45,7 @@ const DashboardPage = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const [mobileOpen, setMobileOpen] = useState(false);
-    const [selectedMenu, setSelectedMenu] = useState('dashboard');
+    const [selectedMenu, setSelectedMenu] = useState('pulpit');
     const [user, setUser] = useState(null);
     const navigate = useNavigate();
 
@@ -73,48 +79,36 @@ const DashboardPage = () => {
 
     // Menu items
     const menuItems = [
-        { id: 'dashboard', label: 'Dashboard', icon: <DashboardIcon /> },
-        { id: 'expenses', label: 'Wydatki', icon: <AccountBalanceWalletIcon /> },
-        { id: 'budget', label: 'Budżet', icon: <TrendingUpIcon /> },
-        { id: 'reports', label: 'Raporty', icon: <AssessmentIcon /> },
-        { id: 'settings', label: 'Ustawienia', icon: <SettingsIcon /> },
+        { id: 'pulpit', label: 'Pulpit', icon: <DashboardIcon /> },
+        { id: 'wydatki', label: 'Wydatki', icon: <AccountBalanceWalletIcon /> },
+        { id: 'budzet', label: 'Budżet', icon: <TrendingUpIcon /> },
+        { id: 'rachunki', label: 'Rachunki', icon: <ReceiptIcon /> },
+        { id: 'cele', label: 'Cele', icon: <TrackChangesIcon /> },
+        { id: 'analizy', label: 'Analizy', icon: <BarChartIcon /> },
+        { id: 'ustawienia', label: 'Ustawienia', icon: <SettingsIcon /> },
     ];
 
-    // Fake data - placeholder
-    const stats = [
-        {
-            title: 'Saldo',
-            value: '12,450 zł',
-            change: '+2.5%',
-            positive: true,
-            icon: <AttachMoneyIcon />,
-            color: '#00f0ff',
-        },
-        {
-            title: 'Wydatki (miesiąc)',
-            value: '3,280 zł',
-            change: '-15%',
-            positive: true,
-            icon: <AccountBalanceWalletIcon />,
-            color: '#ff6b9d',
-        },
-        {
-            title: 'Oszczędności',
-            value: '8,500 zł',
-            change: '+8%',
-            positive: true,
-            icon: <TrendingUpIcon />,
-            color: '#a8e6cf',
-        },
-        {
-            title: 'Cel budżetowy',
-            value: '68%',
-            change: 'Brak zmian',
-            positive: false,
-            icon: <AssessmentIcon />,
-            color: '#ffd93d',
-        },
-    ];
+    // Render content based on selected menu
+    const renderContent = () => {
+        switch (selectedMenu) {
+            case 'pulpit':
+                return <PulpitSection user={user} onNavigate={setSelectedMenu} />;
+            case 'wydatki':
+                return <WydatkiSection />;
+            case 'budzet':
+                return <BudzetSection />;
+            case 'rachunki':
+                return <RachunkiSection />;
+            case 'cele':
+                return <CeleSection />;
+            case 'analizy':
+                return <AnalizySection />;
+            case 'ustawienia':
+                return <UstawieniaSection />;
+            default:
+                return <PulpitSection user={user} onNavigate={setSelectedMenu} />;
+        }
+    };
 
     // Drawer content (sidebar)
     const drawer = (
@@ -218,7 +212,7 @@ const DashboardPage = () => {
 
                     {/* Title */}
                     <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, color: 'text.primary' }}>
-                        Dashboard
+                        {menuItems.find(item => item.id === selectedMenu)?.label || 'Dashboard'}
                     </Typography>
 
                     {/* User profile */}
@@ -297,100 +291,12 @@ const DashboardPage = () => {
                     p: 3,
                     width: { md: `calc(100% - ${drawerWidth}px)` },
                     mt: 8,
+                    maxWidth: '100%',
                 }}
             >
-                <Container maxWidth="xl">
-                    {/* Welcome message */}
-                    <Box sx={{ mb: 4 }}>
-                        <Typography variant="h4" sx={{ fontWeight: 600, mb: 1, color: 'text.primary' }}>
-                            Witaj, {user?.username || 'Użytkowniku'}! 👋
-                        </Typography>
-                        <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                            Oto Twoje podsumowanie finansowe
-                        </Typography>
-                    </Box>
-
-                    {/* Stats Cards */}
-                    <Grid container spacing={3} sx={{ mb: 4 }}>
-                        {stats.map((stat, index) => (
-                            <Grid item xs={12} sm={6} lg={3} key={index}>
-                                <Card
-                                    sx={{
-                                        height: '100%',
-                                        backgroundColor: 'background.paper',
-                                        border: '1px solid',
-                                        borderColor: 'divider',
-                                        transition: 'transform 0.2s, box-shadow 0.2s',
-                                        '&:hover': {
-                                            transform: 'translateY(-4px)',
-                                            boxShadow: `0 8px 20px ${stat.color}30`,
-                                        },
-                                    }}
-                                >
-                                    <CardContent>
-                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                                            <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>
-                                                {stat.title}
-                                            </Typography>
-                                            <Box
-                                                sx={{
-                                                    width: 40,
-                                                    height: 40,
-                                                    borderRadius: '50%',
-                                                    backgroundColor: `${stat.color}20`,
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    color: stat.color,
-                                                }}
-                                            >
-                                                {stat.icon}
-                                            </Box>
-                                        </Box>
-                                        <Typography variant="h4" sx={{ fontWeight: 700, mb: 1, color: 'text.primary' }}>
-                                            {stat.value}
-                                        </Typography>
-                                        <Typography
-                                            variant="body2"
-                                            sx={{
-                                                color: stat.positive ? '#4caf50' : 'text.secondary',
-                                                fontWeight: 500,
-                                            }}
-                                        >
-                                            {stat.change}
-                                        </Typography>
-                                    </CardContent>
-                                </Card>
-                            </Grid>
-                        ))}
-                    </Grid>
-
-                    {/* Placeholder content */}
-                    <Card
-                        sx={{
-                            backgroundColor: 'background.paper',
-                            border: '1px solid',
-                            borderColor: 'divider',
-                            p: 4,
-                            textAlign: 'center',
-                        }}
-                    >
-                        <Typography variant="h5" sx={{ mb: 2, color: 'text.primary' }}>
-                            🚧 Dashboard w budowie
-                        </Typography>
-                        <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3 }}>
-                            To jest przykładowy layout Dashboard. Backend developer może tutaj zintegrować
-                            rzeczywiste dane z API.
-                        </Typography>
-                        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
-                            <Button variant="outlined">Dodaj wydatek</Button>
-                            <Button variant="outlined">Zobacz raporty</Button>
-                            <Button variant="contained" onClick={() => navigate('/')}>
-                                Wróć na stronę główną
-                            </Button>
-                        </Box>
-                    </Card>
-                </Container>
+                <Box sx={{ width: '100%', maxWidth: '100%' }}>
+                    {renderContent()}
+                </Box>
             </Box>
         </Box>
     );
