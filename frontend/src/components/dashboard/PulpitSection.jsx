@@ -123,7 +123,7 @@ const PulpitSection = ({ user, onNavigate }) => {
     ];
 
     return (
-        <Box>
+        <Box sx={{ width: '100%' }}>
             {/* Welcome message */}
             <Box sx={{ mb: 4 }}>
                 <Typography variant="h4" sx={{ fontWeight: 600, mb: 1, color: 'text.primary' }}>
@@ -135,9 +135,18 @@ const PulpitSection = ({ user, onNavigate }) => {
             </Box>
 
             {/* Stats Cards */}
-            <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Box sx={{
+                display: 'flex',
+                gap: 2,
+                mb: 4,
+                width: '100%',
+                flexWrap: 'wrap'
+            }}>
                 {stats.map((stat, index) => (
-                    <Grid item xs={12} sm={6} lg={4} xl={2.4} key={index}>
+                    <Box key={index} sx={{
+                        flex: { xs: '1 1 100%', sm: '1 1 calc(50% - 8px)', md: '1 1 calc(33.333% - 11px)', lg: '1 1 calc(20% - 13px)' },
+                        minWidth: 0
+                    }}>
                         <Card
                             onClick={() => onNavigate(stat.navigateTo)}
                             sx={{
@@ -200,19 +209,25 @@ const PulpitSection = ({ user, onNavigate }) => {
                                 </Box>
                             </CardContent>
                         </Card>
-                    </Grid>
+                    </Box>
                 ))}
-            </Grid>
+            </Box>
 
             {/* Content Grid - Transactions and Chart */}
-            <Grid container spacing={3}>
+            <Box sx={{
+                display: 'flex',
+                gap: 2,
+                width: '100%',
+                flexDirection: { xs: 'column', md: 'row' }
+            }}>
                 {/* Recent Transactions */}
-                <Grid item xs={12} md={4}>
+                <Box sx={{ flex: '1 1 auto', minWidth: 0 }}>
                     <Card
                         sx={{
                             backgroundColor: 'background.paper',
                             border: '1px solid',
                             borderColor: 'divider',
+                            height: '100%',
                         }}
                     >
                         <CardContent>
@@ -273,30 +288,31 @@ const PulpitSection = ({ user, onNavigate }) => {
                             </List>
                         </CardContent>
                     </Card>
-                </Grid>
+                </Box>
 
                 {/* Expenses by Category Chart */}
-                <Grid item xs={12} md={8}>
+                <Box sx={{ flex: '0 0 65%', minWidth: 0 }}>
                     <Card
                         sx={{
                             backgroundColor: 'background.paper',
                             border: '1px solid',
                             borderColor: 'divider',
+                            height: '100%',
                         }}
                     >
-                        <CardContent>
+                        <CardContent sx={{ height: '100%' }}>
                             <Typography variant="h6" sx={{ mb: 3, color: 'text.primary', fontWeight: 600 }}>
                                 Wydatki według kategorii
                             </Typography>
-                            <Box sx={{ width: '100%', height: 400 }}>
+                            <Box sx={{ width: '100%', height: 450 }}>
                                 <ResponsiveContainer width="100%" height="100%">
                                     <PieChart>
                                         <Pie
                                             data={expensesByCategory}
                                             cx="50%"
-                                            cy="50%"
-                                            innerRadius={80}
-                                            outerRadius={140}
+                                            cy="48%"
+                                            innerRadius={95}
+                                            outerRadius={160}
                                             fill="#8884d8"
                                             paddingAngle={5}
                                             dataKey="value"
@@ -311,12 +327,20 @@ const PulpitSection = ({ user, onNavigate }) => {
                                                 backgroundColor: '#1a1a1a',
                                                 border: '1px solid #333',
                                                 borderRadius: '8px',
+                                                color: '#ffffff',
+                                            }}
+                                            itemStyle={{
+                                                color: '#ffffff',
+                                            }}
+                                            labelStyle={{
+                                                color: '#ffffff',
                                             }}
                                             formatter={(value) => `${value} zł`}
                                         />
                                         <Legend
                                             verticalAlign="bottom"
-                                            height={36}
+                                            height={50}
+                                            wrapperStyle={{ paddingTop: '20px' }}
                                             formatter={(value) => (
                                                 <span style={{ color: '#b0b0b0' }}>{value}</span>
                                             )}
@@ -326,8 +350,8 @@ const PulpitSection = ({ user, onNavigate }) => {
                             </Box>
                         </CardContent>
                     </Card>
-                </Grid>
-            </Grid>
+                </Box>
+            </Box>
         </Box>
     );
 };

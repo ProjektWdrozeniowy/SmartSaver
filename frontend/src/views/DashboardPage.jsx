@@ -291,11 +291,12 @@ const DashboardPage = () => {
                     p: 3,
                     width: { md: `calc(100% - ${drawerWidth}px)` },
                     mt: 8,
+                    maxWidth: '100%',
                 }}
             >
-                <Container maxWidth="xl">
+                <Box sx={{ width: '100%', maxWidth: '100%' }}>
                     {renderContent()}
-                </Container>
+                </Box>
             </Box>
         </Box>
     );
