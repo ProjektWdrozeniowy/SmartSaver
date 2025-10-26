@@ -8,7 +8,8 @@
 5. [Categories Endpoints](#categories-endpoints)
 6. [Goals Endpoints](#goals-endpoints)
 7. [Analysis Endpoints](#analysis-endpoints)
-8. [Struktury danych](#struktury-danych)
+8. [Budget Endpoints](#budget-endpoints)
+9. [Struktury danych](#struktury-danych)
 
 ---
 
@@ -873,6 +874,207 @@ Wykres wydatków według kategorii w sekcji Analizy wykorzystuje ten sam endpoin
 
 ---
 
+## Budget Endpoints
+
+### 1. GET /api/budget/income
+Pobiera listę przychodów użytkownika.
+
+**Query Parameters:**
+- `month` (optional) - Filtruj po miesiącu w formacie YYYY-MM
+
+**Request Headers:**
+```http
+Authorization: Bearer <token>
+```
+
+**Request Example:**
+```http
+GET /api/budget/income?month=2025-10
+```
+
+**Response Body:**
+```json
+{
+  "incomes": [
+    {
+      "id": 1,
+      "name": "Wynagrodzenie",
+      "amount": 5730.00,
+      "date": "2025-10-25",
+      "description": "Pensja za październik"
+    },
+    {
+      "id": 2,
+      "name": "Premia",
+      "amount": 1000.00,
+      "date": "2025-10-30",
+      "description": "Premia kwartalna"
+    }
+  ]
+}
+```
+
+**Uwagi:**
+- Lista przychodów powinna być posortowana według daty malejąco (najnowsze na początku)
+- `amount` jako liczba zmiennoprzecinkowa
+- `description` jest opcjonalne (może być null lub pusty string)
+
+---
+
+### 2. POST /api/budget/income
+Tworzy nowy przychód.
+
+**Request Headers:**
+```http
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "name": "Wynagrodzenie",
+  "amount": 5730.00,
+  "date": "2025-10-25",
+  "description": "Pensja za październik"
+}
+```
+
+**Validation:**
+- `name` - wymagane, string (max 100 znaków)
+- `amount` - wymagane, number (> 0)
+- `date` - wymagane, string (format YYYY-MM-DD)
+- `description` - opcjonalne, string (max 500 znaków)
+
+**Response Body (201 Created):**
+```json
+{
+  "message": "Przychód został dodany",
+  "income": {
+    "id": 3,
+    "name": "Wynagrodzenie",
+    "amount": 5730.00,
+    "date": "2025-10-25",
+    "description": "Pensja za październik",
+    "userId": 1,
+    "createdAt": "2025-10-25T10:00:00.000Z"
+  }
+}
+```
+
+**Error Response (400 Bad Request):**
+```json
+{
+  "message": "Nieprawidłowe dane: amount musi być większe od 0"
+}
+```
+
+---
+
+### 3. PUT /api/budget/income/:id
+Aktualizuje istniejący przychód.
+
+**Request Headers:**
+```http
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "name": "Wynagrodzenie - zaktualizowane",
+  "amount": 6000.00,
+  "date": "2025-10-25",
+  "description": "Pensja za październik + nadgodziny"
+}
+```
+
+**Response Body (200 OK):**
+```json
+{
+  "message": "Przychód został zaktualizowany",
+  "income": {
+    "id": 1,
+    "name": "Wynagrodzenie - zaktualizowane",
+    "amount": 6000.00,
+    "date": "2025-10-25",
+    "description": "Pensja za październik + nadgodziny",
+    "userId": 1,
+    "updatedAt": "2025-10-26T14:30:00.000Z"
+  }
+}
+```
+
+**Error Response (404 Not Found):**
+```json
+{
+  "message": "Przychód nie został znaleziony"
+}
+```
+
+---
+
+### 4. DELETE /api/budget/income/:id
+Usuwa przychód.
+
+**Request Headers:**
+```http
+Authorization: Bearer <token>
+```
+
+**Response Body (200 OK):**
+```json
+{
+  "message": "Przychód został usunięty"
+}
+```
+
+**Error Response (404 Not Found):**
+```json
+{
+  "message": "Przychód nie został znaleziony"
+}
+```
+
+---
+
+### 5. GET /api/budget/summary
+Pobiera podsumowanie budżetu (saldo, przychody, wydatki, oszczędności).
+
+**Query Parameters:**
+- `month` (optional) - Miesiąc w formacie YYYY-MM (domyślnie bieżący miesiąc)
+
+**Request Headers:**
+```http
+Authorization: Bearer <token>
+```
+
+**Request Example:**
+```http
+GET /api/budget/summary?month=2025-10
+```
+
+**Response Body:**
+```json
+{
+  "totalIncome": 6730.00,
+  "totalExpenses": 3280.00,
+  "balance": 12450.00,
+  "savings": 3450.00
+}
+```
+
+**Uwagi:**
+- `totalIncome` - suma wszystkich przychodów w wybranym miesiącu
+- `totalExpenses` - suma wszystkich wydatków w wybranym miesiącu
+- `balance` - całkowite saldo użytkownika (suma wszystkich przychodów - suma wszystkich wydatków od początku)
+- `savings` - oszczędności w danym miesiącu (totalIncome - totalExpenses dla wybranego miesiąca)
+- Wszystkie wartości jako liczby zmiennoprzecinkowe
+- Jeśli nie podano miesiąca, zwraca dane dla bieżącego miesiąca
+
+---
+
 ## Struktury danych
 
 ### User
@@ -924,6 +1126,20 @@ Wykres wydatków według kategorii w sekcji Analizy wykorzystuje ten sam endpoin
   "userId": 1,
   "createdAt": "2025-10-01T10:00:00.000Z",
   "updatedAt": "2025-10-23T14:30:00.000Z"
+}
+```
+
+### Income
+```json
+{
+  "id": 1,
+  "name": "Wynagrodzenie",
+  "amount": 5730.00,
+  "date": "2025-10-25",
+  "description": "Pensja za październik",
+  "userId": 1,
+  "createdAt": "2025-10-25T10:00:00.000Z",
+  "updatedAt": "2025-10-25T10:00:00.000Z"
 }
 ```
 
@@ -1009,6 +1225,21 @@ CREATE TABLE goal_contributions (
   amount REAL NOT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (goal_id) REFERENCES goals(id)
+);
+```
+
+**incomes**
+```sql
+CREATE TABLE incomes (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  name TEXT NOT NULL,
+  amount REAL NOT NULL,
+  date DATE NOT NULL,
+  description TEXT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id)
 );
 ```
 
