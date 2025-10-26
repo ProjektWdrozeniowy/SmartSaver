@@ -325,11 +325,18 @@ const PulpitSection = ({ user, onNavigate }) => {
                 {/* Expenses by Category Chart */}
                 <Box sx={{ flex: '0 0 65%', minWidth: 0 }}>
                     <Card
+                        onClick={() => expensesByCategory.length > 0 && onNavigate('analizy')}
                         sx={{
                             backgroundColor: 'background.paper',
                             border: '1px solid',
                             borderColor: 'divider',
                             height: '100%',
+                            cursor: expensesByCategory.length > 0 ? 'pointer' : 'default',
+                            transition: 'transform 0.2s, box-shadow 0.2s',
+                            '&:hover': expensesByCategory.length > 0 ? {
+                                transform: 'translateY(-4px)',
+                                boxShadow: '0 8px 24px rgba(0, 240, 255, 0.2)',
+                            } : {},
                         }}
                     >
                         <CardContent sx={{ height: '100%' }}>

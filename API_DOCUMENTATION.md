@@ -7,7 +7,8 @@
 4. [Expenses Endpoints](#expenses-endpoints)
 5. [Categories Endpoints](#categories-endpoints)
 6. [Goals Endpoints](#goals-endpoints)
-7. [Struktury danych](#struktury-danych)
+7. [Analysis Endpoints](#analysis-endpoints)
+8. [Struktury danych](#struktury-danych)
 
 ---
 
@@ -696,6 +697,179 @@ Content-Type: application/json
   "message": "Cel nie został znaleziony"
 }
 ```
+
+---
+
+## Analysis Endpoints
+
+### 1. GET /api/analysis/statistics
+Pobiera statystyki analizy dla wybranego okresu (średnie wydatki, przychody, oszczędności, stopa oszczędności).
+
+**Query Parameters:**
+- `period` (optional) - Okres analizy: `last3months`, `last6months`, `last12months`, `thisyear` (default: `last6months`)
+
+**Request Headers:**
+```http
+Authorization: Bearer <token>
+```
+
+**Request Example:**
+```http
+GET /api/analysis/statistics?period=last6months
+```
+
+**Response Body:**
+```json
+{
+  "averageExpenses": 3400.00,
+  "averageIncome": 5233.00,
+  "averageSavings": 1917.00,
+  "savingsRate": 36.0,
+  "expensesChange": -8.0,
+  "incomeChange": 9.0,
+  "savingsChange": 12.0,
+  "savingsRateChange": 5.0
+}
+```
+
+**Uwagi:**
+- `averageExpenses` - średnia wydatków w wybranym okresie
+- `averageIncome` - średnia przychodów w wybranym okresie
+- `averageSavings` - średnia oszczędności w wybranym okresie
+- `savingsRate` - stopa oszczędności w % (savings/income * 100)
+- `*Change` - zmiana procentowa w stosunku do poprzedniego okresu (może być ujemna lub dodatnia)
+
+---
+
+### 2. GET /api/analysis/savings-growth
+Pobiera dane dla wykresu wzrostu oszczędności w czasie.
+
+**Query Parameters:**
+- `period` (optional) - Okres analizy: `last3months`, `last6months`, `last12months`, `thisyear` (default: `last6months`)
+
+**Request Headers:**
+```http
+Authorization: Bearer <token>
+```
+
+**Request Example:**
+```http
+GET /api/analysis/savings-growth?period=last6months
+```
+
+**Response Body:**
+```json
+{
+  "data": [
+    { "month": "Sty", "savings": 7500.00 },
+    { "month": "Lut", "savings": 10200.00 },
+    { "month": "Mar", "savings": 12800.00 },
+    { "month": "Kwi", "savings": 14500.00 },
+    { "month": "Maj", "savings": 15800.00 },
+    { "month": "Cze", "savings": 18000.00 }
+  ]
+}
+```
+
+**Uwagi:**
+- `month` - skrócona nazwa miesiąca (3 znaki: Sty, Lut, Mar, etc.)
+- `savings` - skumulowana wartość oszczędności do danego miesiąca
+- Dane powinny być posortowane chronologicznie
+- Liczba elementów zależy od wybranego okresu (3, 6, 12 miesięcy)
+
+---
+
+### 3. GET /api/analysis/income-vs-expenses
+Pobiera dane dla wykresu porównania przychodów, wydatków i oszczędności w czasie.
+
+**Query Parameters:**
+- `period` (optional) - Okres analizy: `last3months`, `last6months`, `last12months`, `thisyear` (default: `last6months`)
+
+**Request Headers:**
+```http
+Authorization: Bearer <token>
+```
+
+**Request Example:**
+```http
+GET /api/analysis/income-vs-expenses?period=last6months
+```
+
+**Response Body:**
+```json
+{
+  "data": [
+    { "month": "Sty", "income": 5200.00, "expenses": 3100.00, "savings": 1500.00 },
+    { "month": "Lut", "income": 5300.00, "expenses": 3600.00, "savings": 1300.00 },
+    { "month": "Mar", "income": 5100.00, "expenses": 2900.00, "savings": 1600.00 },
+    { "month": "Kwi", "income": 5800.00, "expenses": 3500.00, "savings": 1200.00 },
+    { "month": "Maj", "income": 5600.00, "expenses": 3200.00, "savings": 1300.00 },
+    { "month": "Cze", "income": 5900.00, "expenses": 3000.00, "savings": 2000.00 }
+  ]
+}
+```
+
+**Uwagi:**
+- `month` - skrócona nazwa miesiąca (3 znaki)
+- `income` - suma przychodów w danym miesiącu
+- `expenses` - suma wydatków w danym miesiącu
+- `savings` - różnica między przychodami a wydatkami (income - expenses)
+- Dane powinny być posortowane chronologicznie
+- Wszystkie wartości jako liczby zmiennoprzecinkowe
+
+---
+
+### 4. GET /api/analysis/weekly-expenses
+Pobiera dane dla wykresu wydatków tygodniowych (dni tygodnia).
+
+**Query Parameters:**
+- `weeks` (optional) - Liczba ostatnich tygodni do analizy (default: 8)
+
+**Request Headers:**
+```http
+Authorization: Bearer <token>
+```
+
+**Request Example:**
+```http
+GET /api/analysis/weekly-expenses?weeks=8
+```
+
+**Response Body:**
+```json
+{
+  "data": [
+    { "week": "Pon", "amount": 120.00 },
+    { "week": "Wt", "amount": 85.00 },
+    { "week": "Śr", "amount": 140.00 },
+    { "week": "Czw", "amount": 95.00 },
+    { "week": "Pt", "amount": 190.00 },
+    { "week": "Sob", "amount": 180.00 },
+    { "week": "Ndz", "amount": 135.00 }
+  ],
+  "dailyAverage": 139.29
+}
+```
+
+**Uwagi:**
+- `week` - nazwa dnia tygodnia (Pon, Wt, Śr, Czw, Pt, Sob, Ndz)
+- `amount` - średnia wydatków dla danego dnia tygodnia z ostatnich X tygodni
+- `dailyAverage` - średnia dzienna wydatków ze wszystkich dni
+- Obliczenie: dla każdego dnia tygodnia zsumować wydatki z ostatnich X wystąpień tego dnia i podzielić przez X
+- Przykład: jeśli `weeks=8`, to dla poniedziałków zsumować wydatki z ostatnich 8 poniedziałków i podzielić przez 8
+
+---
+
+### 5. GET /api/dashboard/expenses-by-category (ponownie wykorzystany)
+Wykres wydatków według kategorii w sekcji Analizy wykorzystuje ten sam endpoint co na dashboardzie.
+
+**Endpoint szczegółowo opisany w:** [Dashboard Endpoints](#3-get-apidashboardexpenses-by-category)
+
+**Uwagi dla sekcji Analizy:**
+- Używa tego samego endpointu bez parametru `month`
+- Zwraca wydatki według kategorii dla bieżącego miesiąca
+- Frontend korzysta z `getExpensesByCategory()` z `api/dashboard.js`
+- Wykres w sekcji Analizy ma identyczny format (donut chart) jak na pulpicie
 
 ---
 
