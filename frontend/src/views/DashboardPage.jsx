@@ -88,6 +88,17 @@ const DashboardPage = () => {
         { id: 'ustawienia', label: 'Ustawienia', icon: <SettingsIcon /> },
     ];
 
+    // Titles for AppBar (can be different from menu labels)
+    const sectionTitles = {
+        pulpit: 'Pulpit',
+        wydatki: 'Wydatki',
+        budzet: 'Budżet',
+        rachunki: 'Rachunki',
+        cele: 'Cele oszczędnościowe',
+        analizy: 'Analizy',
+        ustawienia: 'Ustawienia',
+    };
+
     // Render content based on selected menu
     const renderContent = () => {
         switch (selectedMenu) {
@@ -212,7 +223,7 @@ const DashboardPage = () => {
 
                     {/* Title */}
                     <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, color: 'text.primary' }}>
-                        {menuItems.find(item => item.id === selectedMenu)?.label || 'Dashboard'}
+                        {sectionTitles[selectedMenu] || 'Dashboard'}
                     </Typography>
 
                     {/* User profile */}

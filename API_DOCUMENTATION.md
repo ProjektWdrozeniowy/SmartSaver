@@ -6,7 +6,8 @@
 3. [Dashboard Endpoints](#dashboard-endpoints)
 4. [Expenses Endpoints](#expenses-endpoints)
 5. [Categories Endpoints](#categories-endpoints)
-6. [Struktury danych](#struktury-danych)
+6. [Goals Endpoints](#goals-endpoints)
+7. [Struktury danych](#struktury-danych)
 
 ---
 
@@ -449,6 +450,255 @@ Authorization: Bearer <token>
 
 ---
 
+## Goals Endpoints
+
+### 1. GET /api/goals
+Pobiera listę wszystkich celów oszczędnościowych użytkownika.
+
+**Request Headers:**
+```http
+Authorization: Bearer <token>
+```
+
+**Response Body:**
+```json
+{
+  "goals": [
+    {
+      "id": 1,
+      "name": "Wakacje 2026",
+      "targetAmount": 5000.00,
+      "currentAmount": 3500.00,
+      "dueDate": "2026-06-30",
+      "description": "Wyjazd do Grecji",
+      "userId": 1,
+      "createdAt": "2025-10-01T10:00:00.000Z",
+      "updatedAt": "2025-10-23T14:30:00.000Z"
+    },
+    {
+      "id": 2,
+      "name": "Nowy laptop",
+      "targetAmount": 4000.00,
+      "currentAmount": 2100.00,
+      "dueDate": "2025-12-31",
+      "description": "MacBook Pro",
+      "userId": 1,
+      "createdAt": "2025-09-15T12:00:00.000Z",
+      "updatedAt": "2025-10-20T10:15:00.000Z"
+    }
+  ]
+}
+```
+
+**Uwagi:**
+- Lista powinna zawierać wszystkie cele użytkownika (aktywne i ukończone)
+- `dueDate` w formacie YYYY-MM-DD
+- Kwoty jako liczby zmiennoprzecinkowe
+
+---
+
+### 2. POST /api/goals
+Tworzy nowy cel oszczędnościowy.
+
+**Request Headers:**
+```http
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "name": "Fundusz awaryjny",
+  "targetAmount": 10000.00,
+  "currentAmount": 0.00,
+  "dueDate": "2026-12-31",
+  "description": "6-miesięczny fundusz awaryjny"
+}
+```
+
+**Validation:**
+- `name` - wymagane, string (max 100 znaków)
+- `targetAmount` - wymagane, number (> 0)
+- `currentAmount` - wymagane, number (>= 0, domyślnie 0)
+- `dueDate` - wymagane, string (format YYYY-MM-DD, musi być w przyszłości)
+- `description` - opcjonalne, string (max 500 znaków)
+
+**Response Body (201 Created):**
+```json
+{
+  "message": "Cel został dodany",
+  "goal": {
+    "id": 3,
+    "name": "Fundusz awaryjny",
+    "targetAmount": 10000.00,
+    "currentAmount": 0.00,
+    "dueDate": "2026-12-31",
+    "description": "6-miesięczny fundusz awaryjny",
+    "userId": 1,
+    "createdAt": "2025-10-24T15:00:00.000Z",
+    "updatedAt": "2025-10-24T15:00:00.000Z"
+  }
+}
+```
+
+**Error Response (400 Bad Request):**
+```json
+{
+  "message": "Nieprawidłowe dane: targetAmount musi być większe od 0"
+}
+```
+
+---
+
+### 3. PUT /api/goals/:id
+Aktualizuje istniejący cel oszczędnościowy.
+
+**Request Headers:**
+```http
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "name": "Wakacje 2026 - zaktualizowane",
+  "targetAmount": 6000.00,
+  "currentAmount": 3500.00,
+  "dueDate": "2026-07-15",
+  "description": "Wyjazd do Grecji - 2 tygodnie"
+}
+```
+
+**Validation:**
+- Wszystkie pola są wymagane (jak w POST)
+- `currentAmount` nie może być większe niż `targetAmount`
+- Użytkownik musi być właścicielem celu
+
+**Response Body (200 OK):**
+```json
+{
+  "message": "Cel został zaktualizowany",
+  "goal": {
+    "id": 1,
+    "name": "Wakacje 2026 - zaktualizowane",
+    "targetAmount": 6000.00,
+    "currentAmount": 3500.00,
+    "dueDate": "2026-07-15",
+    "description": "Wyjazd do Grecji - 2 tygodnie",
+    "userId": 1,
+    "updatedAt": "2025-10-24T16:00:00.000Z"
+  }
+}
+```
+
+**Error Response (404 Not Found):**
+```json
+{
+  "message": "Cel nie został znaleziony"
+}
+```
+
+**Error Response (403 Forbidden):**
+```json
+{
+  "message": "Brak uprawnień do edycji tego celu"
+}
+```
+
+---
+
+### 4. DELETE /api/goals/:id
+Usuwa cel oszczędnościowy.
+
+**Request Headers:**
+```http
+Authorization: Bearer <token>
+```
+
+**Response Body (200 OK):**
+```json
+{
+  "message": "Cel został usunięty"
+}
+```
+
+**Error Response (404 Not Found):**
+```json
+{
+  "message": "Cel nie został znaleziony"
+}
+```
+
+**Error Response (403 Forbidden):**
+```json
+{
+  "message": "Brak uprawnień do usunięcia tego celu"
+}
+```
+
+---
+
+### 5. POST /api/goals/:id/contribute
+Dodaje wpłatę do celu oszczędnościowego.
+
+**Request Headers:**
+```http
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "amount": 500.00
+}
+```
+
+**Validation:**
+- `amount` - wymagane, number (> 0)
+- Użytkownik musi być właścicielem celu
+- Po wpłacie `currentAmount` nie może przekroczyć `targetAmount` (opcjonalnie można pozwolić)
+
+**Response Body (200 OK):**
+```json
+{
+  "message": "Wpłata została dodana",
+  "goal": {
+    "id": 1,
+    "name": "Wakacje 2026",
+    "targetAmount": 5000.00,
+    "currentAmount": 4000.00,
+    "dueDate": "2026-06-30",
+    "description": "Wyjazd do Grecji",
+    "userId": 1,
+    "updatedAt": "2025-10-24T17:00:00.000Z"
+  }
+}
+```
+
+**Uwagi:**
+- Ten endpoint zwiększa wartość `currentAmount` o podaną kwotę
+- Możesz opcjonalnie prowadzić historię wpłat w osobnej tabeli (zalecane)
+- Frontend wysyła tylko kwotę wpłaty, backend dodaje ją do `currentAmount`
+
+**Error Response (400 Bad Request):**
+```json
+{
+  "message": "Kwota wpłaty musi być większa od 0"
+}
+```
+
+**Error Response (404 Not Found):**
+```json
+{
+  "message": "Cel nie został znaleziony"
+}
+```
+
+---
+
 ## Struktury danych
 
 ### User
@@ -485,6 +735,21 @@ Authorization: Bearer <token>
   "icon": "🍕",
   "userId": 1,
   "createdAt": "2025-01-15T10:00:00.000Z"
+}
+```
+
+### Goal
+```json
+{
+  "id": 1,
+  "name": "Wakacje 2026",
+  "targetAmount": 5000.00,
+  "currentAmount": 3500.00,
+  "dueDate": "2026-06-30",
+  "description": "Wyjazd do Grecji",
+  "userId": 1,
+  "createdAt": "2025-10-01T10:00:00.000Z",
+  "updatedAt": "2025-10-23T14:30:00.000Z"
 }
 ```
 
@@ -543,6 +808,33 @@ CREATE TABLE expenses (
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id),
   FOREIGN KEY (category_id) REFERENCES categories(id)
+);
+```
+
+**goals**
+```sql
+CREATE TABLE goals (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  name TEXT NOT NULL,
+  target_amount REAL NOT NULL,
+  current_amount REAL NOT NULL DEFAULT 0,
+  due_date DATE NOT NULL,
+  description TEXT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+```
+
+**goal_contributions** (opcjonalna tabela dla historii wpłat)
+```sql
+CREATE TABLE goal_contributions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  goal_id INTEGER NOT NULL,
+  amount REAL NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (goal_id) REFERENCES goals(id)
 );
 ```
 
