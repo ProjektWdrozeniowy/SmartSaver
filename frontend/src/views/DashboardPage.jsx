@@ -95,7 +95,7 @@ const DashboardPage = () => {
         budzet: 'Budżet',
         rachunki: 'Rachunki',
         cele: 'Cele oszczędnościowe',
-        analizy: 'Analizy',
+        analizy: 'Analizy i statystyki',
         ustawienia: 'Ustawienia',
     };
 
