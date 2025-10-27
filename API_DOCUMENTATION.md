@@ -9,7 +9,8 @@
 6. [Goals Endpoints](#goals-endpoints)
 7. [Analysis Endpoints](#analysis-endpoints)
 8. [Budget Endpoints](#budget-endpoints)
-9. [Struktury danych](#struktury-danych)
+9. [Settings/User Endpoints](#settingsuser-endpoints)
+10. [Struktury danych](#struktury-danych)
 
 ---
 
@@ -1251,6 +1252,230 @@ Przy rejestracji użytkownika, można automatycznie utworzyć podstawowe kategor
 - Rozrywka (#a8e6cf, 🎬)
 - Rachunki (#ffd93d, ⚡)
 - Zakupy (#c77dff, 🛒)
+
+---
+
+## Settings/User Endpoints
+
+### 1. GET /api/user/profile
+Pobiera dane profilu użytkownika.
+
+**Request Headers:**
+```http
+Authorization: Bearer <token>
+```
+
+**Response Body:**
+```json
+{
+  "id": 1,
+  "username": "Jan Kowalski",
+  "email": "jan.kowalski@example.com",
+  "createdAt": "2025-01-15T10:00:00.000Z"
+}
+```
+
+---
+
+### 2. PUT /api/user/profile
+Aktualizuje dane profilu użytkownika.
+
+**Request Headers:**
+```http
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "username": "Jan Kowalski",
+  "email": "jan.kowalski@example.com"
+}
+```
+
+**Validation:**
+- `username` - wymagane, string (max 100 znaków)
+- `email` - wymagane, string (format email, unikalny)
+
+**Response Body (200 OK):**
+```json
+{
+  "message": "Profil został zaktualizowany",
+  "user": {
+    "id": 1,
+    "username": "Jan Kowalski",
+    "email": "jan.kowalski@example.com",
+    "updatedAt": "2025-10-27T14:30:00.000Z"
+  }
+}
+```
+
+**Error Response (400 Bad Request):**
+```json
+{
+  "message": "Email jest już używany przez inne konto"
+}
+```
+
+---
+
+### 3. PUT /api/user/change-password
+Zmienia hasło użytkownika.
+
+**Request Headers:**
+```http
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "currentPassword": "stare_haslo",
+  "newPassword": "nowe_haslo"
+}
+```
+
+**Validation:**
+- `currentPassword` - wymagane, string
+- `newPassword` - wymagane, string (min 6 znaków)
+
+**Response Body (200 OK):**
+```json
+{
+  "message": "Hasło zostało zmienione"
+}
+```
+
+**Error Response (400 Bad Request):**
+```json
+{
+  "message": "Aktualne hasło jest nieprawidłowe"
+}
+```
+
+---
+
+### 4. GET /api/user/notifications
+Pobiera ustawienia powiadomień użytkownika.
+
+**Request Headers:**
+```http
+Authorization: Bearer <token>
+```
+
+**Response Body:**
+```json
+{
+  "budgetAlerts": true,
+  "goalReminders": false
+}
+```
+
+**Uwagi:**
+- `budgetAlerts` - powiadomienia o przekroczeniu budżetu
+- `goalReminders` - powiadomienia o postępach w celach
+
+---
+
+### 5. PUT /api/user/notifications
+Aktualizuje ustawienia powiadomień użytkownika.
+
+**Request Headers:**
+```http
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "budgetAlerts": true,
+  "goalReminders": true
+}
+```
+
+**Response Body (200 OK):**
+```json
+{
+  "message": "Ustawienia powiadomień zaktualizowane",
+  "settings": {
+    "budgetAlerts": true,
+    "goalReminders": true
+  }
+}
+```
+
+---
+
+### 6. GET /api/user/export
+Eksportuje wszystkie dane użytkownika w formacie JSON.
+
+**Request Headers:**
+```http
+Authorization: Bearer <token>
+```
+
+**Response Body:**
+```json
+{
+  "user": {
+    "id": 1,
+    "username": "Jan Kowalski",
+    "email": "jan.kowalski@example.com",
+    "createdAt": "2025-01-15T10:00:00.000Z"
+  },
+  "expenses": [...],
+  "incomes": [...],
+  "categories": [...],
+  "goals": [...]
+}
+```
+
+**Uwagi:**
+- Zwraca kompletny eksport wszystkich danych użytkownika
+- Format JSON umożliwia łatwe archiwizowanie i przenoszenie danych
+
+---
+
+### 7. DELETE /api/user/delete
+Usuwa konto użytkownika i wszystkie powiązane dane.
+
+**Request Headers:**
+```http
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "password": "haslo_uzytkownika"
+}
+```
+
+**Validation:**
+- `password` - wymagane, string (hasło użytkownika dla potwierdzenia)
+
+**Response Body (200 OK):**
+```json
+{
+  "message": "Konto zostało usunięte"
+}
+```
+
+**Error Response (400 Bad Request):**
+```json
+{
+  "message": "Nieprawidłowe hasło"
+}
+```
+
+**Uwagi:**
+- Usuwa użytkownika i wszystkie powiązane dane (wydatki, przychody, kategorie, cele)
+- Operacja jest nieodwracalna
+- Wymaga potwierdzenia hasłem
 
 ---
 
