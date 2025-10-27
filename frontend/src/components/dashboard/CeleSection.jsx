@@ -229,9 +229,18 @@ const CeleSection = () => {
                     startIcon={<AddIcon />}
                     onClick={handleAddGoal}
                     sx={{
-                        background: 'linear-gradient(135deg, #c77dff 0%, #9d4edd 100%)',
+                        background: 'linear-gradient(135deg, rgba(199, 125, 255, 0.3), rgba(199, 125, 255, 0.2))',
+                        backdropFilter: 'blur(8px)',
+                        WebkitBackdropFilter: 'blur(8px)',
+                        border: '1px solid rgba(199, 125, 255, 0.5)',
+                        color: '#ffffff',
+                        boxShadow: '0 4px 12px rgba(199, 125, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        textShadow: '0 0 10px rgba(199, 125, 255, 0.5)',
                         '&:hover': {
-                            background: 'linear-gradient(135deg, #9d4edd 0%, #7b2cbf 100%)',
+                            background: 'linear-gradient(135deg, rgba(199, 125, 255, 0.4), rgba(199, 125, 255, 0.3))',
+                            boxShadow: '0 6px 16px rgba(199, 125, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+                            transform: 'translateY(-2px)',
                         },
                     }}
                 >
@@ -254,33 +263,49 @@ const CeleSection = () => {
                 }}>
                     <Card
                         sx={{
-                            backgroundColor: 'background.paper',
-                            border: '1px solid',
-                            borderColor: 'divider',
+                            background: 'linear-gradient(135deg, rgba(199, 125, 255, 0.08), rgba(199, 125, 255, 0.02))',
+                            backdropFilter: 'blur(10px)',
+                            WebkitBackdropFilter: 'blur(10px)',
+                            border: '1px solid rgba(199, 125, 255, 0.3)',
+                            boxShadow: '0 4px 12px rgba(199, 125, 255, 0.15), inset 0 1px 0 rgba(199, 125, 255, 0.2)',
                             height: '100%',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            '&:hover': {
+                                transform: 'translateY(-5px)',
+                                boxShadow: '0 12px 28px rgba(199, 125, 255, 0.25), inset 0 1px 0 rgba(199, 125, 255, 0.3)',
+                                borderColor: 'rgba(199, 125, 255, 0.4)',
+                            },
                         }}
                     >
                         <CardContent>
-                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                                <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                                    Wszystkie cele
+                                </Typography>
                                 <Box
                                     sx={{
-                                        width: 48,
-                                        height: 48,
+                                        width: 40,
+                                        height: 40,
                                         borderRadius: '50%',
-                                        backgroundColor: 'rgba(199, 125, 255, 0.2)',
+                                        backgroundColor: '#c77dff20',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        mr: 2,
+                                        color: '#c77dff',
                                     }}
                                 >
-                                    <TrackChangesIcon sx={{ color: '#c77dff', fontSize: 24 }} />
+                                    <TrackChangesIcon />
                                 </Box>
-                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                    Wszystkie cele
-                                </Typography>
                             </Box>
-                            <Typography variant="h3" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                            <Typography
+                                variant="h4"
+                                sx={{
+                                    fontWeight: 700,
+                                    mb: 1,
+                                    color: 'text.primary',
+                                    textShadow: '0 0 20px #c77dff60, 0 0 40px #c77dff40'
+                                }}
+                            >
                                 {statistics.totalGoals}
                             </Typography>
                             <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1 }}>
@@ -297,34 +322,50 @@ const CeleSection = () => {
                 }}>
                     <Card
                         sx={{
-                            backgroundColor: 'background.paper',
-                            border: '1px solid',
-                            borderColor: 'divider',
+                            background: 'linear-gradient(135deg, rgba(0, 240, 255, 0.08), rgba(0, 240, 255, 0.02))',
+                            backdropFilter: 'blur(10px)',
+                            WebkitBackdropFilter: 'blur(10px)',
+                            border: '1px solid rgba(0, 240, 255, 0.3)',
+                            boxShadow: '0 4px 12px rgba(0, 240, 255, 0.15), inset 0 1px 0 rgba(0, 240, 255, 0.2)',
                             height: '100%',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            '&:hover': {
+                                transform: 'translateY(-5px)',
+                                boxShadow: '0 12px 28px rgba(0, 240, 255, 0.25), inset 0 1px 0 rgba(0, 240, 255, 0.3)',
+                                borderColor: 'rgba(0, 240, 255, 0.4)',
+                            },
                         }}
                     >
                         <CardContent>
-                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                                <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                                    Zaoszczędzone
+                                </Typography>
                                 <Box
                                     sx={{
-                                        width: 48,
-                                        height: 48,
+                                        width: 40,
+                                        height: 40,
                                         borderRadius: '50%',
-                                        backgroundColor: 'rgba(0, 240, 255, 0.2)',
+                                        backgroundColor: '#00f0ff20',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        mr: 2,
+                                        color: '#00f0ff',
                                     }}
                                 >
-                                    <SavingsIcon sx={{ color: '#00f0ff', fontSize: 24 }} />
+                                    <SavingsIcon />
                                 </Box>
-                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                    Zaoszczędzone
-                                </Typography>
                             </Box>
-                            <Typography variant="h3" sx={{ fontWeight: 700, color: '#00f0ff' }}>
-                                {statistics.totalSaved.toFixed(2)} zł
+                            <Typography
+                                variant="h4"
+                                sx={{
+                                    fontWeight: 700,
+                                    mb: 1,
+                                    color: 'text.primary',
+                                    textShadow: '0 0 20px #00f0ff60, 0 0 40px #00f0ff40'
+                                }}
+                            >
+                                {statistics.totalSaved.toFixed(0)} zł
                             </Typography>
                             <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1 }}>
                                 {statistics.percentageComplete.toFixed(0)}% całkowitego celu
@@ -340,34 +381,50 @@ const CeleSection = () => {
                 }}>
                     <Card
                         sx={{
-                            backgroundColor: 'background.paper',
-                            border: '1px solid',
-                            borderColor: 'divider',
+                            background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.08), rgba(255, 215, 0, 0.02))',
+                            backdropFilter: 'blur(10px)',
+                            WebkitBackdropFilter: 'blur(10px)',
+                            border: '1px solid rgba(255, 215, 0, 0.3)',
+                            boxShadow: '0 4px 12px rgba(255, 215, 0, 0.15), inset 0 1px 0 rgba(255, 215, 0, 0.2)',
                             height: '100%',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            '&:hover': {
+                                transform: 'translateY(-5px)',
+                                boxShadow: '0 12px 28px rgba(255, 215, 0, 0.25), inset 0 1px 0 rgba(255, 215, 0, 0.3)',
+                                borderColor: 'rgba(255, 215, 0, 0.4)',
+                            },
                         }}
                     >
                         <CardContent>
-                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                                <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                                    Do zebrania
+                                </Typography>
                                 <Box
                                     sx={{
-                                        width: 48,
-                                        height: 48,
+                                        width: 40,
+                                        height: 40,
                                         borderRadius: '50%',
-                                        backgroundColor: 'rgba(255, 215, 0, 0.2)',
+                                        backgroundColor: '#ffd70020',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        mr: 2,
+                                        color: '#ffd700',
                                     }}
                                 >
-                                    <TrendingUpIcon sx={{ color: '#ffd700', fontSize: 24 }} />
+                                    <TrendingUpIcon />
                                 </Box>
-                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                    Do zebrania
-                                </Typography>
                             </Box>
-                            <Typography variant="h3" sx={{ fontWeight: 700, color: '#ffd700' }}>
-                                {statistics.remaining.toFixed(2)} zł
+                            <Typography
+                                variant="h4"
+                                sx={{
+                                    fontWeight: 700,
+                                    mb: 1,
+                                    color: 'text.primary',
+                                    textShadow: '0 0 20px #ffd70060, 0 0 40px #ffd70040'
+                                }}
+                            >
+                                {statistics.remaining.toFixed(0)} zł
                             </Typography>
                             <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1 }}>
                                 Pozostało do osiągnięcia
@@ -385,9 +442,12 @@ const CeleSection = () => {
             ) : goals.length === 0 ? (
                 <Card
                     sx={{
-                        backgroundColor: 'background.paper',
+                        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                        backdropFilter: 'blur(10px)',
+                        WebkitBackdropFilter: 'blur(10px)',
                         border: '1px solid',
-                        borderColor: 'divider',
+                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                         p: 4,
                         textAlign: 'center',
                     }}
@@ -449,18 +509,26 @@ const CeleSection = () => {
                             >
                                 <Card
                                     sx={{
-                                        backgroundColor: isCompleted
-                                            ? 'rgba(76, 175, 80, 0.1)'
-                                            : 'background.paper',
+                                        background: isCompleted
+                                            ? 'linear-gradient(135deg, rgba(76, 175, 80, 0.15), rgba(76, 175, 80, 0.05))'
+                                            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                                        backdropFilter: 'blur(10px)',
+                                        WebkitBackdropFilter: 'blur(10px)',
                                         border: '1px solid',
-                                        borderColor: isCompleted ? 'rgba(76, 175, 80, 0.5)' : 'divider',
+                                        borderColor: isCompleted ? 'rgba(76, 175, 80, 0.4)' : 'rgba(255, 255, 255, 0.1)',
+                                        boxShadow: isCompleted
+                                            ? '0 4px 12px rgba(76, 175, 80, 0.2), inset 0 1px 0 rgba(76, 175, 80, 0.2)'
+                                            : '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                                         height: '100%',
                                         display: 'flex',
                                         flexDirection: 'column',
-                                        transition: 'transform 0.2s, box-shadow 0.2s',
+                                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                         '&:hover': {
-                                            transform: 'translateY(-4px)',
-                                            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)',
+                                            transform: 'translateY(-5px)',
+                                            boxShadow: isCompleted
+                                                ? '0 12px 28px rgba(76, 175, 80, 0.3), inset 0 1px 0 rgba(76, 175, 80, 0.3)'
+                                                : '0 8px 20px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+                                            borderColor: isCompleted ? 'rgba(76, 175, 80, 0.5)' : 'rgba(255, 255, 255, 0.15)',
                                         },
                                     }}
                                 >
@@ -571,12 +639,19 @@ const CeleSection = () => {
                                                 disabled={isCompleted}
                                                 fullWidth
                                                 sx={{
-                                                    background: 'linear-gradient(135deg, #c77dff 0%, #9d4edd 100%)',
+                                                    background: 'linear-gradient(135deg, rgba(199, 125, 255, 0.3), rgba(199, 125, 255, 0.2))',
+                                                    backdropFilter: 'blur(8px)',
+                                                    WebkitBackdropFilter: 'blur(8px)',
+                                                    border: '1px solid rgba(199, 125, 255, 0.5)',
+                                                    color: '#ffffff',
+                                                    boxShadow: '0 2px 8px rgba(199, 125, 255, 0.3)',
                                                     '&:hover': {
-                                                        background: 'linear-gradient(135deg, #9d4edd 0%, #7b2cbf 100%)',
+                                                        background: 'linear-gradient(135deg, rgba(199, 125, 255, 0.4), rgba(199, 125, 255, 0.3))',
+                                                        boxShadow: '0 4px 12px rgba(199, 125, 255, 0.4)',
                                                     },
                                                     '&:disabled': {
                                                         background: 'rgba(255, 255, 255, 0.12)',
+                                                        border: '1px solid rgba(255, 255, 255, 0.1)',
                                                     },
                                                 }}
                                             >
@@ -586,9 +661,16 @@ const CeleSection = () => {
                                                 size="small"
                                                 onClick={() => handleEditGoal(goal)}
                                                 sx={{
-                                                    border: '1px solid',
-                                                    borderColor: 'divider',
-                                                    color: 'primary.main',
+                                                    background: 'rgba(0, 240, 255, 0.1)',
+                                                    backdropFilter: 'blur(8px)',
+                                                    WebkitBackdropFilter: 'blur(8px)',
+                                                    border: '1px solid rgba(0, 240, 255, 0.3)',
+                                                    color: '#00f0ff',
+                                                    transition: 'all 0.3s',
+                                                    '&:hover': {
+                                                        background: 'rgba(0, 240, 255, 0.2)',
+                                                        boxShadow: '0 4px 12px rgba(0, 240, 255, 0.3)',
+                                                    },
                                                 }}
                                             >
                                                 <EditIcon fontSize="small" />
@@ -597,9 +679,16 @@ const CeleSection = () => {
                                                 size="small"
                                                 onClick={() => handleDeleteGoal(goal.id)}
                                                 sx={{
-                                                    border: '1px solid',
-                                                    borderColor: 'divider',
-                                                    color: 'error.main',
+                                                    background: 'rgba(244, 67, 54, 0.1)',
+                                                    backdropFilter: 'blur(8px)',
+                                                    WebkitBackdropFilter: 'blur(8px)',
+                                                    border: '1px solid rgba(244, 67, 54, 0.3)',
+                                                    color: '#f44336',
+                                                    transition: 'all 0.3s',
+                                                    '&:hover': {
+                                                        background: 'rgba(244, 67, 54, 0.2)',
+                                                        boxShadow: '0 4px 12px rgba(244, 67, 54, 0.3)',
+                                                    },
                                                 }}
                                             >
                                                 <DeleteIcon fontSize="small" />
