@@ -30,9 +30,9 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import TrendingDownIcon from '@mui/icons-material/TrendingDown';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import SavingsIcon from '@mui/icons-material/Savings';
 import { getIncome, createIncome, updateIncome, deleteIncome, getBudgetSummary } from '../../api/budget';
 
@@ -213,10 +213,18 @@ const BudzetSection = () => {
                     startIcon={<AddIcon />}
                     onClick={handleAddIncome}
                     sx={{
-                        background: 'linear-gradient(135deg, #a8e6cf 0%, #84dcc6 100%)',
-                        color: '#000',
+                        background: 'linear-gradient(135deg, rgba(168, 230, 207, 0.3), rgba(168, 230, 207, 0.2))',
+                        backdropFilter: 'blur(8px)',
+                        WebkitBackdropFilter: 'blur(8px)',
+                        border: '1px solid rgba(168, 230, 207, 0.5)',
+                        color: '#ffffff',
+                        boxShadow: '0 4px 12px rgba(168, 230, 207, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        textShadow: '0 0 10px rgba(168, 230, 207, 0.5)',
                         '&:hover': {
-                            background: 'linear-gradient(135deg, #84dcc6 0%, #5ec9b5 100%)',
+                            background: 'linear-gradient(135deg, rgba(168, 230, 207, 0.4), rgba(168, 230, 207, 0.3))',
+                            boxShadow: '0 6px 16px rgba(168, 230, 207, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+                            transform: 'translateY(-2px)',
                         },
                     }}
                 >
@@ -239,37 +247,50 @@ const BudzetSection = () => {
                 }}>
                     <Card
                         sx={{
-                            backgroundColor: 'background.paper',
-                            border: '1px solid',
-                            borderColor: 'divider',
+                            background: 'linear-gradient(135deg, rgba(0, 240, 255, 0.08), rgba(0, 240, 255, 0.02))',
+                            backdropFilter: 'blur(10px)',
+                            WebkitBackdropFilter: 'blur(10px)',
+                            border: '1px solid rgba(0, 240, 255, 0.3)',
+                            boxShadow: '0 4px 12px rgba(0, 240, 255, 0.15), inset 0 1px 0 rgba(0, 240, 255, 0.2)',
                             height: '100%',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            '&:hover': {
+                                transform: 'translateY(-5px)',
+                                boxShadow: '0 12px 28px rgba(0, 240, 255, 0.25), inset 0 1px 0 rgba(0, 240, 255, 0.3)',
+                                borderColor: 'rgba(0, 240, 255, 0.4)',
+                            },
                         }}
                     >
                         <CardContent>
-                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                                <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                                    Aktualne saldo
+                                </Typography>
                                 <Box
                                     sx={{
-                                        width: 48,
-                                        height: 48,
+                                        width: 40,
+                                        height: 40,
                                         borderRadius: '50%',
-                                        backgroundColor: 'rgba(0, 240, 255, 0.2)',
+                                        backgroundColor: '#00f0ff20',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        mr: 2,
+                                        color: '#00f0ff',
                                     }}
                                 >
-                                    <AccountBalanceIcon sx={{ color: '#00f0ff', fontSize: 24 }} />
+                                    <AttachMoneyIcon />
                                 </Box>
-                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                    Aktualne saldo
-                                </Typography>
                             </Box>
-                            <Typography variant="h3" sx={{ fontWeight: 700, color: '#00f0ff' }}>
-                                {budgetSummary.balance.toFixed(2)} zł
-                            </Typography>
-                            <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1 }}>
-                                Całkowite saldo
+                            <Typography
+                                variant="h4"
+                                sx={{
+                                    fontWeight: 700,
+                                    mb: 1,
+                                    color: 'text.primary',
+                                    textShadow: '0 0 20px #00f0ff60, 0 0 40px #00f0ff40'
+                                }}
+                            >
+                                {budgetSummary.balance.toFixed(0)} zł
                             </Typography>
                         </CardContent>
                     </Card>
@@ -282,37 +303,50 @@ const BudzetSection = () => {
                 }}>
                     <Card
                         sx={{
-                            backgroundColor: 'background.paper',
-                            border: '1px solid',
-                            borderColor: 'divider',
+                            background: 'linear-gradient(135deg, rgba(168, 230, 207, 0.08), rgba(168, 230, 207, 0.02))',
+                            backdropFilter: 'blur(10px)',
+                            WebkitBackdropFilter: 'blur(10px)',
+                            border: '1px solid rgba(168, 230, 207, 0.3)',
+                            boxShadow: '0 4px 12px rgba(168, 230, 207, 0.15), inset 0 1px 0 rgba(168, 230, 207, 0.2)',
                             height: '100%',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            '&:hover': {
+                                transform: 'translateY(-5px)',
+                                boxShadow: '0 12px 28px rgba(168, 230, 207, 0.25), inset 0 1px 0 rgba(168, 230, 207, 0.3)',
+                                borderColor: 'rgba(168, 230, 207, 0.4)',
+                            },
                         }}
                     >
                         <CardContent>
-                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                                <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                                    Przychody (mies.)
+                                </Typography>
                                 <Box
                                     sx={{
-                                        width: 48,
-                                        height: 48,
+                                        width: 40,
+                                        height: 40,
                                         borderRadius: '50%',
-                                        backgroundColor: 'rgba(168, 230, 207, 0.2)',
+                                        backgroundColor: '#a8e6cf20',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        mr: 2,
+                                        color: '#a8e6cf',
                                     }}
                                 >
-                                    <TrendingUpIcon sx={{ color: '#a8e6cf', fontSize: 24 }} />
+                                    <TrendingUpIcon />
                                 </Box>
-                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                    Przychody (mies.)
-                                </Typography>
                             </Box>
-                            <Typography variant="h3" sx={{ fontWeight: 700, color: '#a8e6cf' }}>
-                                {budgetSummary.totalIncome.toFixed(2)} zł
-                            </Typography>
-                            <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1 }}>
-                                Suma przychodów
+                            <Typography
+                                variant="h4"
+                                sx={{
+                                    fontWeight: 700,
+                                    mb: 1,
+                                    color: 'text.primary',
+                                    textShadow: '0 0 20px #a8e6cf60, 0 0 40px #a8e6cf40'
+                                }}
+                            >
+                                {budgetSummary.totalIncome.toFixed(0)} zł
                             </Typography>
                         </CardContent>
                     </Card>
@@ -325,37 +359,50 @@ const BudzetSection = () => {
                 }}>
                     <Card
                         sx={{
-                            backgroundColor: 'background.paper',
-                            border: '1px solid',
-                            borderColor: 'divider',
+                            background: 'linear-gradient(135deg, rgba(255, 107, 157, 0.08), rgba(255, 107, 157, 0.02))',
+                            backdropFilter: 'blur(10px)',
+                            WebkitBackdropFilter: 'blur(10px)',
+                            border: '1px solid rgba(255, 107, 157, 0.3)',
+                            boxShadow: '0 4px 12px rgba(255, 107, 157, 0.15), inset 0 1px 0 rgba(255, 107, 157, 0.2)',
                             height: '100%',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            '&:hover': {
+                                transform: 'translateY(-5px)',
+                                boxShadow: '0 12px 28px rgba(255, 107, 157, 0.25), inset 0 1px 0 rgba(255, 107, 157, 0.3)',
+                                borderColor: 'rgba(255, 107, 157, 0.4)',
+                            },
                         }}
                     >
                         <CardContent>
-                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                                <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                                    Wydatki (miesiąc)
+                                </Typography>
                                 <Box
                                     sx={{
-                                        width: 48,
-                                        height: 48,
+                                        width: 40,
+                                        height: 40,
                                         borderRadius: '50%',
-                                        backgroundColor: 'rgba(255, 107, 157, 0.2)',
+                                        backgroundColor: '#ff6b9d20',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        mr: 2,
+                                        color: '#ff6b9d',
                                     }}
                                 >
-                                    <TrendingDownIcon sx={{ color: '#ff6b9d', fontSize: 24 }} />
+                                    <AccountBalanceWalletIcon />
                                 </Box>
-                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                    Wydatki (mies.)
-                                </Typography>
                             </Box>
-                            <Typography variant="h3" sx={{ fontWeight: 700, color: '#ff6b9d' }}>
-                                {budgetSummary.totalExpenses.toFixed(2)} zł
-                            </Typography>
-                            <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1 }}>
-                                Suma wydatków
+                            <Typography
+                                variant="h4"
+                                sx={{
+                                    fontWeight: 700,
+                                    mb: 1,
+                                    color: 'text.primary',
+                                    textShadow: '0 0 20px #ff6b9d60, 0 0 40px #ff6b9d40'
+                                }}
+                            >
+                                {budgetSummary.totalExpenses.toFixed(0)} zł
                             </Typography>
                         </CardContent>
                     </Card>
@@ -368,37 +415,50 @@ const BudzetSection = () => {
                 }}>
                     <Card
                         sx={{
-                            backgroundColor: 'background.paper',
-                            border: '1px solid',
-                            borderColor: 'divider',
+                            background: 'linear-gradient(135deg, rgba(255, 217, 61, 0.08), rgba(255, 217, 61, 0.02))',
+                            backdropFilter: 'blur(10px)',
+                            WebkitBackdropFilter: 'blur(10px)',
+                            border: '1px solid rgba(255, 217, 61, 0.3)',
+                            boxShadow: '0 4px 12px rgba(255, 217, 61, 0.15), inset 0 1px 0 rgba(255, 217, 61, 0.2)',
                             height: '100%',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            '&:hover': {
+                                transform: 'translateY(-5px)',
+                                boxShadow: '0 12px 28px rgba(255, 217, 61, 0.25), inset 0 1px 0 rgba(255, 217, 61, 0.3)',
+                                borderColor: 'rgba(255, 217, 61, 0.4)',
+                            },
                         }}
                     >
                         <CardContent>
-                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                                <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                                    Twoje oszczędności
+                                </Typography>
                                 <Box
                                     sx={{
-                                        width: 48,
-                                        height: 48,
+                                        width: 40,
+                                        height: 40,
                                         borderRadius: '50%',
-                                        backgroundColor: 'rgba(255, 217, 61, 0.2)',
+                                        backgroundColor: '#ffd93d20',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        mr: 2,
+                                        color: '#ffd93d',
                                     }}
                                 >
-                                    <SavingsIcon sx={{ color: '#ffd93d', fontSize: 24 }} />
+                                    <SavingsIcon />
                                 </Box>
-                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                    Oszczędności (mies.)
-                                </Typography>
                             </Box>
-                            <Typography variant="h3" sx={{ fontWeight: 700, color: '#ffd93d' }}>
-                                {budgetSummary.savings.toFixed(2)} zł
-                            </Typography>
-                            <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1 }}>
-                                Różnica przychód-wydatek
+                            <Typography
+                                variant="h4"
+                                sx={{
+                                    fontWeight: 700,
+                                    mb: 1,
+                                    color: 'text.primary',
+                                    textShadow: '0 0 20px #ffd93d60, 0 0 40px #ffd93d40'
+                                }}
+                            >
+                                {budgetSummary.savings.toFixed(0)} zł
                             </Typography>
                         </CardContent>
                     </Card>
@@ -408,10 +468,18 @@ const BudzetSection = () => {
             {/* Month Selector */}
             <Card
                 sx={{
-                    backgroundColor: 'background.paper',
+                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                    backdropFilter: 'blur(10px)',
+                    WebkitBackdropFilter: 'blur(10px)',
                     border: '1px solid',
-                    borderColor: 'divider',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                     mb: 3,
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    '&:hover': {
+                        boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+                        borderColor: 'rgba(255, 255, 255, 0.15)',
+                    },
                 }}
             >
                 <CardContent>
@@ -440,9 +508,17 @@ const BudzetSection = () => {
             {/* Incomes Table */}
             <Card
                 sx={{
-                    backgroundColor: 'background.paper',
+                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                    backdropFilter: 'blur(10px)',
+                    WebkitBackdropFilter: 'blur(10px)',
                     border: '1px solid',
-                    borderColor: 'divider',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    '&:hover': {
+                        boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+                        borderColor: 'rgba(255, 255, 255, 0.15)',
+                    },
                 }}
             >
                 <TableContainer>
