@@ -172,14 +172,18 @@ const PulpitSection = ({ user, onNavigate }) => {
                             onClick={() => onNavigate(stat.navigateTo)}
                             sx={{
                                 height: '100%',
-                                backgroundColor: 'background.paper',
+                                background: `linear-gradient(135deg, ${stat.color}15, ${stat.color}05)`,
+                                backdropFilter: 'blur(10px)',
+                                WebkitBackdropFilter: 'blur(10px)',
                                 border: '1px solid',
-                                borderColor: 'divider',
+                                borderColor: `${stat.color}40`,
+                                boxShadow: `0 4px 12px ${stat.color}20, inset 0 1px 0 ${stat.color}30`,
                                 cursor: 'pointer',
-                                transition: 'transform 0.2s, box-shadow 0.2s',
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                 '&:hover': {
-                                    transform: 'translateY(-4px)',
-                                    boxShadow: `0 8px 20px ${stat.color}30`,
+                                    transform: 'translateY(-5px)',
+                                    boxShadow: `0 12px 28px ${stat.color}40, inset 0 1px 0 ${stat.color}50`,
+                                    borderColor: `${stat.color}60`,
                                 },
                             }}
                         >
@@ -203,7 +207,15 @@ const PulpitSection = ({ user, onNavigate }) => {
                                         {stat.icon}
                                     </Box>
                                 </Box>
-                                <Typography variant="h4" sx={{ fontWeight: 700, mb: 1, color: 'text.primary' }}>
+                                <Typography
+                                    variant="h4"
+                                    sx={{
+                                        fontWeight: 700,
+                                        mb: 1,
+                                        color: 'text.primary',
+                                        textShadow: `0 0 20px ${stat.color}60, 0 0 40px ${stat.color}40`
+                                    }}
+                                >
                                     {stat.value}
                                 </Typography>
                                 <Box
@@ -245,10 +257,18 @@ const PulpitSection = ({ user, onNavigate }) => {
                 <Box sx={{ flex: '1 1 auto', minWidth: 0 }}>
                     <Card
                         sx={{
-                            backgroundColor: 'background.paper',
+                            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                            backdropFilter: 'blur(10px)',
+                            WebkitBackdropFilter: 'blur(10px)',
                             border: '1px solid',
-                            borderColor: 'divider',
+                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                             height: '100%',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            '&:hover': {
+                                boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+                                borderColor: 'rgba(255, 255, 255, 0.15)',
+                            },
                         }}
                     >
                         <CardContent>
@@ -327,15 +347,19 @@ const PulpitSection = ({ user, onNavigate }) => {
                     <Card
                         onClick={() => expensesByCategory.length > 0 && onNavigate('analizy')}
                         sx={{
-                            backgroundColor: 'background.paper',
+                            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                            backdropFilter: 'blur(10px)',
+                            WebkitBackdropFilter: 'blur(10px)',
                             border: '1px solid',
-                            borderColor: 'divider',
+                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                             height: '100%',
                             cursor: expensesByCategory.length > 0 ? 'pointer' : 'default',
-                            transition: 'transform 0.2s, box-shadow 0.2s',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                             '&:hover': expensesByCategory.length > 0 ? {
-                                transform: 'translateY(-4px)',
-                                boxShadow: '0 8px 24px rgba(0, 240, 255, 0.2)',
+                                transform: 'translateY(-5px)',
+                                boxShadow: '0 12px 28px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+                                borderColor: 'rgba(255, 255, 255, 0.15)',
                             } : {},
                         }}
                     >
