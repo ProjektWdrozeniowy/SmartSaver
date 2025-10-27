@@ -177,9 +177,14 @@ const AnalizySection = () => {
                         value={selectedPeriod}
                         onChange={(e) => setSelectedPeriod(e.target.value)}
                         sx={{
-                            backgroundColor: 'background.paper',
+                            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                            backdropFilter: 'blur(10px)',
+                            WebkitBackdropFilter: 'blur(10px)',
                             '& .MuiOutlinedInput-notchedOutline': {
-                                borderColor: 'divider',
+                                borderColor: 'rgba(255, 255, 255, 0.2)',
+                            },
+                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                                borderColor: 'rgba(255, 255, 255, 0.3)',
                             },
                         }}
                     >
@@ -206,33 +211,49 @@ const AnalizySection = () => {
                 }}>
                     <Card
                         sx={{
-                            backgroundColor: 'background.paper',
-                            border: '1px solid',
-                            borderColor: 'divider',
+                            background: 'linear-gradient(135deg, rgba(255, 107, 157, 0.08), rgba(255, 107, 157, 0.02))',
+                            backdropFilter: 'blur(10px)',
+                            WebkitBackdropFilter: 'blur(10px)',
+                            border: '1px solid rgba(255, 107, 157, 0.3)',
+                            boxShadow: '0 4px 12px rgba(255, 107, 157, 0.15), inset 0 1px 0 rgba(255, 107, 157, 0.2)',
                             height: '100%',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            '&:hover': {
+                                transform: 'translateY(-5px)',
+                                boxShadow: '0 12px 28px rgba(255, 107, 157, 0.25), inset 0 1px 0 rgba(255, 107, 157, 0.3)',
+                                borderColor: 'rgba(255, 107, 157, 0.4)',
+                            },
                         }}
                     >
                         <CardContent>
-                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                                <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                                    Średnie wydatki
+                                </Typography>
                                 <Box
                                     sx={{
                                         width: 40,
                                         height: 40,
                                         borderRadius: '50%',
-                                        backgroundColor: 'rgba(255, 107, 157, 0.2)',
+                                        backgroundColor: '#ff6b9d20',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        mr: 2,
+                                        color: '#ff6b9d',
                                     }}
                                 >
-                                    <TrendingDownIcon sx={{ color: '#ff6b9d', fontSize: 20 }} />
+                                    <TrendingDownIcon />
                                 </Box>
-                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                    Średnie wydatki
-                                </Typography>
                             </Box>
-                            <Typography variant="h4" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
+                            <Typography
+                                variant="h4"
+                                sx={{
+                                    fontWeight: 700,
+                                    mb: 1,
+                                    color: 'text.primary',
+                                    textShadow: '0 0 20px #ff6b9d60, 0 0 40px #ff6b9d40'
+                                }}
+                            >
                                 {statistics.averageExpenses.toFixed(0)} zł
                             </Typography>
                             <Typography
@@ -257,33 +278,49 @@ const AnalizySection = () => {
                 }}>
                     <Card
                         sx={{
-                            backgroundColor: 'background.paper',
-                            border: '1px solid',
-                            borderColor: 'divider',
+                            background: 'linear-gradient(135deg, rgba(0, 240, 255, 0.08), rgba(0, 240, 255, 0.02))',
+                            backdropFilter: 'blur(10px)',
+                            WebkitBackdropFilter: 'blur(10px)',
+                            border: '1px solid rgba(0, 240, 255, 0.3)',
+                            boxShadow: '0 4px 12px rgba(0, 240, 255, 0.15), inset 0 1px 0 rgba(0, 240, 255, 0.2)',
                             height: '100%',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            '&:hover': {
+                                transform: 'translateY(-5px)',
+                                boxShadow: '0 12px 28px rgba(0, 240, 255, 0.25), inset 0 1px 0 rgba(0, 240, 255, 0.3)',
+                                borderColor: 'rgba(0, 240, 255, 0.4)',
+                            },
                         }}
                     >
                         <CardContent>
-                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                                <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                                    Średnie przychody
+                                </Typography>
                                 <Box
                                     sx={{
                                         width: 40,
                                         height: 40,
                                         borderRadius: '50%',
-                                        backgroundColor: 'rgba(0, 240, 255, 0.2)',
+                                        backgroundColor: '#00f0ff20',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        mr: 2,
+                                        color: '#00f0ff',
                                     }}
                                 >
-                                    <TrendingUpIcon sx={{ color: '#00f0ff', fontSize: 20 }} />
+                                    <TrendingUpIcon />
                                 </Box>
-                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                    Średnie przychody
-                                </Typography>
                             </Box>
-                            <Typography variant="h4" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
+                            <Typography
+                                variant="h4"
+                                sx={{
+                                    fontWeight: 700,
+                                    mb: 1,
+                                    color: 'text.primary',
+                                    textShadow: '0 0 20px #00f0ff60, 0 0 40px #00f0ff40'
+                                }}
+                            >
                                 {statistics.averageIncome.toFixed(0)} zł
                             </Typography>
                             <Typography
@@ -308,33 +345,49 @@ const AnalizySection = () => {
                 }}>
                     <Card
                         sx={{
-                            backgroundColor: 'background.paper',
-                            border: '1px solid',
-                            borderColor: 'divider',
+                            background: 'linear-gradient(135deg, rgba(168, 230, 207, 0.08), rgba(168, 230, 207, 0.02))',
+                            backdropFilter: 'blur(10px)',
+                            WebkitBackdropFilter: 'blur(10px)',
+                            border: '1px solid rgba(168, 230, 207, 0.3)',
+                            boxShadow: '0 4px 12px rgba(168, 230, 207, 0.15), inset 0 1px 0 rgba(168, 230, 207, 0.2)',
                             height: '100%',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            '&:hover': {
+                                transform: 'translateY(-5px)',
+                                boxShadow: '0 12px 28px rgba(168, 230, 207, 0.25), inset 0 1px 0 rgba(168, 230, 207, 0.3)',
+                                borderColor: 'rgba(168, 230, 207, 0.4)',
+                            },
                         }}
                     >
                         <CardContent>
-                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                                <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                                    Średnie oszczędności
+                                </Typography>
                                 <Box
                                     sx={{
                                         width: 40,
                                         height: 40,
                                         borderRadius: '50%',
-                                        backgroundColor: 'rgba(168, 230, 207, 0.2)',
+                                        backgroundColor: '#a8e6cf20',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        mr: 2,
+                                        color: '#a8e6cf',
                                     }}
                                 >
-                                    <SavingsIcon sx={{ color: '#a8e6cf', fontSize: 20 }} />
+                                    <SavingsIcon />
                                 </Box>
-                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                    Średnie oszczędności
-                                </Typography>
                             </Box>
-                            <Typography variant="h4" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
+                            <Typography
+                                variant="h4"
+                                sx={{
+                                    fontWeight: 700,
+                                    mb: 1,
+                                    color: 'text.primary',
+                                    textShadow: '0 0 20px #a8e6cf60, 0 0 40px #a8e6cf40'
+                                }}
+                            >
                                 {statistics.averageSavings.toFixed(0)} zł
                             </Typography>
                             <Typography
@@ -359,33 +412,49 @@ const AnalizySection = () => {
                 }}>
                     <Card
                         sx={{
-                            backgroundColor: 'background.paper',
-                            border: '1px solid',
-                            borderColor: 'divider',
+                            background: 'linear-gradient(135deg, rgba(199, 125, 255, 0.08), rgba(199, 125, 255, 0.02))',
+                            backdropFilter: 'blur(10px)',
+                            WebkitBackdropFilter: 'blur(10px)',
+                            border: '1px solid rgba(199, 125, 255, 0.3)',
+                            boxShadow: '0 4px 12px rgba(199, 125, 255, 0.15), inset 0 1px 0 rgba(199, 125, 255, 0.2)',
                             height: '100%',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            '&:hover': {
+                                transform: 'translateY(-5px)',
+                                boxShadow: '0 12px 28px rgba(199, 125, 255, 0.25), inset 0 1px 0 rgba(199, 125, 255, 0.3)',
+                                borderColor: 'rgba(199, 125, 255, 0.4)',
+                            },
                         }}
                     >
                         <CardContent>
-                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                                <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                                    Stopa oszczędności
+                                </Typography>
                                 <Box
                                     sx={{
                                         width: 40,
                                         height: 40,
                                         borderRadius: '50%',
-                                        backgroundColor: 'rgba(199, 125, 255, 0.2)',
+                                        backgroundColor: '#c77dff20',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        mr: 2,
+                                        color: '#c77dff',
                                     }}
                                 >
-                                    <PercentIcon sx={{ color: '#c77dff', fontSize: 20 }} />
+                                    <PercentIcon />
                                 </Box>
-                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                    Stopa oszczędności
-                                </Typography>
                             </Box>
-                            <Typography variant="h4" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
+                            <Typography
+                                variant="h4"
+                                sx={{
+                                    fontWeight: 700,
+                                    mb: 1,
+                                    color: 'text.primary',
+                                    textShadow: '0 0 20px #c77dff60, 0 0 40px #c77dff40'
+                                }}
+                            >
                                 {statistics.savingsRate.toFixed(0)}%
                             </Typography>
                             <Typography
@@ -407,10 +476,17 @@ const AnalizySection = () => {
             {/* Savings Growth Chart */}
             <Card
                 sx={{
-                    backgroundColor: 'background.paper',
-                    border: '1px solid',
-                    borderColor: 'divider',
+                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                    backdropFilter: 'blur(10px)',
+                    WebkitBackdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                     mb: 3,
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    '&:hover': {
+                        boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+                        borderColor: 'rgba(255, 255, 255, 0.15)',
+                    },
                 }}
             >
                 <CardContent>
@@ -466,10 +542,17 @@ const AnalizySection = () => {
             {/* Income vs Expenses Chart */}
             <Card
                 sx={{
-                    backgroundColor: 'background.paper',
-                    border: '1px solid',
-                    borderColor: 'divider',
+                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                    backdropFilter: 'blur(10px)',
+                    WebkitBackdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                     mb: 3,
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    '&:hover': {
+                        boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+                        borderColor: 'rgba(255, 255, 255, 0.15)',
+                    },
                 }}
             >
                 <CardContent>
@@ -548,10 +631,17 @@ const AnalizySection = () => {
                 }}>
                     <Card
                         sx={{
-                            backgroundColor: 'background.paper',
-                            border: '1px solid',
-                            borderColor: 'divider',
+                            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                            backdropFilter: 'blur(10px)',
+                            WebkitBackdropFilter: 'blur(10px)',
+                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                             height: '100%',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            '&:hover': {
+                                boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+                                borderColor: 'rgba(255, 255, 255, 0.15)',
+                            },
                         }}
                     >
                         <CardContent sx={{ height: '100%' }}>
@@ -634,10 +724,17 @@ const AnalizySection = () => {
                 }}>
                     <Card
                         sx={{
-                            backgroundColor: 'background.paper',
-                            border: '1px solid',
-                            borderColor: 'divider',
+                            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                            backdropFilter: 'blur(10px)',
+                            WebkitBackdropFilter: 'blur(10px)',
+                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                             height: '100%',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            '&:hover': {
+                                boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+                                borderColor: 'rgba(255, 255, 255, 0.15)',
+                            },
                         }}
                     >
                         <CardContent sx={{ height: '100%' }}>
