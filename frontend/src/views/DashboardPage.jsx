@@ -121,7 +121,8 @@ const DashboardPage = () => {
             {/* Logo */}
             <Box
                 sx={{
-                    p: 3,
+                    height: 64,
+                    px: 3,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -223,7 +224,7 @@ const DashboardPage = () => {
                     boxShadow: '0 4px 12px rgba(0, 240, 255, 0.1), inset 0 1px 0 rgba(0, 240, 255, 0.15)',
                 }}
             >
-                <Toolbar sx={{ py: 1.5, px: 3 }}>
+                <Toolbar sx={{ minHeight: 64, px: 3 }}>
                     {/* Hamburger dla mobile */}
                     <IconButton
                         color="inherit"
