@@ -24,7 +24,6 @@ import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
-import ReceiptIcon from '@mui/icons-material/Receipt';
 import TrackChangesIcon from '@mui/icons-material/TrackChanges';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import { useNavigate } from 'react-router-dom';
@@ -34,7 +33,6 @@ import { getUser, logout } from '../api/auth';
 import PulpitSection from '../components/dashboard/PulpitSection';
 import WydatkiSection from '../components/dashboard/WydatkiSection';
 import BudzetSection from '../components/dashboard/BudzetSection';
-import RachunkiSection from '../components/dashboard/RachunkiSection';
 import CeleSection from '../components/dashboard/CeleSection';
 import AnalizySection from '../components/dashboard/AnalizySection';
 import UstawieniaSection from '../components/dashboard/UstawieniaSection';
@@ -82,7 +80,6 @@ const DashboardPage = () => {
         { id: 'pulpit', label: 'Pulpit', icon: <DashboardIcon /> },
         { id: 'wydatki', label: 'Wydatki', icon: <AccountBalanceWalletIcon /> },
         { id: 'budzet', label: 'Budżet', icon: <TrendingUpIcon /> },
-        { id: 'rachunki', label: 'Rachunki', icon: <ReceiptIcon /> },
         { id: 'cele', label: 'Cele', icon: <TrackChangesIcon /> },
         { id: 'analizy', label: 'Analizy', icon: <BarChartIcon /> },
         { id: 'ustawienia', label: 'Ustawienia', icon: <SettingsIcon /> },
@@ -93,7 +90,6 @@ const DashboardPage = () => {
         pulpit: 'Pulpit',
         wydatki: 'Wydatki',
         budzet: 'Budżet',
-        rachunki: 'Rachunki',
         cele: 'Cele oszczędnościowe',
         analizy: 'Analizy i statystyki',
         ustawienia: 'Ustawienia',
@@ -108,8 +104,6 @@ const DashboardPage = () => {
                 return <WydatkiSection />;
             case 'budzet':
                 return <BudzetSection />;
-            case 'rachunki':
-                return <RachunkiSection />;
             case 'cele':
                 return <CeleSection />;
             case 'analizy':
