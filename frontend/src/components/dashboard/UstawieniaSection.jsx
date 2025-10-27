@@ -324,11 +324,18 @@ const UstawieniaSection = () => {
             {/* Informacje o profilu */}
             <Card
                 sx={{
-                    backgroundColor: 'background.paper',
-                    border: '1px solid',
-                    borderColor: 'divider',
+                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                    backdropFilter: 'blur(10px)',
+                    WebkitBackdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                     p: 3,
                     mb: 3,
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    '&:hover': {
+                        boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+                        borderColor: 'rgba(255, 255, 255, 0.15)',
+                    },
                 }}
             >
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
@@ -380,9 +387,17 @@ const UstawieniaSection = () => {
                         sx={{
                             mt: 1,
                             alignSelf: 'flex-start',
-                            backgroundColor: 'primary.main',
+                            background: 'linear-gradient(135deg, rgba(144, 164, 174, 0.3), rgba(144, 164, 174, 0.2))',
+                            backdropFilter: 'blur(8px)',
+                            WebkitBackdropFilter: 'blur(8px)',
+                            border: '1px solid rgba(144, 164, 174, 0.5)',
+                            color: '#ffffff',
+                            textShadow: '0 0 10px rgba(144, 164, 174, 0.5)',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                             '&:hover': {
-                                backgroundColor: 'primary.dark',
+                                background: 'linear-gradient(135deg, rgba(144, 164, 174, 0.4), rgba(144, 164, 174, 0.3))',
+                                transform: 'translateY(-2px)',
+                                boxShadow: '0 6px 16px rgba(144, 164, 174, 0.3)',
                             },
                         }}
                     >
@@ -394,11 +409,18 @@ const UstawieniaSection = () => {
             {/* Zmiana hasła */}
             <Card
                 sx={{
-                    backgroundColor: 'background.paper',
-                    border: '1px solid',
-                    borderColor: 'divider',
+                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                    backdropFilter: 'blur(10px)',
+                    WebkitBackdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                     p: 3,
                     mb: 3,
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    '&:hover': {
+                        boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+                        borderColor: 'rgba(255, 255, 255, 0.15)',
+                    },
                 }}
             >
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
@@ -464,9 +486,17 @@ const UstawieniaSection = () => {
                         sx={{
                             mt: 1,
                             alignSelf: 'flex-start',
-                            backgroundColor: 'primary.main',
+                            background: 'linear-gradient(135deg, rgba(144, 164, 174, 0.3), rgba(144, 164, 174, 0.2))',
+                            backdropFilter: 'blur(8px)',
+                            WebkitBackdropFilter: 'blur(8px)',
+                            border: '1px solid rgba(144, 164, 174, 0.5)',
+                            color: '#ffffff',
+                            textShadow: '0 0 10px rgba(144, 164, 174, 0.5)',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                             '&:hover': {
-                                backgroundColor: 'primary.dark',
+                                background: 'linear-gradient(135deg, rgba(144, 164, 174, 0.4), rgba(144, 164, 174, 0.3))',
+                                transform: 'translateY(-2px)',
+                                boxShadow: '0 6px 16px rgba(144, 164, 174, 0.3)',
                             },
                         }}
                     >
@@ -478,11 +508,18 @@ const UstawieniaSection = () => {
             {/* Powiadomienia */}
             <Card
                 sx={{
-                    backgroundColor: 'background.paper',
-                    border: '1px solid',
-                    borderColor: 'divider',
+                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                    backdropFilter: 'blur(10px)',
+                    WebkitBackdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                     p: 3,
                     mb: 3,
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    '&:hover': {
+                        boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+                        borderColor: 'rgba(255, 255, 255, 0.15)',
+                    },
                 }}
             >
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
@@ -552,11 +589,18 @@ const UstawieniaSection = () => {
             {/* Wygląd */}
             <Card
                 sx={{
-                    backgroundColor: 'background.paper',
-                    border: '1px solid',
-                    borderColor: 'divider',
+                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                    backdropFilter: 'blur(10px)',
+                    WebkitBackdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                     p: 3,
                     mb: 3,
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    '&:hover': {
+                        boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+                        borderColor: 'rgba(255, 255, 255, 0.15)',
+                    },
                 }}
             >
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
@@ -596,11 +640,18 @@ const UstawieniaSection = () => {
             {/* Dane i prywatność */}
             <Card
                 sx={{
-                    backgroundColor: 'background.paper',
-                    border: '1px solid',
-                    borderColor: 'divider',
+                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                    backdropFilter: 'blur(10px)',
+                    WebkitBackdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                     p: 3,
                     mb: 3,
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    '&:hover': {
+                        boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+                        borderColor: 'rgba(255, 255, 255, 0.15)',
+                    },
                 }}
             >
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
@@ -637,11 +688,18 @@ const UstawieniaSection = () => {
                             startIcon={<DownloadIcon />}
                             onClick={handleExportData}
                             sx={{
-                                borderColor: 'primary.main',
-                                color: 'primary.main',
+                                background: 'linear-gradient(135deg, rgba(144, 164, 174, 0.15), rgba(144, 164, 174, 0.08))',
+                                backdropFilter: 'blur(8px)',
+                                WebkitBackdropFilter: 'blur(8px)',
+                                border: '1px solid rgba(144, 164, 174, 0.4)',
+                                color: '#90a4ae',
+                                textShadow: '0 0 8px rgba(144, 164, 174, 0.3)',
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                 '&:hover': {
-                                    borderColor: 'primary.dark',
-                                    backgroundColor: 'rgba(0, 240, 255, 0.08)',
+                                    background: 'linear-gradient(135deg, rgba(144, 164, 174, 0.25), rgba(144, 164, 174, 0.15))',
+                                    transform: 'translateY(-2px)',
+                                    boxShadow: '0 4px 12px rgba(144, 164, 174, 0.2)',
+                                    borderColor: 'rgba(144, 164, 174, 0.5)',
                                 },
                             }}
                         >
@@ -673,11 +731,18 @@ const UstawieniaSection = () => {
                             startIcon={<DeleteIcon />}
                             onClick={() => setDeleteDialog({ open: true, password: '' })}
                             sx={{
-                                borderColor: 'error.main',
-                                color: 'error.main',
+                                background: 'linear-gradient(135deg, rgba(244, 67, 54, 0.15), rgba(244, 67, 54, 0.08))',
+                                backdropFilter: 'blur(8px)',
+                                WebkitBackdropFilter: 'blur(8px)',
+                                border: '1px solid rgba(244, 67, 54, 0.4)',
+                                color: '#f44336',
+                                textShadow: '0 0 8px rgba(244, 67, 54, 0.3)',
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                 '&:hover': {
-                                    borderColor: 'error.dark',
-                                    backgroundColor: 'rgba(255, 0, 0, 0.08)',
+                                    background: 'linear-gradient(135deg, rgba(244, 67, 54, 0.25), rgba(244, 67, 54, 0.15))',
+                                    transform: 'translateY(-2px)',
+                                    boxShadow: '0 4px 12px rgba(244, 67, 54, 0.2)',
+                                    borderColor: 'rgba(244, 67, 54, 0.5)',
                                 },
                             }}
                         >
