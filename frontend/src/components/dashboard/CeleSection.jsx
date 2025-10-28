@@ -450,6 +450,12 @@ const CeleSection = () => {
                         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                         p: 4,
                         textAlign: 'center',
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        '&:hover': {
+                            transform: 'none',
+                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                            borderColor: 'rgba(255, 255, 255, 0.15)',
+                        },
                     }}
                 >
                     <Box
@@ -524,10 +530,10 @@ const CeleSection = () => {
                                         flexDirection: 'column',
                                         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                         '&:hover': {
-                                            transform: 'translateY(-5px)',
+                                            transform: 'none',
                                             boxShadow: isCompleted
-                                                ? '0 12px 28px rgba(76, 175, 80, 0.3), inset 0 1px 0 rgba(76, 175, 80, 0.3)'
-                                                : '0 8px 20px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+                                                ? '0 4px 12px rgba(76, 175, 80, 0.2), inset 0 1px 0 rgba(76, 175, 80, 0.2)'
+                                                : '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                                             borderColor: isCompleted ? 'rgba(76, 175, 80, 0.5)' : 'rgba(255, 255, 255, 0.15)',
                                         },
                                     }}
