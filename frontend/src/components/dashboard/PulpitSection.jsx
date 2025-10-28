@@ -10,6 +10,7 @@ import {
     ListItem,
     Divider,
     CircularProgress,
+    Snackbar,
     Alert,
 } from '@mui/material';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
@@ -30,7 +31,16 @@ const PulpitSection = ({ user, onNavigate }) => {
 
     // Loading and error states
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+
+    // Snackbar function
+    const showSnackbar = (message, severity = 'success') => {
+        setSnackbar({ open: true, message, severity });
+    };
+
+    const handleCloseSnackbar = () => {
+        setSnackbar({ ...snackbar, open: false });
+    };
 
     // Icons mapping for stats
     const iconMap = {
@@ -95,7 +105,6 @@ const PulpitSection = ({ user, onNavigate }) => {
         const fetchDashboardData = async () => {
             try {
                 setLoading(true);
-                setError(null);
 
                 // Parallel API calls
                 const [statsData, transactionsData, categoryData] = await Promise.all([
@@ -115,7 +124,7 @@ const PulpitSection = ({ user, onNavigate }) => {
                 setExpensesByCategory(categoryData.categories || []);
             } catch (err) {
                 console.error('Error fetching dashboard data:', err);
-                setError(err.message || 'Nie udało się pobrać danych');
+                showSnackbar(err.message || 'Nie udało się pobrać danych', 'error');
 
                 // Fallback to default/empty data
                 setStats(defaultStats);
@@ -140,13 +149,6 @@ const PulpitSection = ({ user, onNavigate }) => {
                     Oto Twoje podsumowanie finansowe
                 </Typography>
             </Box>
-
-            {/* Error Alert */}
-            {error && (
-                <Alert severity="error" sx={{ mb: 3 }}>
-                    {error} - Wyświetlane są dane domyślne. Spróbuj odświeżyć stronę.
-                </Alert>
-            )}
 
             {/* Loading overlay for stats */}
             {loading && (
@@ -439,6 +441,18 @@ const PulpitSection = ({ user, onNavigate }) => {
                     </Card>
                 </Box>
             </Box>
+
+            {/* Snackbar for notifications */}
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 };
