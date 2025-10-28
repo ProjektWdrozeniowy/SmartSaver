@@ -256,6 +256,7 @@ const PulpitSection = ({ user, onNavigate }) => {
                 {/* Recent Transactions */}
                 <Box sx={{ flex: '1 1 auto', minWidth: 0 }}>
                     <Card
+                        onClick={() => onNavigate('wydatki')}
                         sx={{
                             background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
                             backdropFilter: 'blur(10px)',
@@ -264,10 +265,12 @@ const PulpitSection = ({ user, onNavigate }) => {
                             borderColor: 'rgba(255, 255, 255, 0.1)',
                             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                             height: '100%',
+                            cursor: 'pointer',
                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                             '&:hover': {
-                                boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
-                                borderColor: 'rgba(255, 255, 255, 0.15)',
+                                transform: 'none',
+                                borderColor: 'rgba(255, 255, 255, 0.2)',
+                                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                             },
                         }}
                     >
@@ -345,7 +348,7 @@ const PulpitSection = ({ user, onNavigate }) => {
                 {/* Expenses by Category Chart */}
                 <Box sx={{ flex: '0 0 65%', minWidth: 0 }}>
                     <Card
-                        onClick={() => expensesByCategory.length > 0 && onNavigate('analizy')}
+                        onClick={() => onNavigate('analizy')}
                         sx={{
                             background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
                             backdropFilter: 'blur(10px)',
@@ -354,13 +357,13 @@ const PulpitSection = ({ user, onNavigate }) => {
                             borderColor: 'rgba(255, 255, 255, 0.1)',
                             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                             height: '100%',
-                            cursor: expensesByCategory.length > 0 ? 'pointer' : 'default',
+                            cursor: 'pointer',
                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                            '&:hover': expensesByCategory.length > 0 ? {
-                                transform: 'translateY(-5px)',
-                                boxShadow: '0 12px 28px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
-                                borderColor: 'rgba(255, 255, 255, 0.15)',
-                            } : {},
+                            '&:hover': {
+                                transform: 'none',
+                                borderColor: 'rgba(255, 255, 255, 0.2)',
+                                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                            },
                         }}
                     >
                         <CardContent sx={{ height: '100%' }}>
