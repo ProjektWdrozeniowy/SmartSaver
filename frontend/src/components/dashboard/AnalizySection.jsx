@@ -484,7 +484,8 @@ const AnalizySection = () => {
                     mb: 3,
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     '&:hover': {
-                        boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+                        transform: 'none',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                         borderColor: 'rgba(255, 255, 255, 0.15)',
                     },
                 }}
@@ -550,7 +551,8 @@ const AnalizySection = () => {
                     mb: 3,
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     '&:hover': {
-                        boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+                        transform: 'none',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                         borderColor: 'rgba(255, 255, 255, 0.15)',
                     },
                 }}
@@ -639,7 +641,8 @@ const AnalizySection = () => {
                             height: '100%',
                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                             '&:hover': {
-                                boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+                                transform: 'none',
+                                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                                 borderColor: 'rgba(255, 255, 255, 0.15)',
                             },
                         }}
@@ -732,7 +735,8 @@ const AnalizySection = () => {
                             height: '100%',
                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                             '&:hover': {
-                                boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+                                transform: 'none',
+                                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                                 borderColor: 'rgba(255, 255, 255, 0.15)',
                             },
                         }}
