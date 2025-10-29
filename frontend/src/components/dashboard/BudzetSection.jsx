@@ -27,6 +27,11 @@ import {
     Alert,
     Snackbar,
 } from '@mui/material';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
+import 'dayjs/locale/pl';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -494,6 +499,17 @@ const BudzetSection = () => {
                                 value={selectedMonth}
                                 label="Miesiąc"
                                 onChange={(e) => setSelectedMonth(e.target.value)}
+                                MenuProps={{
+                                    PaperProps: {
+                                        sx: {
+                                            background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                                            backdropFilter: 'blur(20px)',
+                                            WebkitBackdropFilter: 'blur(20px)',
+                                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                                            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                                        }
+                                    }
+                                }}
                             >
                                 {monthOptions.map((option) => (
                                     <MenuItem key={option.value} value={option.value}>
@@ -592,6 +608,15 @@ const BudzetSection = () => {
                 onClose={() => setOpenIncomeDialog(false)}
                 maxWidth="sm"
                 fullWidth
+                PaperProps={{
+                    sx: {
+                        background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                        backdropFilter: 'blur(20px)',
+                        WebkitBackdropFilter: 'blur(20px)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                    }
+                }}
             >
                 <DialogTitle>
                     {editingIncome ? 'Edytuj przychód' : 'Dodaj przychód'}
@@ -606,15 +631,58 @@ const BudzetSection = () => {
                             required
                             placeholder="np. Wynagrodzenie"
                         />
-                        <TextField
-                            label="Data"
-                            type="date"
-                            value={incomeForm.date}
-                            onChange={(e) => setIncomeForm({ ...incomeForm, date: e.target.value })}
-                            fullWidth
-                            required
-                            InputLabelProps={{ shrink: true }}
-                        />
+                        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
+                            <DatePicker
+                                label="Data"
+                                value={dayjs(incomeForm.date)}
+                                onChange={(newValue) => setIncomeForm({ ...incomeForm, date: newValue ? newValue.format('YYYY-MM-DD') : '' })}
+                                slotProps={{
+                                    textField: {
+                                        fullWidth: true,
+                                        required: true,
+                                    },
+                                    popper: {
+                                        sx: {
+                                            '& .MuiPaper-root': {
+                                                background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                                                backdropFilter: 'blur(20px)',
+                                                WebkitBackdropFilter: 'blur(20px)',
+                                                border: '1px solid rgba(255, 255, 255, 0.1)',
+                                                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                                            },
+                                            '& .MuiPickersCalendarHeader-root': {
+                                                color: '#ffffff',
+                                            },
+                                            '& .MuiPickersCalendarHeader-label': {
+                                                color: '#ffffff',
+                                            },
+                                            '& .MuiPickersDay-root': {
+                                                color: '#ffffff',
+                                                '&:hover': {
+                                                    backgroundColor: 'rgba(168, 230, 207, 0.2)',
+                                                },
+                                                '&.Mui-selected': {
+                                                    backgroundColor: '#a8e6cf',
+                                                    color: '#000000',
+                                                    '&:hover': {
+                                                        backgroundColor: '#84dcc6',
+                                                    },
+                                                },
+                                            },
+                                            '& .MuiPickersDay-today': {
+                                                border: '1px solid #a8e6cf',
+                                            },
+                                            '& .MuiDayCalendar-weekDayLabel': {
+                                                color: 'rgba(255, 255, 255, 0.7)',
+                                            },
+                                            '& .MuiIconButton-root': {
+                                                color: '#ffffff',
+                                            },
+                                        },
+                                    },
+                                }}
+                            />
+                        </LocalizationProvider>
                         <TextField
                             label="Kwota"
                             type="number"

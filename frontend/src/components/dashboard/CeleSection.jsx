@@ -19,6 +19,11 @@ import {
     LinearProgress,
     Chip,
 } from '@mui/material';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
+import 'dayjs/locale/pl';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -714,6 +719,15 @@ const CeleSection = () => {
                 onClose={() => setOpenGoalDialog(false)}
                 maxWidth="sm"
                 fullWidth
+                PaperProps={{
+                    sx: {
+                        background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                        backdropFilter: 'blur(20px)',
+                        WebkitBackdropFilter: 'blur(20px)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                    }
+                }}
             >
                 <DialogTitle>
                     {editingGoal ? 'Edytuj cel' : 'Dodaj nowy cel'}
@@ -752,15 +766,57 @@ const CeleSection = () => {
                                 endAdornment: <InputAdornment position="end">zł</InputAdornment>,
                             }}
                         />
-                        <TextField
-                            label="Termin realizacji"
-                            type="date"
-                            value={goalForm.dueDate}
-                            onChange={(e) => setGoalForm({ ...goalForm, dueDate: e.target.value })}
-                            fullWidth
-                            required
-                            InputLabelProps={{ shrink: true }}
-                        />
+                        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
+                            <DatePicker
+                                label="Termin realizacji"
+                                value={goalForm.dueDate ? dayjs(goalForm.dueDate) : null}
+                                onChange={(newValue) => setGoalForm({ ...goalForm, dueDate: newValue ? newValue.format('YYYY-MM-DD') : '' })}
+                                slotProps={{
+                                    textField: {
+                                        fullWidth: true,
+                                        required: true,
+                                    },
+                                    popper: {
+                                        sx: {
+                                            '& .MuiPaper-root': {
+                                                background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                                                backdropFilter: 'blur(20px)',
+                                                WebkitBackdropFilter: 'blur(20px)',
+                                                border: '1px solid rgba(255, 255, 255, 0.1)',
+                                                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                                            },
+                                            '& .MuiPickersCalendarHeader-root': {
+                                                color: '#ffffff',
+                                            },
+                                            '& .MuiPickersCalendarHeader-label': {
+                                                color: '#ffffff',
+                                            },
+                                            '& .MuiPickersDay-root': {
+                                                color: '#ffffff',
+                                                '&:hover': {
+                                                    backgroundColor: 'rgba(199, 125, 255, 0.2)',
+                                                },
+                                                '&.Mui-selected': {
+                                                    backgroundColor: '#c77dff',
+                                                    '&:hover': {
+                                                        backgroundColor: '#9d4edd',
+                                                    },
+                                                },
+                                            },
+                                            '& .MuiPickersDay-today': {
+                                                border: '1px solid #c77dff',
+                                            },
+                                            '& .MuiDayCalendar-weekDayLabel': {
+                                                color: 'rgba(255, 255, 255, 0.7)',
+                                            },
+                                            '& .MuiIconButton-root': {
+                                                color: '#ffffff',
+                                            },
+                                        },
+                                    },
+                                }}
+                            />
+                        </LocalizationProvider>
                         <TextField
                             label="Opis (opcjonalnie)"
                             value={goalForm.description}
@@ -798,6 +854,15 @@ const CeleSection = () => {
                 onClose={() => setOpenContributeDialog(false)}
                 maxWidth="xs"
                 fullWidth
+                PaperProps={{
+                    sx: {
+                        background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                        backdropFilter: 'blur(20px)',
+                        WebkitBackdropFilter: 'blur(20px)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                    }
+                }}
             >
                 <DialogTitle>
                     Wpłać do celu
