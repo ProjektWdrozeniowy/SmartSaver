@@ -187,6 +187,17 @@ const AnalizySection = () => {
                                 borderColor: 'rgba(255, 255, 255, 0.3)',
                             },
                         }}
+                        MenuProps={{
+                            PaperProps: {
+                                sx: {
+                                    background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                                    backdropFilter: 'blur(20px)',
+                                    WebkitBackdropFilter: 'blur(20px)',
+                                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                                }
+                            }
+                        }}
                     >
                         <MenuItem value="last6months">Ostatnie 6 miesięcy</MenuItem>
                         <MenuItem value="last3months">Ostatnie 3 miesiące</MenuItem>
