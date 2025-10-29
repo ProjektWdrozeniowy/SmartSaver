@@ -10,6 +10,7 @@ import {
     ListItem,
     Divider,
     CircularProgress,
+    Snackbar,
     Alert,
 } from '@mui/material';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
@@ -30,7 +31,16 @@ const PulpitSection = ({ user, onNavigate }) => {
 
     // Loading and error states
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+
+    // Snackbar function
+    const showSnackbar = (message, severity = 'success') => {
+        setSnackbar({ open: true, message, severity });
+    };
+
+    const handleCloseSnackbar = () => {
+        setSnackbar({ ...snackbar, open: false });
+    };
 
     // Icons mapping for stats
     const iconMap = {
@@ -95,7 +105,6 @@ const PulpitSection = ({ user, onNavigate }) => {
         const fetchDashboardData = async () => {
             try {
                 setLoading(true);
-                setError(null);
 
                 // Parallel API calls
                 const [statsData, transactionsData, categoryData] = await Promise.all([
@@ -115,7 +124,7 @@ const PulpitSection = ({ user, onNavigate }) => {
                 setExpensesByCategory(categoryData.categories || []);
             } catch (err) {
                 console.error('Error fetching dashboard data:', err);
-                setError(err.message || 'Nie udało się pobrać danych');
+                showSnackbar(err.message || 'Nie udało się pobrać danych', 'error');
 
                 // Fallback to default/empty data
                 setStats(defaultStats);
@@ -141,13 +150,6 @@ const PulpitSection = ({ user, onNavigate }) => {
                 </Typography>
             </Box>
 
-            {/* Error Alert */}
-            {error && (
-                <Alert severity="error" sx={{ mb: 3 }}>
-                    {error} - Wyświetlane są dane domyślne. Spróbuj odświeżyć stronę.
-                </Alert>
-            )}
-
             {/* Loading overlay for stats */}
             {loading && (
                 <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
@@ -172,14 +174,18 @@ const PulpitSection = ({ user, onNavigate }) => {
                             onClick={() => onNavigate(stat.navigateTo)}
                             sx={{
                                 height: '100%',
-                                backgroundColor: 'background.paper',
+                                background: `linear-gradient(135deg, ${stat.color}15, ${stat.color}05)`,
+                                backdropFilter: 'blur(10px)',
+                                WebkitBackdropFilter: 'blur(10px)',
                                 border: '1px solid',
-                                borderColor: 'divider',
+                                borderColor: `${stat.color}40`,
+                                boxShadow: `0 4px 12px ${stat.color}20, inset 0 1px 0 ${stat.color}30`,
                                 cursor: 'pointer',
-                                transition: 'transform 0.2s, box-shadow 0.2s',
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                 '&:hover': {
-                                    transform: 'translateY(-4px)',
-                                    boxShadow: `0 8px 20px ${stat.color}30`,
+                                    transform: 'translateY(-5px)',
+                                    boxShadow: `0 12px 28px ${stat.color}40, inset 0 1px 0 ${stat.color}50`,
+                                    borderColor: `${stat.color}60`,
                                 },
                             }}
                         >
@@ -203,7 +209,15 @@ const PulpitSection = ({ user, onNavigate }) => {
                                         {stat.icon}
                                     </Box>
                                 </Box>
-                                <Typography variant="h4" sx={{ fontWeight: 700, mb: 1, color: 'text.primary' }}>
+                                <Typography
+                                    variant="h4"
+                                    sx={{
+                                        fontWeight: 700,
+                                        mb: 1,
+                                        color: 'text.primary',
+                                        textShadow: `0 0 20px ${stat.color}60, 0 0 40px ${stat.color}40`
+                                    }}
+                                >
                                     {stat.value}
                                 </Typography>
                                 <Box
@@ -244,11 +258,22 @@ const PulpitSection = ({ user, onNavigate }) => {
                 {/* Recent Transactions */}
                 <Box sx={{ flex: '1 1 auto', minWidth: 0 }}>
                     <Card
+                        onClick={() => onNavigate('wydatki')}
                         sx={{
-                            backgroundColor: 'background.paper',
+                            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                            backdropFilter: 'blur(10px)',
+                            WebkitBackdropFilter: 'blur(10px)',
                             border: '1px solid',
-                            borderColor: 'divider',
+                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                             height: '100%',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            '&:hover': {
+                                transform: 'none',
+                                borderColor: 'rgba(255, 255, 255, 0.2)',
+                                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                            },
                         }}
                     >
                         <CardContent>
@@ -325,18 +350,22 @@ const PulpitSection = ({ user, onNavigate }) => {
                 {/* Expenses by Category Chart */}
                 <Box sx={{ flex: '0 0 65%', minWidth: 0 }}>
                     <Card
-                        onClick={() => expensesByCategory.length > 0 && onNavigate('analizy')}
+                        onClick={() => onNavigate('analizy')}
                         sx={{
-                            backgroundColor: 'background.paper',
+                            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                            backdropFilter: 'blur(10px)',
+                            WebkitBackdropFilter: 'blur(10px)',
                             border: '1px solid',
-                            borderColor: 'divider',
+                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                             height: '100%',
-                            cursor: expensesByCategory.length > 0 ? 'pointer' : 'default',
-                            transition: 'transform 0.2s, box-shadow 0.2s',
-                            '&:hover': expensesByCategory.length > 0 ? {
-                                transform: 'translateY(-4px)',
-                                boxShadow: '0 8px 24px rgba(0, 240, 255, 0.2)',
-                            } : {},
+                            cursor: 'pointer',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            '&:hover': {
+                                transform: 'none',
+                                borderColor: 'rgba(255, 255, 255, 0.2)',
+                                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                            },
                         }}
                     >
                         <CardContent sx={{ height: '100%' }}>
@@ -412,6 +441,18 @@ const PulpitSection = ({ user, onNavigate }) => {
                     </Card>
                 </Box>
             </Box>
+
+            {/* Snackbar for notifications */}
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 };

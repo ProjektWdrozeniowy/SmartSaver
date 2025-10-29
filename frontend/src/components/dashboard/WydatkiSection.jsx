@@ -28,6 +28,11 @@ import {
     Alert,
     Snackbar,
 } from '@mui/material';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
+import 'dayjs/locale/pl';
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
@@ -265,11 +270,18 @@ const WydatkiSection = () => {
                         startIcon={<CategoryIcon />}
                         onClick={handleAddCategory}
                         sx={{
-                            borderColor: 'primary.main',
-                            color: 'primary.main',
+                            background: 'linear-gradient(135deg, rgba(255, 107, 157, 0.15), rgba(255, 107, 157, 0.05))',
+                            backdropFilter: 'blur(8px)',
+                            WebkitBackdropFilter: 'blur(8px)',
+                            borderColor: 'rgba(255, 107, 157, 0.4)',
+                            color: '#ff6b9d',
+                            boxShadow: '0 4px 12px rgba(255, 107, 157, 0.2), inset 0 1px 0 rgba(255, 107, 157, 0.2)',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                             '&:hover': {
-                                borderColor: 'primary.light',
-                                backgroundColor: 'rgba(0, 240, 255, 0.08)',
+                                background: 'linear-gradient(135deg, rgba(255, 107, 157, 0.25), rgba(255, 107, 157, 0.15))',
+                                borderColor: 'rgba(255, 107, 157, 0.6)',
+                                boxShadow: '0 6px 16px rgba(255, 107, 157, 0.3), inset 0 1px 0 rgba(255, 107, 157, 0.3)',
+                                transform: 'translateY(-2px)',
                             },
                         }}
                     >
@@ -279,98 +291,165 @@ const WydatkiSection = () => {
                         variant="contained"
                         startIcon={<AddIcon />}
                         onClick={handleAddExpense}
+                        sx={{
+                            background: 'linear-gradient(135deg, rgba(255, 107, 157, 0.3), rgba(255, 107, 157, 0.2))',
+                            backdropFilter: 'blur(8px)',
+                            WebkitBackdropFilter: 'blur(8px)',
+                            border: '1px solid rgba(255, 107, 157, 0.5)',
+                            color: '#ffffff',
+                            boxShadow: '0 4px 12px rgba(255, 107, 157, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            textShadow: '0 0 10px rgba(255, 107, 157, 0.5)',
+                            '&:hover': {
+                                background: 'linear-gradient(135deg, rgba(255, 107, 157, 0.4), rgba(255, 107, 157, 0.3))',
+                                boxShadow: '0 6px 16px rgba(255, 107, 157, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+                                transform: 'translateY(-2px)',
+                            },
+                        }}
                     >
                         Dodaj wydatek
                     </Button>
                 </Box>
             </Box>
 
-            {/* Summary Card */}
-            <Card
-                sx={{
-                    backgroundColor: 'background.paper',
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    mb: 3,
-                }}
-            >
-                <CardContent>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
-                        <Box>
-                            <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
-                                Suma wydatków
-                            </Typography>
-                            <Typography variant="h3" sx={{ fontWeight: 700, color: '#ff6b9d' }}>
-                                {totalExpenses.toFixed(2)} zł
-                            </Typography>
+            {/* Summary and Filters Row */}
+            <Box sx={{ display: 'flex', gap: 2, mb: 3, flexDirection: { xs: 'column', md: 'row' } }}>
+                {/* Summary Card - 50% width */}
+                <Card
+                    sx={{
+                        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                        backdropFilter: 'blur(10px)',
+                        WebkitBackdropFilter: 'blur(10px)',
+                        border: '1px solid',
+                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                        flex: '1 1 50%',
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        '&:hover': {
+                            transform: 'none',
+                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                            borderColor: 'rgba(255, 255, 255, 0.15)',
+                        },
+                    }}
+                >
+                    <CardContent>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+                            <Box>
+                                <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
+                                    Suma wydatków
+                                </Typography>
+                                <Typography variant="h3" sx={{ fontWeight: 700, color: '#ff6b9d' }}>
+                                    {totalExpenses.toFixed(2)} zł
+                                </Typography>
+                            </Box>
+                            <FormControl sx={{ minWidth: 200 }}>
+                                <InputLabel>Miesiąc</InputLabel>
+                                <Select
+                                    value={selectedMonth}
+                                    label="Miesiąc"
+                                    onChange={(e) => setSelectedMonth(e.target.value)}
+                                    MenuProps={{
+                                        PaperProps: {
+                                            sx: {
+                                                background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                                                backdropFilter: 'blur(20px)',
+                                                WebkitBackdropFilter: 'blur(20px)',
+                                                border: '1px solid rgba(255, 255, 255, 0.1)',
+                                                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                                            }
+                                        }
+                                    }}
+                                >
+                                    {monthOptions.map((option) => (
+                                        <MenuItem key={option.value} value={option.value}>
+                                            {option.label}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
                         </Box>
-                        <FormControl sx={{ minWidth: 200 }}>
-                            <InputLabel>Miesiąc</InputLabel>
-                            <Select
-                                value={selectedMonth}
-                                label="Miesiąc"
-                                onChange={(e) => setSelectedMonth(e.target.value)}
-                            >
-                                {monthOptions.map((option) => (
-                                    <MenuItem key={option.value} value={option.value}>
-                                        {option.label}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Box>
-                </CardContent>
-            </Card>
+                    </CardContent>
+                </Card>
 
-            {/* Filters */}
-            <Card
-                sx={{
-                    backgroundColor: 'background.paper',
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    mb: 3,
-                }}
-            >
-                <CardContent>
-                    <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                        <TextField
-                            placeholder="Szukaj wydatków..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            sx={{ flex: 1, minWidth: 250 }}
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <SearchIcon />
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />
-                        <FormControl sx={{ minWidth: 200 }}>
-                            <InputLabel>Kategoria</InputLabel>
-                            <Select
-                                value={selectedCategory}
-                                label="Kategoria"
-                                onChange={(e) => setSelectedCategory(e.target.value)}
-                            >
-                                <MenuItem value="all">Wszystkie</MenuItem>
-                                {categories.map((category) => (
-                                    <MenuItem key={category.id} value={category.id}>
-                                        {category.name}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Box>
-                </CardContent>
-            </Card>
+                {/* Filters Card - 50% width */}
+                <Card
+                    sx={{
+                        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                        backdropFilter: 'blur(10px)',
+                        WebkitBackdropFilter: 'blur(10px)',
+                        border: '1px solid',
+                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                        flex: '1 1 50%',
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        '&:hover': {
+                            transform: 'none',
+                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                            borderColor: 'rgba(255, 255, 255, 0.15)',
+                        },
+                    }}
+                >
+                    <CardContent>
+                        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                            <TextField
+                                placeholder="Szukaj wydatków..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                sx={{ flex: 1, minWidth: 200 }}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <SearchIcon />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                            <FormControl sx={{ minWidth: 180, flex: 1 }}>
+                                <InputLabel>Kategoria</InputLabel>
+                                <Select
+                                    value={selectedCategory}
+                                    label="Kategoria"
+                                    onChange={(e) => setSelectedCategory(e.target.value)}
+                                    MenuProps={{
+                                        PaperProps: {
+                                            sx: {
+                                                background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                                                backdropFilter: 'blur(20px)',
+                                                WebkitBackdropFilter: 'blur(20px)',
+                                                border: '1px solid rgba(255, 255, 255, 0.1)',
+                                                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                                            }
+                                        }
+                                    }}
+                                >
+                                    <MenuItem value="all">Wszystkie</MenuItem>
+                                    {categories.map((category) => (
+                                        <MenuItem key={category.id} value={category.id}>
+                                            {category.name}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Box>
+                    </CardContent>
+                </Card>
+            </Box>
 
             {/* Expenses Table */}
             <Card
                 sx={{
-                    backgroundColor: 'background.paper',
+                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                    backdropFilter: 'blur(10px)',
+                    WebkitBackdropFilter: 'blur(10px)',
                     border: '1px solid',
-                    borderColor: 'divider',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    '&:hover': {
+                        transform: 'none',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                        borderColor: 'rgba(255, 255, 255, 0.15)',
+                    },
                 }}
             >
                 <TableContainer>
@@ -456,6 +535,15 @@ const WydatkiSection = () => {
                 onClose={() => setOpenExpenseDialog(false)}
                 maxWidth="sm"
                 fullWidth
+                PaperProps={{
+                    sx: {
+                        background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                        backdropFilter: 'blur(20px)',
+                        WebkitBackdropFilter: 'blur(20px)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                    }
+                }}
             >
                 <DialogTitle>
                     {editingExpense ? 'Edytuj wydatek' : 'Dodaj wydatek'}
@@ -475,6 +563,17 @@ const WydatkiSection = () => {
                                 value={expenseForm.categoryId}
                                 label="Kategoria"
                                 onChange={(e) => setExpenseForm({ ...expenseForm, categoryId: e.target.value })}
+                                MenuProps={{
+                                    PaperProps: {
+                                        sx: {
+                                            background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                                            backdropFilter: 'blur(20px)',
+                                            WebkitBackdropFilter: 'blur(20px)',
+                                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                                            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                                        }
+                                    }
+                                }}
                             >
                                 {categories.map((category) => (
                                     <MenuItem key={category.id} value={category.id}>
@@ -483,15 +582,57 @@ const WydatkiSection = () => {
                                 ))}
                             </Select>
                         </FormControl>
-                        <TextField
-                            label="Data"
-                            type="date"
-                            value={expenseForm.date}
-                            onChange={(e) => setExpenseForm({ ...expenseForm, date: e.target.value })}
-                            fullWidth
-                            required
-                            InputLabelProps={{ shrink: true }}
-                        />
+                        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
+                            <DatePicker
+                                label="Data"
+                                value={dayjs(expenseForm.date)}
+                                onChange={(newValue) => setExpenseForm({ ...expenseForm, date: newValue ? newValue.format('YYYY-MM-DD') : '' })}
+                                slotProps={{
+                                    textField: {
+                                        fullWidth: true,
+                                        required: true,
+                                    },
+                                    popper: {
+                                        sx: {
+                                            '& .MuiPaper-root': {
+                                                background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                                                backdropFilter: 'blur(20px)',
+                                                WebkitBackdropFilter: 'blur(20px)',
+                                                border: '1px solid rgba(255, 255, 255, 0.1)',
+                                                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                                            },
+                                            '& .MuiPickersCalendarHeader-root': {
+                                                color: '#ffffff',
+                                            },
+                                            '& .MuiPickersCalendarHeader-label': {
+                                                color: '#ffffff',
+                                            },
+                                            '& .MuiPickersDay-root': {
+                                                color: '#ffffff',
+                                                '&:hover': {
+                                                    backgroundColor: 'rgba(255, 107, 157, 0.2)',
+                                                },
+                                                '&.Mui-selected': {
+                                                    backgroundColor: '#ff6b9d',
+                                                    '&:hover': {
+                                                        backgroundColor: '#ff5c8d',
+                                                    },
+                                                },
+                                            },
+                                            '& .MuiPickersDay-today': {
+                                                border: '1px solid #ff6b9d',
+                                            },
+                                            '& .MuiDayCalendar-weekDayLabel': {
+                                                color: 'rgba(255, 255, 255, 0.7)',
+                                            },
+                                            '& .MuiIconButton-root': {
+                                                color: '#ffffff',
+                                            },
+                                        },
+                                    },
+                                }}
+                            />
+                        </LocalizationProvider>
                         <TextField
                             label="Kwota"
                             type="number"
@@ -534,6 +675,15 @@ const WydatkiSection = () => {
                 onClose={() => setOpenCategoryDialog(false)}
                 maxWidth="sm"
                 fullWidth
+                PaperProps={{
+                    sx: {
+                        background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                        backdropFilter: 'blur(20px)',
+                        WebkitBackdropFilter: 'blur(20px)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                    }
+                }}
             >
                 <DialogTitle>Dodaj kategorię</DialogTitle>
                 <DialogContent>

@@ -75,14 +75,14 @@ const DashboardPage = () => {
         return name.substring(0, 2).toUpperCase();
     };
 
-    // Menu items
+    // Menu items with colors matching dashboard cards
     const menuItems = [
-        { id: 'pulpit', label: 'Pulpit', icon: <DashboardIcon /> },
-        { id: 'wydatki', label: 'Wydatki', icon: <AccountBalanceWalletIcon /> },
-        { id: 'budzet', label: 'Budżet', icon: <TrendingUpIcon /> },
-        { id: 'cele', label: 'Cele', icon: <TrackChangesIcon /> },
-        { id: 'analizy', label: 'Analizy', icon: <BarChartIcon /> },
-        { id: 'ustawienia', label: 'Ustawienia', icon: <SettingsIcon /> },
+        { id: 'pulpit', label: 'Pulpit', icon: <DashboardIcon />, color: '#00f0ff' }, // Aktualne saldo - cyan
+        { id: 'wydatki', label: 'Wydatki', icon: <AccountBalanceWalletIcon />, color: '#ff6b9d' }, // Wydatki - różowy
+        { id: 'budzet', label: 'Budżet', icon: <TrendingUpIcon />, color: '#a8e6cf' }, // Przychody - zielony
+        { id: 'cele', label: 'Cele', icon: <TrackChangesIcon />, color: '#c77dff' }, // Twój cel - fioletowy
+        { id: 'analizy', label: 'Analizy', icon: <BarChartIcon />, color: '#ffd93d' }, // Oszczędności - żółty
+        { id: 'ustawienia', label: 'Ustawienia', icon: <SettingsIcon />, color: '#90a4ae' }, // Ustawienia - blue-grey
     ];
 
     // Titles for AppBar (can be different from menu labels)
@@ -121,34 +121,26 @@ const DashboardPage = () => {
             {/* Logo */}
             <Box
                 sx={{
-                    p: 2.5,
+                    height: 64,
+                    px: 3,
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 1,
+                    justifyContent: 'center',
                 }}
             >
-                <Box
+                <Typography
+                    variant="h4"
                     sx={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: '50%',
-                        backgroundColor: 'primary.main',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '1.5rem',
                         fontWeight: 700,
-                        color: 'primary.contrastText',
+                        color: 'text.primary',
+                        letterSpacing: 1,
                     }}
                 >
-                    $
-                </Box>
-                <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary' }}>
                     SmartSaver
                 </Typography>
             </Box>
 
-            <Divider />
+            <Divider sx={{ borderColor: 'rgba(0, 240, 255, 0.2)', boxShadow: '0 1px 2px rgba(0, 240, 255, 0.1)' }} />
 
             {/* Menu */}
             <List sx={{ flex: 1, pt: 2 }}>
@@ -159,24 +151,49 @@ const DashboardPage = () => {
                             onClick={() => setSelectedMenu(item.id)}
                             sx={{
                                 borderRadius: 2,
-                                '&.Mui-selected': {
-                                    backgroundColor: 'rgba(0, 240, 255, 0.15)',
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                ...(selectedMenu === item.id && {
+                                    background: `linear-gradient(135deg, ${item.color}33, ${item.color}1a)`,
+                                    backdropFilter: 'blur(8px)',
+                                    WebkitBackdropFilter: 'blur(8px)',
+                                    border: `1px solid ${item.color}4d`,
+                                    boxShadow: `0 4px 12px ${item.color}26, inset 0 1px 0 ${item.color}33`,
                                     '&:hover': {
-                                        backgroundColor: 'rgba(0, 240, 255, 0.2)',
+                                        background: `linear-gradient(135deg, ${item.color}40, ${item.color}26)`,
+                                        boxShadow: `0 6px 16px ${item.color}33, inset 0 1px 0 ${item.color}4d`,
                                     },
+                                }),
+                                '&:hover': {
+                                    background: selectedMenu === item.id ? undefined : `${item.color}0d`,
                                 },
                             }}
                         >
-                            <ListItemIcon sx={{ color: selectedMenu === item.id ? 'primary.main' : 'text.secondary' }}>
+                            <ListItemIcon
+                                sx={{
+                                    color: selectedMenu === item.id ? item.color : 'text.secondary',
+                                    filter: selectedMenu === item.id ? `drop-shadow(0 0 8px ${item.color}80)` : 'none',
+                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                }}
+                            >
                                 {item.icon}
                             </ListItemIcon>
-                            <ListItemText primary={item.label} />
+                            <ListItemText
+                                primary={item.label}
+                                primaryTypographyProps={{
+                                    sx: {
+                                        color: selectedMenu === item.id ? item.color : 'text.primary',
+                                        textShadow: selectedMenu === item.id ? `0 0 10px ${item.color}40` : 'none',
+                                        fontWeight: selectedMenu === item.id ? 600 : 400,
+                                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                    }
+                                }}
+                            />
                         </ListItemButton>
                     </ListItem>
                 ))}
             </List>
 
-            <Divider />
+            <Divider sx={{ borderColor: 'rgba(0, 240, 255, 0.2)', boxShadow: '0 1px 2px rgba(0, 240, 255, 0.1)' }} />
 
             {/* Logout */}
             <List sx={{ pb: 2 }}>
@@ -200,11 +217,14 @@ const DashboardPage = () => {
                 sx={{
                     width: { md: `calc(100% - ${drawerWidth}px)` },
                     ml: { md: `${drawerWidth}px` },
-                    backgroundColor: 'background.paper',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
+                    background: 'linear-gradient(135deg, rgba(0, 240, 255, 0.08), rgba(0, 240, 255, 0.02))',
+                    backdropFilter: 'blur(10px)',
+                    WebkitBackdropFilter: 'blur(10px)',
+                    borderBottom: '1px solid rgba(0, 240, 255, 0.2)',
+                    boxShadow: '0 4px 12px rgba(0, 240, 255, 0.1), inset 0 1px 0 rgba(0, 240, 255, 0.15)',
                 }}
             >
-                <Toolbar>
+                <Toolbar sx={{ minHeight: 64, px: 3 }}>
                     {/* Hamburger dla mobile */}
                     <IconButton
                         color="inherit"
@@ -262,7 +282,11 @@ const DashboardPage = () => {
                         '& .MuiDrawer-paper': {
                             boxSizing: 'border-box',
                             width: drawerWidth,
-                            backgroundColor: 'background.paper',
+                            background: 'linear-gradient(135deg, rgba(0, 240, 255, 0.08), rgba(0, 240, 255, 0.02))',
+                            backdropFilter: 'blur(10px)',
+                            WebkitBackdropFilter: 'blur(10px)',
+                            borderRight: '1px solid rgba(0, 240, 255, 0.2)',
+                            boxShadow: '4px 0 12px rgba(0, 240, 255, 0.1)',
                         },
                     }}
                 >
@@ -277,9 +301,11 @@ const DashboardPage = () => {
                         '& .MuiDrawer-paper': {
                             boxSizing: 'border-box',
                             width: drawerWidth,
-                            backgroundColor: 'background.paper',
-                            borderRight: '1px solid',
-                            borderColor: 'divider',
+                            background: 'linear-gradient(135deg, rgba(0, 240, 255, 0.08), rgba(0, 240, 255, 0.02))',
+                            backdropFilter: 'blur(10px)',
+                            WebkitBackdropFilter: 'blur(10px)',
+                            borderRight: '1px solid rgba(0, 240, 255, 0.2)',
+                            boxShadow: '4px 0 12px rgba(0, 240, 255, 0.1)',
                         },
                     }}
                     open
