@@ -19,5 +19,43 @@ model Account {
   email        String   @unique
   passwordHash String   @map("password")
 
+  createdAt    DateTime @default(now())
+  
+  // relations
+  categories   Category[]
+  expenses     Expense[]
+
   @@map("accounts")
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  name      String
+  color     String
+  icon      String
+  createdAt DateTime @default(now())
+
+  user Account @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expenses Expense[]
+
+  @@map("categories")
+  @@unique([userId, name])
+}
+
+model Expense {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  categoryId Int
+  name       String
+  amount     Float
+  date       DateTime
+  description String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user     Account  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  @@map("expenses")
 }

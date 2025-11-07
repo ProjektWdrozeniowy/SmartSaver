@@ -52,6 +52,21 @@ const LoginSchema = z.object({
   password: z.string().min(8)
 });
 
+// Categories and Expenses validation
+const CategorySchema = z.object({
+  name: z.string().min(1).max(100),
+  color: z.string().regex(/^#([0-9A-Fa-f]{6})$/),
+  icon: z.string().min(1).max(4)
+});
+
+const ExpenseSchema = z.object({
+  name: z.string().min(1).max(200),
+  categoryId: z.number().int().positive(),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  amount: z.number().positive(),
+  description: z.string().max(1000).optional()
+});
+
 // 👇 tu dodajesz
 app.get('/', (_req, res) => {
   res.type('html').send(`
@@ -86,6 +101,23 @@ app.post('/api/register', async (req, res) => {
       }
     });
 
+    // create default categories for new user
+    try {
+      const defaultCategories = [
+        { name: 'Jedzenie', color: '#ff6b9d', icon: '🍕' },
+        { name: 'Transport', color: '#00f0ff', icon: '🚗' },
+        { name: 'Rozrywka', color: '#a8e6cf', icon: '🎬' },
+        { name: 'Rachunki', color: '#ffd93d', icon: '⚡' },
+        { name: 'Zakupy', color: '#c77dff', icon: '🛒' }
+      ];
+
+      // map to include userId
+      const categoriesToCreate = defaultCategories.map((c) => ({ ...c, userId: newUser.id }));
+      await prisma.category.createMany({ data: categoriesToCreate });
+    } catch (err) {
+      console.warn('Warning: could not create default categories', err?.message || err);
+    }
+
     // Generuj JWT token
     const token = generateToken(newUser);
 
@@ -101,6 +133,171 @@ app.post('/api/register', async (req, res) => {
       return res.status(400).json({ ok: false, message: 'Nieprawidłowe dane: ' + err.errors.map(e => e.message).join(', ') });
     }
     res.status(400).json({ ok: false, message: err.message });
+  }
+});
+
+// -------------------- Categories --------------------
+// GET /api/categories
+app.get('/api/categories', authenticateToken, async (req, res) => {
+  try {
+    const categories = await prisma.category.findMany({
+      where: { userId: req.user.id },
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json({ ok: true, categories });
+  } catch (err) {
+    console.error('[GET_CATEGORIES_ERROR]', err);
+    res.status(500).json({ ok: false, message: 'Błąd serwera' });
+  }
+});
+
+// POST /api/categories
+app.post('/api/categories', authenticateToken, async (req, res) => {
+  try {
+    const { name, color, icon } = CategorySchema.parse(req.body);
+
+    const exists = await prisma.category.findFirst({ where: { userId: req.user.id, name } });
+    if (exists) {
+      return res.status(400).json({ ok: false, message: 'Kategoria o tej nazwie już istnieje' });
+    }
+
+    const category = await prisma.category.create({
+      data: { userId: req.user.id, name, color, icon }
+    });
+
+    res.status(201).json({ message: 'Kategoria została dodana', category });
+  } catch (err) {
+    console.error('[CREATE_CATEGORY_ERROR]', err);
+    if (err?.name === 'ZodError') {
+      return res.status(400).json({ ok: false, message: 'Nieprawidłowe dane' });
+    }
+    res.status(500).json({ ok: false, message: 'Błąd serwera' });
+  }
+});
+
+// -------------------- Expenses --------------------
+// GET /api/expenses?month=YYYY-MM
+app.get('/api/expenses', authenticateToken, async (req, res) => {
+  try {
+    const { month } = req.query;
+    const where = { userId: req.user.id };
+
+    if (month) {
+      // month expected format YYYY-MM
+      const [y, m] = String(month).split('-').map(Number);
+      if (!y || !m) return res.status(400).json({ ok: false, message: 'Nieprawidłowy format miesiąca' });
+      const start = new Date(Date.UTC(y, m - 1, 1));
+      const end = new Date(Date.UTC(y, m, 0, 23, 59, 59, 999));
+      where.date = { gte: start, lte: end };
+    }
+
+    const expenses = await prisma.expense.findMany({
+      where,
+      orderBy: { date: 'desc' }
+    });
+
+    // format dates to YYYY-MM-DD
+    const formatted = expenses.map((e) => ({
+      id: e.id,
+      name: e.name,
+      categoryId: e.categoryId,
+      date: e.date.toISOString().split('T')[0],
+      description: e.description,
+      amount: e.amount
+    }));
+
+    res.json({ expenses: formatted });
+  } catch (err) {
+    console.error('[GET_EXPENSES_ERROR]', err);
+    res.status(500).json({ ok: false, message: 'Błąd serwera' });
+  }
+});
+
+// POST /api/expenses
+app.post('/api/expenses', authenticateToken, async (req, res) => {
+  try {
+    const parsed = ExpenseSchema.parse(req.body);
+
+    // check category exists and belongs to user
+    const category = await prisma.category.findUnique({ where: { id: parsed.categoryId } });
+    if (!category || category.userId !== req.user.id) {
+      return res.status(400).json({ ok: false, message: 'Nieprawidłowa kategoria' });
+    }
+
+    const created = await prisma.expense.create({
+      data: {
+        userId: req.user.id,
+        categoryId: parsed.categoryId,
+        name: parsed.name,
+        amount: parsed.amount,
+        date: new Date(parsed.date),
+        description: parsed.description || null
+      }
+    });
+
+    res.status(201).json({ message: 'Wydatek został dodany', expense: created });
+  } catch (err) {
+    console.error('[CREATE_EXPENSE_ERROR]', err);
+    if (err?.name === 'ZodError') {
+      return res.status(400).json({ ok: false, message: 'Nieprawidłowe dane' });
+    }
+    res.status(500).json({ ok: false, message: 'Błąd serwera' });
+  }
+});
+
+// PUT /api/expenses/:id
+app.put('/api/expenses/:id', authenticateToken, async (req, res) => {
+  try {
+    const expenseId = Number(req.params.id);
+    if (!expenseId) return res.status(400).json({ ok: false, message: 'Nieprawidłowe id' });
+
+    const parsed = ExpenseSchema.parse(req.body);
+
+    const existing = await prisma.expense.findUnique({ where: { id: expenseId } });
+    if (!existing || existing.userId !== req.user.id) {
+      return res.status(404).json({ message: 'Wydatek nie został znaleziony' });
+    }
+
+    const category = await prisma.category.findUnique({ where: { id: parsed.categoryId } });
+    if (!category || category.userId !== req.user.id) {
+      return res.status(400).json({ ok: false, message: 'Nieprawidłowa kategoria' });
+    }
+
+    const updated = await prisma.expense.update({
+      where: { id: expenseId },
+      data: {
+        name: parsed.name,
+        categoryId: parsed.categoryId,
+        amount: parsed.amount,
+        date: new Date(parsed.date),
+        description: parsed.description || null
+      }
+    });
+
+    res.json({ message: 'Wydatek został zaktualizowany', expense: updated });
+  } catch (err) {
+    console.error('[UPDATE_EXPENSE_ERROR]', err);
+    if (err?.name === 'ZodError') return res.status(400).json({ ok: false, message: 'Nieprawidłowe dane' });
+    res.status(500).json({ ok: false, message: 'Błąd serwera' });
+  }
+});
+
+// DELETE /api/expenses/:id
+app.delete('/api/expenses/:id', authenticateToken, async (req, res) => {
+  try {
+    const expenseId = Number(req.params.id);
+    if (!expenseId) return res.status(400).json({ ok: false, message: 'Nieprawidłowe id' });
+
+    const existing = await prisma.expense.findUnique({ where: { id: expenseId } });
+    if (!existing || existing.userId !== req.user.id) {
+      return res.status(404).json({ message: 'Wydatek nie został znaleziony' });
+    }
+
+    await prisma.expense.delete({ where: { id: expenseId } });
+    res.json({ message: 'Wydatek został usunięty' });
+  } catch (err) {
+    console.error('[DELETE_EXPENSE_ERROR]', err);
+    res.status(500).json({ ok: false, message: 'Błąd serwera' });
   }
 });
 
