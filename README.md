@@ -40,6 +40,11 @@ JWT_EXPIRES_IN="7d"
 npm run migrate
 ```
 
+**Uwaga:** Jeśli migracje nie wygenerują automatycznie Prisma Client, uruchom:
+```bash
+npx prisma generate
+```
+
 ### Uruchomienie aplikacji
 
 #### Uruchom frontend i backend jedną komendą:
@@ -102,6 +107,9 @@ npm run build
 
 # Uruchom migracje Prisma
 npm run prisma:migrate
+
+# Wygeneruj Prisma Client
+npx prisma generate
 
 # Otwórz Prisma Studio (GUI do bazy danych)
 npm run prisma:studio
