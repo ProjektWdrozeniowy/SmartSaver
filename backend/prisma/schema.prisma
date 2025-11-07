@@ -1,23 +1,110 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+generator client {
+  provider = "prisma-client-js"
+}
 
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 model Account {
-  id           Int      @id @default(autoincrement())
-  username     String
-  email        String   @unique
-  passwordHash String   @map("password")
+  id            Int            @id @default(autoincrement())
+  username      String
+  email         String         @unique
+  passwordHash  String         @map("password")
+  createdAt     DateTime       @default(now())
+  categories    Category[]
+  expenses      Expense[]
+  goals         Goal[]
+  incomes       Income[]
+  settings      UserSettings?
 
   @@map("accounts")
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  name      String
+  color     String
+  icon      String
+  createdAt DateTime  @default(now())
+  user      Account   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expenses  Expense[]
+
+  @@unique([userId, name])
+  @@map("categories")
+}
+
+model Expense {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  categoryId  Int
+  name        String
+  amount      Float
+  date        DateTime
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  category    Category @relation(fields: [categoryId], references: [id])
+  user        Account  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([categoryId], map: "expenses_categoryId_fkey")
+  @@index([userId], map: "expenses_userId_fkey")
+  @@map("expenses")
+}
+
+model Income {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  name        String
+  amount      Float
+  date        DateTime
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        Account  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "incomes_userId_fkey")
+  @@map("incomes")
+}
+
+model Goal {
+  id            Int                @id @default(autoincrement())
+  userId        Int
+  name          String
+  targetAmount  Float
+  currentAmount Float              @default(0)
+  dueDate       DateTime
+  description   String?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  contributions GoalContribution[]
+  user          Account            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "goals_userId_fkey")
+  @@map("goals")
+}
+
+model GoalContribution {
+  id        Int      @id @default(autoincrement())
+  goalId    Int
+  amount    Float
+  createdAt DateTime @default(now())
+  goal      Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
+
+  @@index([goalId], map: "goal_contributions_goalId_fkey")
+  @@map("goal_contributions")
+}
+
+model UserSettings {
+  id            Int      @id @default(autoincrement())
+  userId        Int      @unique
+  budgetAlerts  Boolean  @default(true)
+  goalReminders Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          Account  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_settings")
 }
