@@ -37,7 +37,7 @@ JWT_EXPIRES_IN="7d"
 
 4. **Uruchom migracje bazy danych:**
 ```bash
-npm run prisma:migrate
+npm run migrate
 ```
 
 ### Uruchomienie aplikacji
