@@ -35,7 +35,7 @@ JWT_SECRET="your-super-secret-jwt-key-change-this-in-production-2024"
 JWT_EXPIRES_IN="7d"
 ```
 
-4. **Uruchom migracje bazy danych:**
+4. **Uruchom migracje bazy danych z folderu backend:**
 ```bash
 npm run migrate
 ```

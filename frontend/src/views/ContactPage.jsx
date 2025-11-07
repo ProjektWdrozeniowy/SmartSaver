@@ -104,22 +104,44 @@ const ContactPage = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (validateForm()) {
-            console.log('Contact form submitted:', formData);
+            try {
+                // Wyślij dane do backendu
+                const response = await fetch('http://localhost:4000/api/mail/contact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
 
-            // Pokaż modal sukcesu
-            setSuccessOpen(true);
+                const data = await response.json();
 
-            // Wyczyść formularz
-            setFormData({
-                name: '',
-                email: '',
-                subject: '',
-                message: '',
-            });
+                if (data.ok) {
+                    console.log('Email wysłany pomyślnie:', data);
+
+                    // Pokaż modal sukcesu
+                    setSuccessOpen(true);
+
+                    // Wyczyść formularz
+                    setFormData({
+                        name: '',
+                        email: '',
+                        subject: '',
+                        message: '',
+                    });
+                } else {
+                    // Obsługa błędu z backendu
+                    console.error('Błąd wysyłania:', data);
+                    alert('Wystąpił błąd podczas wysyłania wiadomości: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Błąd połączenia z serwerem:', error);
+                alert('Nie udało się połączyć z serwerem. Sprawdź czy backend działa.');
+            }
         }
     };
 
