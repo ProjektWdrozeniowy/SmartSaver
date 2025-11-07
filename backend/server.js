@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const { z } = require('zod');
 const { PrismaClient } = require('@prisma/client');
 const { authenticateToken } = require('./middleware/auth');
+const mailRoutes = require('./src/routes/mailRoutes');
 
 const prisma = new PrismaClient();
 const app = express();
@@ -40,6 +41,9 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
+
+// Mail routes
+app.use('/api/mail', mailRoutes);
 
 const RegisterSchema = z.object({
   username: z.string().min(3).max(32),
