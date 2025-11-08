@@ -217,7 +217,14 @@ router.get('/summary', authenticateToken, async (req, res) => {
     const totalIncome = incomesResult._sum.amount || 0;
     const totalExpenses = expensesResult._sum.amount || 0;
     const balance = (totalIncomesResult._sum.amount || 0) - (totalExpensesResult._sum.amount || 0);
-    const savings = totalIncome - totalExpenses;
+
+    // Calculate savings based on the user's goals to avoid mirroring the balance value
+    const totalSavingsResult = await prisma.goal.aggregate({
+      where: { userId: req.user.id },
+      _sum: { currentAmount: true }
+    });
+
+    const savings = totalSavingsResult._sum.currentAmount || 0;
 
     res.json({
       totalIncome,
