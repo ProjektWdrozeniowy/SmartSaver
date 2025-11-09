@@ -615,14 +615,6 @@ const AnalizySection = () => {
                                     name="Wydatki"
                                     dot={{ fill: '#ff6b9d', r: 4 }}
                                 />
-                                <Line
-                                    type="monotone"
-                                    dataKey="savings"
-                                    stroke="#a8e6cf"
-                                    strokeWidth={2}
-                                    name="Oszczędności"
-                                    dot={{ fill: '#a8e6cf', r: 4 }}
-                                />
                             </LineChart>
                         </ResponsiveContainer>
                     )}
@@ -688,9 +680,9 @@ const AnalizySection = () => {
                                             <Pie
                                                 data={expensesByCategoryData}
                                                 cx="50%"
-                                                cy="48%"
-                                                innerRadius={70}
-                                                outerRadius={120}
+                                                cy="45%"
+                                                innerRadius={55}
+                                                outerRadius={95}
                                                 fill="#8884d8"
                                                 paddingAngle={5}
                                                 dataKey="value"
