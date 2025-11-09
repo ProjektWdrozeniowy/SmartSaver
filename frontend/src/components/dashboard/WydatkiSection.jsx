@@ -59,7 +59,9 @@ const WydatkiSection = () => {
     const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7)); // YYYY-MM
     const [openExpenseDialog, setOpenExpenseDialog] = useState(false);
     const [openCategoryDialog, setOpenCategoryDialog] = useState(false);
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [editingExpense, setEditingExpense] = useState(null);
+    const [deletingExpenseId, setDeletingExpenseId] = useState(null);
 
     // Loading and notification states
     const [loading, setLoading] = useState(true);
@@ -204,17 +206,25 @@ const WydatkiSection = () => {
         }
     };
 
-    // Handle delete expense
-    const handleDeleteExpense = async (id) => {
-        if (window.confirm('Czy na pewno chcesz usunąć ten wydatek?')) {
-            try {
-                await deleteExpense(id);
-                showSnackbar('Wydatek został usunięty', 'success');
-                fetchExpenses(); // Refresh list
-            } catch (err) {
-                console.error('Error deleting expense:', err);
-                showSnackbar(err.message || 'Nie udało się usunąć wydatku', 'error');
-            }
+    // Handle delete expense - open dialog
+    const handleDeleteExpense = (id) => {
+        setDeletingExpenseId(id);
+        setOpenDeleteDialog(true);
+    };
+
+    // Confirm delete expense
+    const confirmDeleteExpense = async () => {
+        try {
+            setSaving(true);
+            await deleteExpense(deletingExpenseId);
+            showSnackbar('Wydatek został usunięty', 'success');
+            setOpenDeleteDialog(false);
+            fetchExpenses(); // Refresh list
+        } catch (err) {
+            console.error('Error deleting expense:', err);
+            showSnackbar(err.message || 'Nie udało się usunąć wydatku', 'error');
+        } finally {
+            setSaving(false);
         }
     };
 
@@ -765,6 +775,51 @@ const WydatkiSection = () => {
                         disabled={!categoryForm.name || saving}
                     >
                         {saving ? <CircularProgress size={24} /> : 'Dodaj'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Dialog - Delete Confirmation */}
+            <Dialog
+                open={openDeleteDialog}
+                onClose={() => setOpenDeleteDialog(false)}
+                maxWidth="xs"
+                fullWidth
+                PaperProps={{
+                    sx: {
+                        background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                        backdropFilter: 'blur(20px)',
+                        WebkitBackdropFilter: 'blur(20px)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                    }
+                }}
+            >
+                <DialogTitle>Usuń wydatek</DialogTitle>
+                <DialogContent>
+                    <Typography variant="body1" sx={{ color: 'text.secondary', pt: 2 }}>
+                        Czy na pewno chcesz usunąć ten wydatek? Ta operacja jest nieodwracalna.
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        onClick={() => setOpenDeleteDialog(false)}
+                        disabled={saving}
+                    >
+                        Anuluj
+                    </Button>
+                    <Button
+                        onClick={confirmDeleteExpense}
+                        variant="contained"
+                        disabled={saving}
+                        sx={{
+                            background: 'linear-gradient(135deg, #f44336 0%, #d32f2f 100%)',
+                            '&:hover': {
+                                background: 'linear-gradient(135deg, #d32f2f 0%, #c62828 100%)',
+                            },
+                        }}
+                    >
+                        {saving ? <CircularProgress size={24} /> : 'Usuń'}
                     </Button>
                 </DialogActions>
             </Dialog>
