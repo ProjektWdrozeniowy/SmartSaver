@@ -16,7 +16,6 @@ import {
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import SavingsIcon from '@mui/icons-material/Savings';
 import TrackChangesIcon from '@mui/icons-material/TrackChanges';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
@@ -47,7 +46,6 @@ const PulpitSection = ({ user, onNavigate }) => {
         balance: <AttachMoneyIcon />,
         income: <TrendingUpIcon />,
         expenses: <AccountBalanceWalletIcon />,
-        savings: <SavingsIcon />,
         goal: <TrackChangesIcon />,
     };
 
@@ -79,15 +77,6 @@ const PulpitSection = ({ user, onNavigate }) => {
             icon: <AccountBalanceWalletIcon />,
             color: '#ff6b9d',
             navigateTo: 'wydatki',
-        },
-        {
-            title: 'Twoje oszczędności',
-            value: '0 zł',
-            change: '0%',
-            positive: true,
-            icon: <SavingsIcon />,
-            color: '#ffd93d',
-            navigateTo: 'budzet',
         },
         {
             title: 'Twój cel',

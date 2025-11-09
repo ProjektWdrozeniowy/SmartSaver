@@ -11,7 +11,6 @@ function getIconKey(title) {
     'Aktualne saldo': 'balance',
     'Przychody (mies)': 'income',
     'Wydatki (miesiąc)': 'expenses',
-    'Twoje oszczędności': 'savings',
     'Twój cel': 'goal'
   };
   return iconMap[title] || 'balance';
@@ -37,7 +36,7 @@ router.get('/stats', authenticateToken, async (req, res) => {
     const previousMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
 
     // Get current month data
-    const [currentIncome, currentExpenses, previousIncome, previousExpenses, totalBalance, totalSavings, activeGoal] = await Promise.all([
+    const [currentIncome, currentExpenses, previousIncome, previousExpenses, totalBalance, activeGoal] = await Promise.all([
       // Current month income
       prisma.income.aggregate({
         where: {
@@ -81,11 +80,6 @@ router.get('/stats', authenticateToken, async (req, res) => {
           _sum: { amount: true }
         })
       ]),
-      // Total savings in goals
-      prisma.goal.aggregate({
-        where: { userId: req.user.id },
-        _sum: { currentAmount: true }
-      }),
       // Get the most active goal
       prisma.goal.findFirst({
         where: { userId: req.user.id },
@@ -98,12 +92,10 @@ router.get('/stats', authenticateToken, async (req, res) => {
     const previousIncomeAmount = previousIncome._sum.amount || 0;
     const previousExpensesAmount = previousExpenses._sum.amount || 0;
     const balance = (totalBalance[0]._sum.amount || 0) - (totalBalance[1]._sum.amount || 0);
-    const savings = totalSavings._sum.currentAmount || 0;
 
     // Calculate changes
     const incomeChange = calculateChange(currentIncomeAmount, previousIncomeAmount);
     const expensesChange = calculateChange(currentExpensesAmount, previousExpensesAmount);
-    const savingsChange = calculateChange(savings, savings * 0.93); // Mock previous savings
 
     const stats = [
       {
@@ -132,15 +124,6 @@ router.get('/stats', authenticateToken, async (req, res) => {
         iconKey: 'expenses',
         color: '#ff6b9d',
         navigateTo: 'wydatki'
-      },
-      {
-        title: 'Twoje oszczędności',
-        value: formatCurrency(savings),
-        change: `${savingsChange >= 0 ? '+' : ''}${savingsChange}%`,
-        positive: parseFloat(savingsChange) >= 0,
-        iconKey: 'savings',
-        color: '#ffd93d',
-        navigateTo: 'budzet'
       }
     ];
 
