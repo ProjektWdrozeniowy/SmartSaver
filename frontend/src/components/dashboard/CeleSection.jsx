@@ -641,24 +641,29 @@ const CeleSection = () => {
                                         )}
 
                                         {/* Actions */}
-                                        <Box sx={{ display: 'flex', gap: 1, mt: 'auto' }}>
+                                        <Box sx={{ display: 'flex', gap: 1, mt: 'auto', alignItems: 'stretch' }}>
                                             <Button
                                                 variant="contained"
                                                 size="small"
-                                                startIcon={<AccountBalanceWalletIcon />}
+                                                startIcon={<AccountBalanceWalletIcon sx={{ fontSize: '18px' }} />}
                                                 onClick={() => handleOpenContribute(goal)}
                                                 disabled={isCompleted}
-                                                fullWidth
+                                                disableElevation
                                                 sx={{
+                                                    flex: 1,
+                                                    minHeight: '36px',
+                                                    paddingX: 1.5,
                                                     background: 'linear-gradient(135deg, rgba(199, 125, 255, 0.3), rgba(199, 125, 255, 0.2))',
                                                     backdropFilter: 'blur(8px)',
                                                     WebkitBackdropFilter: 'blur(8px)',
                                                     border: '1px solid rgba(199, 125, 255, 0.5)',
                                                     color: '#ffffff',
                                                     boxShadow: '0 2px 8px rgba(199, 125, 255, 0.3)',
+                                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                                     '&:hover': {
                                                         background: 'linear-gradient(135deg, rgba(199, 125, 255, 0.4), rgba(199, 125, 255, 0.3))',
                                                         boxShadow: '0 4px 12px rgba(199, 125, 255, 0.4)',
+                                                        transform: 'none',
                                                     },
                                                     '&:disabled': {
                                                         background: 'rgba(255, 255, 255, 0.12)',
@@ -676,8 +681,12 @@ const CeleSection = () => {
                                                     backdropFilter: 'blur(8px)',
                                                     WebkitBackdropFilter: 'blur(8px)',
                                                     border: '1px solid rgba(0, 240, 255, 0.3)',
+                                                    borderRadius: '20px',
                                                     color: '#00f0ff',
-                                                    transition: 'all 0.3s',
+                                                    padding: '6px 16px',
+                                                    minHeight: '36px',
+                                                    flexShrink: 0,
+                                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                                     '&:hover': {
                                                         background: 'rgba(0, 240, 255, 0.2)',
                                                         boxShadow: '0 4px 12px rgba(0, 240, 255, 0.3)',
@@ -694,8 +703,12 @@ const CeleSection = () => {
                                                     backdropFilter: 'blur(8px)',
                                                     WebkitBackdropFilter: 'blur(8px)',
                                                     border: '1px solid rgba(244, 67, 54, 0.3)',
+                                                    borderRadius: '20px',
                                                     color: '#f44336',
-                                                    transition: 'all 0.3s',
+                                                    padding: '6px 16px',
+                                                    minHeight: '36px',
+                                                    flexShrink: 0,
+                                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                                     '&:hover': {
                                                         background: 'rgba(244, 67, 54, 0.2)',
                                                         boxShadow: '0 4px 12px rgba(244, 67, 54, 0.3)',
