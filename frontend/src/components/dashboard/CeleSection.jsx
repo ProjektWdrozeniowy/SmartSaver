@@ -370,7 +370,7 @@ const CeleSection = () => {
                                     textShadow: '0 0 20px #00f0ff60, 0 0 40px #00f0ff40'
                                 }}
                             >
-                                {statistics.totalSaved.toFixed(0)} zł
+                                {statistics.totalSaved.toFixed(2).replace('.', ',')} zł
                             </Typography>
                             <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1 }}>
                                 {statistics.percentageComplete.toFixed(0)}% całkowitego celu
@@ -429,7 +429,7 @@ const CeleSection = () => {
                                     textShadow: '0 0 20px #ffd70060, 0 0 40px #ffd70040'
                                 }}
                             >
-                                {statistics.remaining.toFixed(0)} zł
+                                {statistics.remaining.toFixed(2).replace('.', ',')} zł
                             </Typography>
                             <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1 }}>
                                 Pozostało do osiągnięcia
@@ -613,7 +613,7 @@ const CeleSection = () => {
                                                     Zaoszczędzone
                                                 </Typography>
                                                 <Typography variant="h6" sx={{ color: '#00f0ff', fontWeight: 600 }}>
-                                                    {goal.currentAmount.toFixed(2)} zł
+                                                    {goal.currentAmount.toFixed(2).replace('.', ',')} zł
                                                 </Typography>
                                             </Box>
                                             <Box sx={{ textAlign: 'right' }}>
@@ -621,7 +621,7 @@ const CeleSection = () => {
                                                     Cel
                                                 </Typography>
                                                 <Typography variant="h6" sx={{ color: 'text.primary', fontWeight: 600 }}>
-                                                    {goal.targetAmount.toFixed(2)} zł
+                                                    {goal.targetAmount.toFixed(2).replace('.', ',')} zł
                                                 </Typography>
                                             </Box>
                                         </Box>
@@ -895,7 +895,7 @@ const CeleSection = () => {
                                         Aktualnie zaoszczędzone
                                     </Typography>
                                     <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 600 }}>
-                                        {selectedGoal.currentAmount.toFixed(2)} zł
+                                        {selectedGoal.currentAmount.toFixed(2).replace('.', ',')} zł
                                     </Typography>
                                 </Box>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -903,7 +903,7 @@ const CeleSection = () => {
                                         Pozostało do celu
                                     </Typography>
                                     <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 600 }}>
-                                        {(selectedGoal.targetAmount - selectedGoal.currentAmount).toFixed(2)} zł
+                                        {(selectedGoal.targetAmount - selectedGoal.currentAmount).toFixed(2).replace('.', ',')} zł
                                     </Typography>
                                 </Box>
                             </Box>

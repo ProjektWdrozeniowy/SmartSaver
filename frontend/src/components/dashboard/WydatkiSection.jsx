@@ -342,7 +342,7 @@ const WydatkiSection = () => {
                                     Suma wydatków
                                 </Typography>
                                 <Typography variant="h3" sx={{ fontWeight: 700, color: '#ff6b9d' }}>
-                                    {totalExpenses.toFixed(2)} zł
+                                    {totalExpenses.toFixed(2).replace('.', ',')} zł
                                 </Typography>
                             </Box>
                             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
@@ -540,7 +540,7 @@ const WydatkiSection = () => {
                                                 {expense.description || '-'}
                                             </TableCell>
                                             <TableCell align="right" sx={{ color: 'text.primary', fontWeight: 600 }}>
-                                                {expense.amount.toFixed(2)} zł
+                                                {expense.amount.toFixed(2).replace('.', ',')} zł
                                             </TableCell>
                                             <TableCell align="center">
                                                 <IconButton

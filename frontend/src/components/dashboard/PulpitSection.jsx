@@ -324,7 +324,7 @@ const PulpitSection = ({ user, onNavigate }) => {
                                                     }}
                                                 >
                                                     {transaction.amount > 0 ? '+' : ''}
-                                                    {transaction.amount.toFixed(2)} zł
+                                                    {transaction.amount.toFixed(2).replace('.', ',')} zł
                                                 </Typography>
                                             </ListItem>
                                             {index < recentTransactions.length - 1 && <Divider sx={{ my: 0 }} />}

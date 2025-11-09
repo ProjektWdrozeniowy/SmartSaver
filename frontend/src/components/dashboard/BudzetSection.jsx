@@ -285,7 +285,7 @@ const BudzetSection = () => {
                                     textShadow: '0 0 20px #00f0ff60, 0 0 40px #00f0ff40'
                                 }}
                             >
-                                {budgetSummary.balance.toFixed(0)} zł
+                                {budgetSummary.balance.toFixed(2).replace('.', ',')} zł
                             </Typography>
                         </CardContent>
                     </Card>
@@ -341,7 +341,7 @@ const BudzetSection = () => {
                                     textShadow: '0 0 20px #a8e6cf60, 0 0 40px #a8e6cf40'
                                 }}
                             >
-                                {budgetSummary.totalIncome.toFixed(0)} zł
+                                {budgetSummary.totalIncome.toFixed(2).replace('.', ',')} zł
                             </Typography>
                         </CardContent>
                     </Card>
@@ -397,7 +397,7 @@ const BudzetSection = () => {
                                     textShadow: '0 0 20px #ff6b9d60, 0 0 40px #ff6b9d40'
                                 }}
                             >
-                                {budgetSummary.totalExpenses.toFixed(0)} zł
+                                {budgetSummary.totalExpenses.toFixed(2).replace('.', ',')} zł
                             </Typography>
                         </CardContent>
                     </Card>
@@ -545,7 +545,7 @@ const BudzetSection = () => {
                                             {income.description || '-'}
                                         </TableCell>
                                         <TableCell align="right" sx={{ color: '#a8e6cf', fontWeight: 700, fontSize: '1.1rem' }}>
-                                            {income.amount.toFixed(2)} zł
+                                            {income.amount.toFixed(2).replace('.', ',')} zł
                                         </TableCell>
                                         <TableCell align="center">
                                             <IconButton
