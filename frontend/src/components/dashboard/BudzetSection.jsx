@@ -188,20 +188,13 @@ const BudzetSection = () => {
         }
     };
 
-    // Generate month options (last 12 months)
-    const generateMonthOptions = () => {
-        const options = [];
-        const currentDate = new Date();
-        for (let i = 0; i < 12; i++) {
-            const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
-            const value = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-            const label = date.toLocaleDateString('pl-PL', { year: 'numeric', month: 'long' });
-            options.push({ value, label });
+    // Handle month change from DatePicker
+    const handleMonthChange = (newValue) => {
+        if (newValue) {
+            const formattedMonth = newValue.format('YYYY-MM');
+            setSelectedMonth(formattedMonth);
         }
-        return options;
     };
-
-    const monthOptions = generateMonthOptions();
 
     return (
         <Box sx={{ width: '100%' }}>
@@ -434,31 +427,66 @@ const BudzetSection = () => {
                         <Typography variant="h6" sx={{ color: 'text.primary', fontWeight: 600 }}>
                             Lista przychodów
                         </Typography>
-                        <FormControl sx={{ minWidth: 200 }}>
-                            <InputLabel>Miesiąc</InputLabel>
-                            <Select
-                                value={selectedMonth}
+                        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
+                            <DatePicker
                                 label="Miesiąc"
-                                onChange={(e) => setSelectedMonth(e.target.value)}
-                                MenuProps={{
-                                    PaperProps: {
+                                views={['month', 'year']}
+                                value={dayjs(selectedMonth + '-01')}
+                                onChange={handleMonthChange}
+                                maxDate={dayjs()}
+                                slotProps={{
+                                    textField: {
+                                        sx: { minWidth: 200 }
+                                    },
+                                    popper: {
                                         sx: {
-                                            background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
-                                            backdropFilter: 'blur(20px)',
-                                            WebkitBackdropFilter: 'blur(20px)',
-                                            border: '1px solid rgba(255, 255, 255, 0.1)',
-                                            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-                                        }
-                                    }
+                                            '& .MuiPaper-root': {
+                                                background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                                                backdropFilter: 'blur(20px)',
+                                                WebkitBackdropFilter: 'blur(20px)',
+                                                border: '1px solid rgba(255, 255, 255, 0.1)',
+                                                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                                            },
+                                            '& .MuiPickersCalendarHeader-root': {
+                                                color: '#ffffff',
+                                            },
+                                            '& .MuiPickersCalendarHeader-label': {
+                                                color: '#ffffff',
+                                            },
+                                            '& .MuiPickersMonth-monthButton': {
+                                                color: '#ffffff',
+                                                '&:hover': {
+                                                    backgroundColor: 'rgba(168, 230, 207, 0.2)',
+                                                },
+                                                '&.Mui-selected': {
+                                                    backgroundColor: '#a8e6cf',
+                                                    color: '#000000',
+                                                    '&:hover': {
+                                                        backgroundColor: '#84dcc6',
+                                                    },
+                                                },
+                                            },
+                                            '& .MuiPickersYear-yearButton': {
+                                                color: '#ffffff',
+                                                '&:hover': {
+                                                    backgroundColor: 'rgba(168, 230, 207, 0.2)',
+                                                },
+                                                '&.Mui-selected': {
+                                                    backgroundColor: '#a8e6cf',
+                                                    color: '#000000',
+                                                    '&:hover': {
+                                                        backgroundColor: '#84dcc6',
+                                                    },
+                                                },
+                                            },
+                                            '& .MuiIconButton-root': {
+                                                color: '#ffffff',
+                                            },
+                                        },
+                                    },
                                 }}
-                            >
-                                {monthOptions.map((option) => (
-                                    <MenuItem key={option.value} value={option.value}>
-                                        {option.label}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
+                            />
+                        </LocalizationProvider>
                     </Box>
                 </CardContent>
             </Card>
