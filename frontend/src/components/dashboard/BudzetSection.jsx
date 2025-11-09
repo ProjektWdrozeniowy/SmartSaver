@@ -38,7 +38,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import SavingsIcon from '@mui/icons-material/Savings';
 import { getIncome, createIncome, updateIncome, deleteIncome, getBudgetSummary } from '../../api/budget';
 
 const BudzetSection = () => {
@@ -48,7 +47,6 @@ const BudzetSection = () => {
         totalIncome: 0,
         totalExpenses: 0,
         balance: 0,
-        savings: 0,
     });
 
     // UI states
@@ -99,7 +97,6 @@ const BudzetSection = () => {
                 totalIncome: data.totalIncome || 0,
                 totalExpenses: data.totalExpenses || 0,
                 balance: data.balance || 0,
-                savings: data.savings || 0,
             });
         } catch (err) {
             console.error('Error fetching budget summary:', err);
@@ -191,20 +188,13 @@ const BudzetSection = () => {
         }
     };
 
-    // Generate month options (last 12 months)
-    const generateMonthOptions = () => {
-        const options = [];
-        const currentDate = new Date();
-        for (let i = 0; i < 12; i++) {
-            const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
-            const value = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-            const label = date.toLocaleDateString('pl-PL', { year: 'numeric', month: 'long' });
-            options.push({ value, label });
+    // Handle month change from DatePicker
+    const handleMonthChange = (newValue) => {
+        if (newValue) {
+            const formattedMonth = newValue.format('YYYY-MM');
+            setSelectedMonth(formattedMonth);
         }
-        return options;
     };
-
-    const monthOptions = generateMonthOptions();
 
     return (
         <Box sx={{ width: '100%' }}>
@@ -247,7 +237,7 @@ const BudzetSection = () => {
             }}>
                 {/* Current Balance */}
                 <Box sx={{
-                    flex: { xs: '1 1 100%', md: '1 1 calc(50% - 8px)', lg: '1 1 calc(25% - 12px)' },
+                    flex: { xs: '1 1 100%', md: '1 1 calc(50% - 8px)', lg: '1 1 calc(33.333% - 11px)' },
                     minWidth: 0
                 }}>
                     <Card
@@ -295,7 +285,7 @@ const BudzetSection = () => {
                                     textShadow: '0 0 20px #00f0ff60, 0 0 40px #00f0ff40'
                                 }}
                             >
-                                {budgetSummary.balance.toFixed(0)} zł
+                                {budgetSummary.balance.toFixed(2).replace('.', ',')} zł
                             </Typography>
                         </CardContent>
                     </Card>
@@ -303,7 +293,7 @@ const BudzetSection = () => {
 
                 {/* Total Income */}
                 <Box sx={{
-                    flex: { xs: '1 1 100%', md: '1 1 calc(50% - 8px)', lg: '1 1 calc(25% - 12px)' },
+                    flex: { xs: '1 1 100%', md: '1 1 calc(50% - 8px)', lg: '1 1 calc(33.333% - 11px)' },
                     minWidth: 0
                 }}>
                     <Card
@@ -351,7 +341,7 @@ const BudzetSection = () => {
                                     textShadow: '0 0 20px #a8e6cf60, 0 0 40px #a8e6cf40'
                                 }}
                             >
-                                {budgetSummary.totalIncome.toFixed(0)} zł
+                                {budgetSummary.totalIncome.toFixed(2).replace('.', ',')} zł
                             </Typography>
                         </CardContent>
                     </Card>
@@ -359,7 +349,7 @@ const BudzetSection = () => {
 
                 {/* Total Expenses */}
                 <Box sx={{
-                    flex: { xs: '1 1 100%', md: '1 1 calc(50% - 8px)', lg: '1 1 calc(25% - 12px)' },
+                    flex: { xs: '1 1 100%', md: '1 1 calc(50% - 8px)', lg: '1 1 calc(33.333% - 11px)' },
                     minWidth: 0
                 }}>
                     <Card
@@ -407,63 +397,7 @@ const BudzetSection = () => {
                                     textShadow: '0 0 20px #ff6b9d60, 0 0 40px #ff6b9d40'
                                 }}
                             >
-                                {budgetSummary.totalExpenses.toFixed(0)} zł
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Box>
-
-                {/* Savings */}
-                <Box sx={{
-                    flex: { xs: '1 1 100%', md: '1 1 calc(50% - 8px)', lg: '1 1 calc(25% - 12px)' },
-                    minWidth: 0
-                }}>
-                    <Card
-                        sx={{
-                            background: 'linear-gradient(135deg, rgba(255, 217, 61, 0.08), rgba(255, 217, 61, 0.02))',
-                            backdropFilter: 'blur(10px)',
-                            WebkitBackdropFilter: 'blur(10px)',
-                            border: '1px solid rgba(255, 217, 61, 0.3)',
-                            boxShadow: '0 4px 12px rgba(255, 217, 61, 0.15), inset 0 1px 0 rgba(255, 217, 61, 0.2)',
-                            height: '100%',
-                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                            '&:hover': {
-                                transform: 'translateY(-5px)',
-                                boxShadow: '0 12px 28px rgba(255, 217, 61, 0.25), inset 0 1px 0 rgba(255, 217, 61, 0.3)',
-                                borderColor: 'rgba(255, 217, 61, 0.4)',
-                            },
-                        }}
-                    >
-                        <CardContent>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                                <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>
-                                    Twoje oszczędności
-                                </Typography>
-                                <Box
-                                    sx={{
-                                        width: 40,
-                                        height: 40,
-                                        borderRadius: '50%',
-                                        backgroundColor: '#ffd93d20',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        color: '#ffd93d',
-                                    }}
-                                >
-                                    <SavingsIcon />
-                                </Box>
-                            </Box>
-                            <Typography
-                                variant="h4"
-                                sx={{
-                                    fontWeight: 700,
-                                    mb: 1,
-                                    color: 'text.primary',
-                                    textShadow: '0 0 20px #ffd93d60, 0 0 40px #ffd93d40'
-                                }}
-                            >
-                                {budgetSummary.savings.toFixed(0)} zł
+                                {budgetSummary.totalExpenses.toFixed(2).replace('.', ',')} zł
                             </Typography>
                         </CardContent>
                     </Card>
@@ -493,31 +427,66 @@ const BudzetSection = () => {
                         <Typography variant="h6" sx={{ color: 'text.primary', fontWeight: 600 }}>
                             Lista przychodów
                         </Typography>
-                        <FormControl sx={{ minWidth: 200 }}>
-                            <InputLabel>Miesiąc</InputLabel>
-                            <Select
-                                value={selectedMonth}
+                        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
+                            <DatePicker
                                 label="Miesiąc"
-                                onChange={(e) => setSelectedMonth(e.target.value)}
-                                MenuProps={{
-                                    PaperProps: {
+                                views={['month', 'year']}
+                                value={dayjs(selectedMonth + '-01')}
+                                onChange={handleMonthChange}
+                                maxDate={dayjs()}
+                                slotProps={{
+                                    textField: {
+                                        sx: { minWidth: 200 }
+                                    },
+                                    popper: {
                                         sx: {
-                                            background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
-                                            backdropFilter: 'blur(20px)',
-                                            WebkitBackdropFilter: 'blur(20px)',
-                                            border: '1px solid rgba(255, 255, 255, 0.1)',
-                                            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-                                        }
-                                    }
+                                            '& .MuiPaper-root': {
+                                                background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                                                backdropFilter: 'blur(20px)',
+                                                WebkitBackdropFilter: 'blur(20px)',
+                                                border: '1px solid rgba(255, 255, 255, 0.1)',
+                                                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                                            },
+                                            '& .MuiPickersCalendarHeader-root': {
+                                                color: '#ffffff',
+                                            },
+                                            '& .MuiPickersCalendarHeader-label': {
+                                                color: '#ffffff',
+                                            },
+                                            '& .MuiPickersMonth-monthButton': {
+                                                color: '#ffffff',
+                                                '&:hover': {
+                                                    backgroundColor: 'rgba(168, 230, 207, 0.2)',
+                                                },
+                                                '&.Mui-selected': {
+                                                    backgroundColor: '#a8e6cf',
+                                                    color: '#000000',
+                                                    '&:hover': {
+                                                        backgroundColor: '#84dcc6',
+                                                    },
+                                                },
+                                            },
+                                            '& .MuiPickersYear-yearButton': {
+                                                color: '#ffffff',
+                                                '&:hover': {
+                                                    backgroundColor: 'rgba(168, 230, 207, 0.2)',
+                                                },
+                                                '&.Mui-selected': {
+                                                    backgroundColor: '#a8e6cf',
+                                                    color: '#000000',
+                                                    '&:hover': {
+                                                        backgroundColor: '#84dcc6',
+                                                    },
+                                                },
+                                            },
+                                            '& .MuiIconButton-root': {
+                                                color: '#ffffff',
+                                            },
+                                        },
+                                    },
                                 }}
-                            >
-                                {monthOptions.map((option) => (
-                                    <MenuItem key={option.value} value={option.value}>
-                                        {option.label}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
+                            />
+                        </LocalizationProvider>
                     </Box>
                 </CardContent>
             </Card>
@@ -576,7 +545,7 @@ const BudzetSection = () => {
                                             {income.description || '-'}
                                         </TableCell>
                                         <TableCell align="right" sx={{ color: '#a8e6cf', fontWeight: 700, fontSize: '1.1rem' }}>
-                                            {income.amount.toFixed(2)} zł
+                                            {income.amount.toFixed(2).replace('.', ',')} zł
                                         </TableCell>
                                         <TableCell align="center">
                                             <IconButton

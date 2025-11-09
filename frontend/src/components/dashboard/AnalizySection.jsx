@@ -145,7 +145,7 @@ const AnalizySection = () => {
                             variant="body2"
                             sx={{ color: entry.color, fontSize: '0.875rem' }}
                         >
-                            {entry.name}: {entry.value.toFixed(2)} zł
+                            {entry.name}: {entry.value.toFixed(2).replace('.', ',')} zł
                         </Typography>
                     ))}
                 </Box>
@@ -265,7 +265,7 @@ const AnalizySection = () => {
                                     textShadow: '0 0 20px #ff6b9d60, 0 0 40px #ff6b9d40'
                                 }}
                             >
-                                {statistics.averageExpenses.toFixed(0)} zł
+                                {statistics.averageExpenses.toFixed(2).replace('.', ',')} zł
                             </Typography>
                             <Typography
                                 variant="body2"
@@ -332,7 +332,7 @@ const AnalizySection = () => {
                                     textShadow: '0 0 20px #00f0ff60, 0 0 40px #00f0ff40'
                                 }}
                             >
-                                {statistics.averageIncome.toFixed(0)} zł
+                                {statistics.averageIncome.toFixed(2).replace('.', ',')} zł
                             </Typography>
                             <Typography
                                 variant="body2"
@@ -399,7 +399,7 @@ const AnalizySection = () => {
                                     textShadow: '0 0 20px #a8e6cf60, 0 0 40px #a8e6cf40'
                                 }}
                             >
-                                {statistics.averageSavings.toFixed(0)} zł
+                                {statistics.averageSavings.toFixed(2).replace('.', ',')} zł
                             </Typography>
                             <Typography
                                 variant="body2"
@@ -615,14 +615,6 @@ const AnalizySection = () => {
                                     name="Wydatki"
                                     dot={{ fill: '#ff6b9d', r: 4 }}
                                 />
-                                <Line
-                                    type="monotone"
-                                    dataKey="savings"
-                                    stroke="#a8e6cf"
-                                    strokeWidth={2}
-                                    name="Oszczędności"
-                                    dot={{ fill: '#a8e6cf', r: 4 }}
-                                />
                             </LineChart>
                         </ResponsiveContainer>
                     )}
@@ -688,9 +680,9 @@ const AnalizySection = () => {
                                             <Pie
                                                 data={expensesByCategoryData}
                                                 cx="50%"
-                                                cy="48%"
-                                                innerRadius={70}
-                                                outerRadius={120}
+                                                cy="45%"
+                                                innerRadius={55}
+                                                outerRadius={95}
                                                 fill="#8884d8"
                                                 paddingAngle={5}
                                                 dataKey="value"
@@ -763,7 +755,7 @@ const AnalizySection = () => {
                                             Średnia dzienna
                                         </Typography>
                                         <Typography variant="h6" sx={{ color: '#00f0ff', fontWeight: 600 }}>
-                                            {dailyAverage.toFixed(0)} zł
+                                            {dailyAverage.toFixed(2).replace('.', ',')} zł
                                         </Typography>
                                     </Box>
                                 )}

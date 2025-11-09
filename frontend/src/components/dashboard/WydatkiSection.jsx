@@ -59,7 +59,9 @@ const WydatkiSection = () => {
     const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7)); // YYYY-MM
     const [openExpenseDialog, setOpenExpenseDialog] = useState(false);
     const [openCategoryDialog, setOpenCategoryDialog] = useState(false);
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [editingExpense, setEditingExpense] = useState(null);
+    const [deletingExpenseId, setDeletingExpenseId] = useState(null);
 
     // Loading and notification states
     const [loading, setLoading] = useState(true);
@@ -204,17 +206,25 @@ const WydatkiSection = () => {
         }
     };
 
-    // Handle delete expense
-    const handleDeleteExpense = async (id) => {
-        if (window.confirm('Czy na pewno chcesz usunąć ten wydatek?')) {
-            try {
-                await deleteExpense(id);
-                showSnackbar('Wydatek został usunięty', 'success');
-                fetchExpenses(); // Refresh list
-            } catch (err) {
-                console.error('Error deleting expense:', err);
-                showSnackbar(err.message || 'Nie udało się usunąć wydatku', 'error');
-            }
+    // Handle delete expense - open dialog
+    const handleDeleteExpense = (id) => {
+        setDeletingExpenseId(id);
+        setOpenDeleteDialog(true);
+    };
+
+    // Confirm delete expense
+    const confirmDeleteExpense = async () => {
+        try {
+            setSaving(true);
+            await deleteExpense(deletingExpenseId);
+            showSnackbar('Wydatek został usunięty', 'success');
+            setOpenDeleteDialog(false);
+            fetchExpenses(); // Refresh list
+        } catch (err) {
+            console.error('Error deleting expense:', err);
+            showSnackbar(err.message || 'Nie udało się usunąć wydatku', 'error');
+        } finally {
+            setSaving(false);
         }
     };
 
@@ -240,20 +250,13 @@ const WydatkiSection = () => {
         }
     };
 
-    // Generate month options (last 12 months)
-    const generateMonthOptions = () => {
-        const options = [];
-        const currentDate = new Date();
-        for (let i = 0; i < 12; i++) {
-            const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
-            const value = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-            const label = date.toLocaleDateString('pl-PL', { year: 'numeric', month: 'long' });
-            options.push({ value, label });
+    // Handle month change from DatePicker
+    const handleMonthChange = (newValue) => {
+        if (newValue) {
+            const formattedMonth = newValue.format('YYYY-MM');
+            setSelectedMonth(formattedMonth);
         }
-        return options;
     };
-
-    const monthOptions = generateMonthOptions();
 
     return (
         <Box sx={{ width: '100%' }}>
@@ -339,34 +342,69 @@ const WydatkiSection = () => {
                                     Suma wydatków
                                 </Typography>
                                 <Typography variant="h3" sx={{ fontWeight: 700, color: '#ff6b9d' }}>
-                                    {totalExpenses.toFixed(2)} zł
+                                    {totalExpenses.toFixed(2).replace('.', ',')} zł
                                 </Typography>
                             </Box>
-                            <FormControl sx={{ minWidth: 200 }}>
-                                <InputLabel>Miesiąc</InputLabel>
-                                <Select
-                                    value={selectedMonth}
+                            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
+                                <DatePicker
                                     label="Miesiąc"
-                                    onChange={(e) => setSelectedMonth(e.target.value)}
-                                    MenuProps={{
-                                        PaperProps: {
+                                    views={['month', 'year']}
+                                    value={dayjs(selectedMonth + '-01')}
+                                    onChange={handleMonthChange}
+                                    maxDate={dayjs()}
+                                    slotProps={{
+                                        textField: {
+                                            sx: { minWidth: 200 }
+                                        },
+                                        popper: {
                                             sx: {
-                                                background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
-                                                backdropFilter: 'blur(20px)',
-                                                WebkitBackdropFilter: 'blur(20px)',
-                                                border: '1px solid rgba(255, 255, 255, 0.1)',
-                                                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-                                            }
-                                        }
+                                                '& .MuiPaper-root': {
+                                                    background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                                                    backdropFilter: 'blur(20px)',
+                                                    WebkitBackdropFilter: 'blur(20px)',
+                                                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                                                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                                                },
+                                                '& .MuiPickersCalendarHeader-root': {
+                                                    color: '#ffffff',
+                                                },
+                                                '& .MuiPickersCalendarHeader-label': {
+                                                    color: '#ffffff',
+                                                },
+                                                '& .MuiPickersMonth-monthButton': {
+                                                    color: '#ffffff',
+                                                    '&:hover': {
+                                                        backgroundColor: 'rgba(255, 107, 157, 0.2)',
+                                                    },
+                                                    '&.Mui-selected': {
+                                                        backgroundColor: '#ff6b9d',
+                                                        color: '#000000',
+                                                        '&:hover': {
+                                                            backgroundColor: '#ff5c8d',
+                                                        },
+                                                    },
+                                                },
+                                                '& .MuiPickersYear-yearButton': {
+                                                    color: '#ffffff',
+                                                    '&:hover': {
+                                                        backgroundColor: 'rgba(255, 107, 157, 0.2)',
+                                                    },
+                                                    '&.Mui-selected': {
+                                                        backgroundColor: '#ff6b9d',
+                                                        color: '#000000',
+                                                        '&:hover': {
+                                                            backgroundColor: '#ff5c8d',
+                                                        },
+                                                    },
+                                                },
+                                                '& .MuiIconButton-root': {
+                                                    color: '#ffffff',
+                                                },
+                                            },
+                                        },
                                     }}
-                                >
-                                    {monthOptions.map((option) => (
-                                        <MenuItem key={option.value} value={option.value}>
-                                            {option.label}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                                />
+                            </LocalizationProvider>
                         </Box>
                     </CardContent>
                 </Card>
@@ -502,7 +540,7 @@ const WydatkiSection = () => {
                                                 {expense.description || '-'}
                                             </TableCell>
                                             <TableCell align="right" sx={{ color: 'text.primary', fontWeight: 600 }}>
-                                                {expense.amount.toFixed(2)} zł
+                                                {expense.amount.toFixed(2).replace('.', ',')} zł
                                             </TableCell>
                                             <TableCell align="center">
                                                 <IconButton
@@ -765,6 +803,51 @@ const WydatkiSection = () => {
                         disabled={!categoryForm.name || saving}
                     >
                         {saving ? <CircularProgress size={24} /> : 'Dodaj'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Dialog - Delete Confirmation */}
+            <Dialog
+                open={openDeleteDialog}
+                onClose={() => setOpenDeleteDialog(false)}
+                maxWidth="xs"
+                fullWidth
+                PaperProps={{
+                    sx: {
+                        background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                        backdropFilter: 'blur(20px)',
+                        WebkitBackdropFilter: 'blur(20px)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                    }
+                }}
+            >
+                <DialogTitle>Usuń wydatek</DialogTitle>
+                <DialogContent>
+                    <Typography variant="body1" sx={{ color: 'text.secondary', pt: 2 }}>
+                        Czy na pewno chcesz usunąć ten wydatek? Ta operacja jest nieodwracalna.
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        onClick={() => setOpenDeleteDialog(false)}
+                        disabled={saving}
+                    >
+                        Anuluj
+                    </Button>
+                    <Button
+                        onClick={confirmDeleteExpense}
+                        variant="contained"
+                        disabled={saving}
+                        sx={{
+                            background: 'linear-gradient(135deg, #f44336 0%, #d32f2f 100%)',
+                            '&:hover': {
+                                background: 'linear-gradient(135deg, #d32f2f 0%, #c62828 100%)',
+                            },
+                        }}
+                    >
+                        {saving ? <CircularProgress size={24} /> : 'Usuń'}
                     </Button>
                 </DialogActions>
             </Dialog>
