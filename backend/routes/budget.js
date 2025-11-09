@@ -217,13 +217,11 @@ router.get('/summary', authenticateToken, async (req, res) => {
     const totalIncome = incomesResult._sum.amount || 0;
     const totalExpenses = expensesResult._sum.amount || 0;
     const balance = (totalIncomesResult._sum.amount || 0) - (totalExpensesResult._sum.amount || 0);
-    const savings = totalIncome - totalExpenses;
 
     res.json({
       totalIncome,
       totalExpenses,
-      balance,
-      savings
+      balance
     });
   } catch (error) {
     console.error('Get budget summary error:', error);

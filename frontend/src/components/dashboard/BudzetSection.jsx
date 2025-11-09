@@ -38,7 +38,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import SavingsIcon from '@mui/icons-material/Savings';
 import { getIncome, createIncome, updateIncome, deleteIncome, getBudgetSummary } from '../../api/budget';
 
 const BudzetSection = () => {
@@ -48,7 +47,6 @@ const BudzetSection = () => {
         totalIncome: 0,
         totalExpenses: 0,
         balance: 0,
-        savings: 0,
     });
 
     // UI states
@@ -99,7 +97,6 @@ const BudzetSection = () => {
                 totalIncome: data.totalIncome || 0,
                 totalExpenses: data.totalExpenses || 0,
                 balance: data.balance || 0,
-                savings: data.savings || 0,
             });
         } catch (err) {
             console.error('Error fetching budget summary:', err);
@@ -247,7 +244,7 @@ const BudzetSection = () => {
             }}>
                 {/* Current Balance */}
                 <Box sx={{
-                    flex: { xs: '1 1 100%', md: '1 1 calc(50% - 8px)', lg: '1 1 calc(25% - 12px)' },
+                    flex: { xs: '1 1 100%', md: '1 1 calc(50% - 8px)', lg: '1 1 calc(33.333% - 11px)' },
                     minWidth: 0
                 }}>
                     <Card
@@ -303,7 +300,7 @@ const BudzetSection = () => {
 
                 {/* Total Income */}
                 <Box sx={{
-                    flex: { xs: '1 1 100%', md: '1 1 calc(50% - 8px)', lg: '1 1 calc(25% - 12px)' },
+                    flex: { xs: '1 1 100%', md: '1 1 calc(50% - 8px)', lg: '1 1 calc(33.333% - 11px)' },
                     minWidth: 0
                 }}>
                     <Card
@@ -359,7 +356,7 @@ const BudzetSection = () => {
 
                 {/* Total Expenses */}
                 <Box sx={{
-                    flex: { xs: '1 1 100%', md: '1 1 calc(50% - 8px)', lg: '1 1 calc(25% - 12px)' },
+                    flex: { xs: '1 1 100%', md: '1 1 calc(50% - 8px)', lg: '1 1 calc(33.333% - 11px)' },
                     minWidth: 0
                 }}>
                     <Card
@@ -408,62 +405,6 @@ const BudzetSection = () => {
                                 }}
                             >
                                 {budgetSummary.totalExpenses.toFixed(0)} zł
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Box>
-
-                {/* Savings */}
-                <Box sx={{
-                    flex: { xs: '1 1 100%', md: '1 1 calc(50% - 8px)', lg: '1 1 calc(25% - 12px)' },
-                    minWidth: 0
-                }}>
-                    <Card
-                        sx={{
-                            background: 'linear-gradient(135deg, rgba(255, 217, 61, 0.08), rgba(255, 217, 61, 0.02))',
-                            backdropFilter: 'blur(10px)',
-                            WebkitBackdropFilter: 'blur(10px)',
-                            border: '1px solid rgba(255, 217, 61, 0.3)',
-                            boxShadow: '0 4px 12px rgba(255, 217, 61, 0.15), inset 0 1px 0 rgba(255, 217, 61, 0.2)',
-                            height: '100%',
-                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                            '&:hover': {
-                                transform: 'translateY(-5px)',
-                                boxShadow: '0 12px 28px rgba(255, 217, 61, 0.25), inset 0 1px 0 rgba(255, 217, 61, 0.3)',
-                                borderColor: 'rgba(255, 217, 61, 0.4)',
-                            },
-                        }}
-                    >
-                        <CardContent>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                                <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>
-                                    Twoje oszczędności
-                                </Typography>
-                                <Box
-                                    sx={{
-                                        width: 40,
-                                        height: 40,
-                                        borderRadius: '50%',
-                                        backgroundColor: '#ffd93d20',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        color: '#ffd93d',
-                                    }}
-                                >
-                                    <SavingsIcon />
-                                </Box>
-                            </Box>
-                            <Typography
-                                variant="h4"
-                                sx={{
-                                    fontWeight: 700,
-                                    mb: 1,
-                                    color: 'text.primary',
-                                    textShadow: '0 0 20px #ffd93d60, 0 0 40px #ffd93d40'
-                                }}
-                            >
-                                {budgetSummary.savings.toFixed(0)} zł
                             </Typography>
                         </CardContent>
                     </Card>
