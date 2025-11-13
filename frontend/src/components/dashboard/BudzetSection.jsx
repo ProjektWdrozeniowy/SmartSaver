@@ -135,8 +135,8 @@ const BudzetSection = () => {
         setIncomeForm({
             name: income.name,
             amount: income.amount,
-            date: income.date,
-            description: income.description,
+            date: income.date.split('T')[0], // Convert ISO string to YYYY-MM-DD format
+            description: income.description || '',
         });
         setOpenIncomeDialog(true);
     };

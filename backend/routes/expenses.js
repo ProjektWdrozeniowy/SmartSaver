@@ -95,7 +95,7 @@ router.post('/', authenticateToken, async (req, res) => {
     });
   } catch (error) {
     console.error('Create expense error:', error);
-    if (error.name === 'ZodError') {
+    if (error instanceof z.ZodError) {
       return res.status(400).json({
         message: 'Nieprawidłowe dane: ' + error.errors.map(e => e.message).join(', ')
       });
@@ -151,7 +151,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
     });
   } catch (error) {
     console.error('Update expense error:', error);
-    if (error.name === 'ZodError') {
+    if (error instanceof z.ZodError) {
       return res.status(400).json({
         message: 'Nieprawidłowe dane: ' + error.errors.map(e => e.message).join(', ')
       });
