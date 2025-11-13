@@ -225,8 +225,7 @@ const ContactPage = () => {
                                 component={motion.div}
                                 variants={fadeIn}
                                 initial="hidden"
-                                whileInView="visible"
-                                viewport={{ once: true }}
+                                animate="visible"
                                 elevation={2}
                                 sx={{
                                     p: { xs: 3, sm: 5 },
@@ -350,8 +349,7 @@ const ContactPage = () => {
                                 component={motion.div}
                                 variants={fadeIn}
                                 initial="hidden"
-                                whileInView="visible"
-                                viewport={{ once: true }}
+                                animate="visible"
                                 elevation={2}
                                 sx={{
                                     p: { xs: 3, sm: 5 },

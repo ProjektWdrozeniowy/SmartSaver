@@ -11,14 +11,14 @@ const CreateIncomeSchema = z.object({
   name: z.string().min(1).max(100),
   amount: z.number().positive(),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  description: z.string().optional()
+  description: z.string().nullable().optional()
 });
 
 const UpdateIncomeSchema = z.object({
   name: z.string().min(1).max(100),
   amount: z.number().positive(),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  description: z.string().optional()
+  description: z.string().nullable().optional()
 });
 
 // GET /api/budget/income - Get all incomes for the authenticated user
@@ -79,7 +79,7 @@ router.post('/income', authenticateToken, async (req, res) => {
     });
   } catch (error) {
     console.error('Create income error:', error);
-    if (error.name === 'ZodError') {
+    if (error instanceof z.ZodError) {
       return res.status(400).json({
         message: 'Nieprawidłowe dane: ' + error.errors.map(e => e.message).join(', ')
       });
@@ -122,7 +122,7 @@ router.put('/income/:id', authenticateToken, async (req, res) => {
     });
   } catch (error) {
     console.error('Update income error:', error);
-    if (error.name === 'ZodError') {
+    if (error instanceof z.ZodError) {
       return res.status(400).json({
         message: 'Nieprawidłowe dane: ' + error.errors.map(e => e.message).join(', ')
       });

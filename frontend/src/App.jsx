@@ -11,10 +11,12 @@ import TermsOfServicePage from './views/TermsOfServicePage';
 import ContactPage from './views/ContactPage.jsx';
 import DashboardPage from './views/DashboardPage';
 import ProtectedRoute from './components/common/ProtectedRoute';
+import ScrollToTopOnRouteChange from './components/common/ScrollToTopOnRouteChange';
 
 function App() {
     return (
         <Router>
+            <ScrollToTopOnRouteChange />
             <Box
                 sx={{
                     minHeight: '100vh',

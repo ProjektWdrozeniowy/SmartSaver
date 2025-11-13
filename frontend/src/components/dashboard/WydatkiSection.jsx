@@ -133,7 +133,7 @@ const WydatkiSection = () => {
     const filteredExpenses = useMemo(() => {
         return expenses.filter((expense) => {
             const matchesSearch = expense.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                expense.description.toLowerCase().includes(searchQuery.toLowerCase());
+                (expense.description && expense.description.toLowerCase().includes(searchQuery.toLowerCase()));
             const matchesCategory = selectedCategory === 'all' || expense.categoryId === parseInt(selectedCategory);
             const matchesMonth = expense.date.startsWith(selectedMonth);
             return matchesSearch && matchesCategory && matchesMonth;
@@ -167,8 +167,8 @@ const WydatkiSection = () => {
         setExpenseForm({
             name: expense.name,
             categoryId: expense.categoryId,
-            date: expense.date,
-            description: expense.description,
+            date: expense.date.split('T')[0], // Convert ISO string to YYYY-MM-DD format
+            description: expense.description || '',
             amount: expense.amount,
         });
         setOpenExpenseDialog(true);

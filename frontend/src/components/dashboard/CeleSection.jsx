@@ -147,7 +147,7 @@ const CeleSection = () => {
             name: goal.name,
             targetAmount: goal.targetAmount,
             currentAmount: goal.currentAmount,
-            dueDate: goal.dueDate,
+            dueDate: goal.dueDate.split('T')[0], // Convert ISO string to YYYY-MM-DD format
             description: goal.description || '',
         });
         setOpenGoalDialog(true);

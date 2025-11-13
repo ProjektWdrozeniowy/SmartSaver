@@ -82,7 +82,7 @@ router.post('/', authenticateToken, async (req, res) => {
     });
   } catch (error) {
     console.error('Create goal error:', error);
-    if (error.name === 'ZodError') {
+    if (error instanceof z.ZodError) {
       return res.status(400).json({
         message: 'Nieprawidłowe dane: ' + error.errors.map(e => e.message).join(', ')
       });
@@ -133,7 +133,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
     });
   } catch (error) {
     console.error('Update goal error:', error);
-    if (error.name === 'ZodError') {
+    if (error instanceof z.ZodError) {
       return res.status(400).json({
         message: 'Nieprawidłowe dane: ' + error.errors.map(e => e.message).join(', ')
       });
@@ -210,7 +210,7 @@ router.post('/:id/contribute', authenticateToken, async (req, res) => {
     });
   } catch (error) {
     console.error('Contribute to goal error:', error);
-    if (error.name === 'ZodError') {
+    if (error instanceof z.ZodError) {
       return res.status(400).json({
         message: 'Nieprawidłowe dane: ' + error.errors.map(e => e.message).join(', ')
       });
