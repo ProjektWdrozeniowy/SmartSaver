@@ -56,6 +56,15 @@ const LoginSchema = z.object({
   password: z.string().min(8)
 });
 
+const ForgotPasswordSchema = z.object({
+  email: z.string().email()
+});
+
+const ResetPasswordSchema = z.object({
+  token: z.string().min(1),
+  newPassword: z.string().min(8)
+});
+
 // 👇 tu dodajesz
 app.get('/', (_req, res) => {
   res.type('html').send(`
@@ -180,6 +189,167 @@ app.get('/api/me', authenticateToken, async (req, res) => {
   } catch (err) {
     console.error('Get user error:', err);
     res.status(500).json({ ok: false, message: 'Błąd serwera' });
+  }
+});
+
+// Forgot password endpoint
+app.post('/api/forgot-password', async (req, res) => {
+  try {
+    console.log('Received forgot password request:', { email: req.body.email });
+    const { email } = ForgotPasswordSchema.parse(req.body);
+
+    // Sprawdź czy użytkownik istnieje
+    const user = await prisma.account.findUnique({
+      where: { email }
+    });
+
+    // Ze względów bezpieczeństwa zawsze zwracamy sukces, nawet jeśli email nie istnieje
+    // (aby nie ujawniać, które emaile są w systemie)
+    if (!user) {
+      console.log('User not found, but returning success for security');
+      return res.status(200).json({
+        ok: true,
+        message: 'Jeśli konto istnieje, wysłano link do resetowania hasła'
+      });
+    }
+
+    // Generuj token resetowania hasła (ważny 1 godzinę)
+    const resetToken = jwt.sign(
+      { id: user.id, email: user.email, purpose: 'password-reset' },
+      JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    // W produkcji, link powinien prowadzić do frontendu
+    const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${resetToken}`;
+
+    // Wyślij email z linkiem resetującym
+    const { sendEmail } = require('./src/services/mailService');
+
+    const emailTemplate = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #0d1a2a 0%, #1a0d1f 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+          .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
+          .button { display: inline-block; padding: 15px 30px; background: #00f0ff; color: #000; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 20px 0; }
+          .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>SmartSaver</h1>
+            <h2>Resetowanie hasła</h2>
+          </div>
+          <div class="content">
+            <p>Witaj ${user.username}!</p>
+            <p>Otrzymaliśmy prośbę o zresetowanie hasła do Twojego konta SmartSaver.</p>
+            <p>Kliknij przycisk poniżej, aby ustawić nowe hasło:</p>
+            <center>
+              <a href="${resetLink}" class="button">Zresetuj hasło</a>
+            </center>
+            <p>Link będzie ważny przez 1 godzinę.</p>
+            <p>Jeśli nie prosiłeś o reset hasła, zignoruj tę wiadomość.</p>
+            <p>Pozdrawiamy,<br>Zespół SmartSaver</p>
+          </div>
+          <div class="footer">
+            <p>© ${new Date().getFullYear()} SmartSaver. Wszystkie prawa zastrzeżone.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    await sendEmail(email, 'SmartSaver - Resetowanie hasła', emailTemplate);
+
+    console.log('Password reset email sent successfully to:', email);
+    res.status(200).json({
+      ok: true,
+      message: 'Email z linkiem do resetowania hasła został wysłany'
+    });
+  } catch (err) {
+    console.error('Forgot password error:', err);
+    if (err.name === 'ZodError') {
+      return res.status(400).json({
+        ok: false,
+        message: 'Nieprawidłowe dane: ' + err.errors.map(e => e.message).join(', ')
+      });
+    }
+    res.status(500).json({
+      ok: false,
+      message: 'Wystąpił błąd podczas wysyłania emaila'
+    });
+  }
+});
+
+// Reset password endpoint
+app.post('/api/reset-password', async (req, res) => {
+  try {
+    console.log('Received reset password request');
+    const { token, newPassword } = ResetPasswordSchema.parse(req.body);
+
+    // Zweryfikuj token
+    let decoded;
+    try {
+      decoded = jwt.verify(token, JWT_SECRET);
+    } catch (err) {
+      console.error('Token verification failed:', err.message);
+      return res.status(400).json({
+        ok: false,
+        message: 'Token jest nieprawidłowy lub wygasł'
+      });
+    }
+
+    // Sprawdź czy token ma odpowiedni cel
+    if (decoded.purpose !== 'password-reset') {
+      return res.status(400).json({
+        ok: false,
+        message: 'Token nie jest tokenem resetowania hasła'
+      });
+    }
+
+    // Sprawdź czy użytkownik istnieje
+    const user = await prisma.account.findUnique({
+      where: { id: decoded.id }
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        ok: false,
+        message: 'Użytkownik nie znaleziony'
+      });
+    }
+
+    // Hashuj nowe hasło
+    const newPasswordHash = await argon2.hash(newPassword);
+
+    // Zaktualizuj hasło
+    await prisma.account.update({
+      where: { id: user.id },
+      data: { passwordHash: newPasswordHash }
+    });
+
+    console.log('Password reset successfully for user:', user.email);
+    res.status(200).json({
+      ok: true,
+      message: 'Hasło zostało pomyślnie zresetowane'
+    });
+  } catch (err) {
+    console.error('Reset password error:', err);
+    if (err.name === 'ZodError') {
+      return res.status(400).json({
+        ok: false,
+        message: 'Nieprawidłowe dane: ' + err.errors.map(e => e.message).join(', ')
+      });
+    }
+    res.status(500).json({
+      ok: false,
+      message: 'Wystąpił błąd podczas resetowania hasła'
+    });
   }
 });
 

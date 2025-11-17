@@ -103,3 +103,37 @@ export async function getCurrentUser() {
 
   return data;
 }
+
+// Funkcja do resetowania hasła (forgot password)
+export async function forgotPassword({ email }) {
+  const url = `${BASE_URL}/api/forgot-password`;
+  console.log('Forgot Password URL ->', url);
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data?.message || `Błąd ${res.status}`);
+
+  return data;
+}
+
+// Funkcja do resetowania hasła z tokenem
+export async function resetPassword({ token, newPassword }) {
+  const url = `${BASE_URL}/api/reset-password`;
+  console.log('Reset Password URL ->', url);
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token, newPassword }),
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data?.message || `Błąd ${res.status}`);
+
+  return data;
+}
