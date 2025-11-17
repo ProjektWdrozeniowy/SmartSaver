@@ -92,6 +92,10 @@ const AuthModal = ({ open, onClose, type = 'success', title, message, actionText
                     fullWidth
                     sx={{
                         py: 1.5,
+                        '&:hover': {
+                            transform: 'none',
+                            boxShadow: '0 0 12px 3px rgba(0, 240, 255, 0.2)',
+                        },
                     }}
                 >
                     {actionText}

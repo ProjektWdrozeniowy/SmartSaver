@@ -131,6 +131,10 @@ const HeroSection = () => {
                                 fontSize: { xs: '0.95rem', sm: '1rem' },
                                 px: { xs: 3, sm: 4 },
                                 py: { xs: 1.2, sm: 1.5 },
+                                '&:hover': {
+                                    transform: 'none',
+                                    boxShadow: '0 0 12px 3px rgba(0, 240, 255, 0.2)',
+                                },
                             }}
                         >
                             Zacznij oszczędzać teraz!
