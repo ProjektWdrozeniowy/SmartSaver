@@ -287,7 +287,7 @@ const PulpitSection = ({ user, onNavigate }) => {
                                                     px: 0,
                                                     py: 2,
                                                     '&:hover': {
-                                                        backgroundColor: 'rgba(0, 240, 255, 0.05)',
+                                                        backgroundColor: 'rgba(0, 184, 212, 0.05)',
                                                         borderRadius: 2,
                                                         cursor: 'pointer',
                                                     },
