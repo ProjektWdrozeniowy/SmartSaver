@@ -157,16 +157,10 @@ const HeroSection = () => {
                         src={HeroImage}
                         alt="SmartSaver app mockups"
                         sx={{
-                            maxWidth: { xs: '280px', sm: '350px', md: '400px' },
+                            maxWidth: { xs: '280px', sm: '350px', md: '600px' },
                             width: '100%',
                             height: 'auto',
                             opacity: 0.85,
-                            filter: 'drop-shadow(0 10px 30px rgba(0, 240, 255, 0.2))',
-                            transition: 'transform 0.3s ease, opacity 0.3s ease',
-                            '&:hover': {
-                                transform: 'scale(1.05)',
-                                opacity: 1,
-                            },
                         }}
                     />
                 </Box>

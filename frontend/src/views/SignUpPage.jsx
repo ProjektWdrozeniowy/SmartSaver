@@ -478,7 +478,6 @@ const handleSubmit = async (e) => {
                                     height: 'auto',
                                     borderRadius: 2,
                                     objectFit: 'contain',
-                                    filter: 'drop-shadow(0 10px 30px rgba(0, 240, 255, 0.2))',
                                 }}
                             />
                         </Box>
