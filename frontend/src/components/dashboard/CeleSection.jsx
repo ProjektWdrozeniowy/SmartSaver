@@ -41,8 +41,10 @@ const CeleSection = () => {
     // UI states
     const [openGoalDialog, setOpenGoalDialog] = useState(false);
     const [openContributeDialog, setOpenContributeDialog] = useState(false);
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [editingGoal, setEditingGoal] = useState(null);
     const [selectedGoal, setSelectedGoal] = useState(null);
+    const [goalToDelete, setGoalToDelete] = useState(null);
 
     // Loading and notification states
     const [loading, setLoading] = useState(true);
@@ -185,17 +187,25 @@ const CeleSection = () => {
         }
     };
 
-    // Handle delete goal
-    const handleDeleteGoal = async (id) => {
-        if (window.confirm('Czy na pewno chcesz usunąć ten cel?')) {
-            try {
-                await deleteGoal(id);
-                showSnackbar('Cel został usunięty', 'success');
-                fetchGoals(); // Refresh list
-            } catch (err) {
-                console.error('Error deleting goal:', err);
-                showSnackbar(err.message || 'Nie udało się usunąć celu', 'error');
-            }
+    // Handle delete goal - open confirmation dialog
+    const handleDeleteGoal = (goal) => {
+        setGoalToDelete(goal);
+        setOpenDeleteDialog(true);
+    };
+
+    // Confirm delete goal
+    const confirmDeleteGoal = async () => {
+        if (!goalToDelete) return;
+
+        try {
+            await deleteGoal(goalToDelete.id);
+            showSnackbar('Cel został usunięty', 'success');
+            setOpenDeleteDialog(false);
+            setGoalToDelete(null);
+            fetchGoals(); // Refresh list
+        } catch (err) {
+            console.error('Error deleting goal:', err);
+            showSnackbar(err.message || 'Nie udało się usunąć celu', 'error');
         }
     };
 
@@ -243,9 +253,9 @@ const CeleSection = () => {
                         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                         textShadow: '0 0 10px rgba(199, 125, 255, 0.5)',
                         '&:hover': {
-                            background: 'linear-gradient(135deg, rgba(199, 125, 255, 0.4), rgba(199, 125, 255, 0.3))',
-                            boxShadow: '0 6px 16px rgba(199, 125, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
-                            transform: 'translateY(-2px)',
+                            background: 'linear-gradient(135deg, rgba(199, 125, 255, 0.3), rgba(199, 125, 255, 0.2))',
+                            boxShadow: '0 0 12px 3px rgba(199, 125, 255, 0.2)',
+                            transform: 'none',
                         },
                     }}
                 >
@@ -697,7 +707,7 @@ const CeleSection = () => {
                                             </IconButton>
                                             <IconButton
                                                 size="small"
-                                                onClick={() => handleDeleteGoal(goal.id)}
+                                                onClick={() => handleDeleteGoal(goal)}
                                                 sx={{
                                                     background: 'rgba(244, 67, 54, 0.1)',
                                                     backdropFilter: 'blur(8px)',
@@ -850,9 +860,9 @@ const CeleSection = () => {
                         variant="contained"
                         disabled={!goalForm.name || !goalForm.targetAmount || !goalForm.dueDate || saving}
                         sx={{
-                            background: 'linear-gradient(135deg, #ab47bc 0%, #9d4edd 100%)',
                             '&:hover': {
-                                background: 'linear-gradient(135deg, #9d4edd 0%, #7b2cbf 100%)',
+                                transform: 'none',
+                                boxShadow: '0 0 12px 3px rgba(0, 240, 255, 0.2)',
                             },
                         }}
                     >
@@ -932,13 +942,61 @@ const CeleSection = () => {
                         variant="contained"
                         disabled={!contributeAmount || parseFloat(contributeAmount) <= 0 || saving}
                         sx={{
-                            background: 'linear-gradient(135deg, #ab47bc 0%, #9d4edd 100%)',
                             '&:hover': {
-                                background: 'linear-gradient(135deg, #9d4edd 0%, #7b2cbf 100%)',
+                                transform: 'none',
+                                boxShadow: '0 0 12px 3px rgba(0, 240, 255, 0.2)',
                             },
                         }}
                     >
                         {saving ? <CircularProgress size={24} /> : 'Wpłać'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Dialog - Delete Confirmation */}
+            <Dialog
+                open={openDeleteDialog}
+                onClose={() => setOpenDeleteDialog(false)}
+                maxWidth="xs"
+                fullWidth
+                PaperProps={{
+                    sx: {
+                        background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                        backdropFilter: 'blur(20px)',
+                        WebkitBackdropFilter: 'blur(20px)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                    }
+                }}
+            >
+                <DialogTitle sx={{ color: 'text.primary' }}>
+                    Potwierdź usunięcie
+                </DialogTitle>
+                <DialogContent>
+                    <Typography sx={{ color: 'text.secondary' }}>
+                        Czy na pewno chcesz usunąć cel "{goalToDelete?.name}"?
+                        <br />
+                        Ta operacja jest nieodwracalna.
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenDeleteDialog(false)}>
+                        Anuluj
+                    </Button>
+                    <Button
+                        onClick={confirmDeleteGoal}
+                        variant="contained"
+                        sx={{
+                            backgroundColor: '#f44336',
+                            color: '#fff',
+                            '&:hover': {
+                                backgroundColor: '#d32f2f',
+                                transform: 'none',
+                                boxShadow: '0 0 12px 3px rgba(244, 67, 54, 0.2)',
+                            },
+                        }}
+                    >
+                        Usuń
                     </Button>
                 </DialogActions>
             </Dialog>

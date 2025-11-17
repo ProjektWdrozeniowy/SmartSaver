@@ -61,7 +61,7 @@ const WydatkiSection = () => {
     const [openCategoryDialog, setOpenCategoryDialog] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [editingExpense, setEditingExpense] = useState(null);
-    const [deletingExpenseId, setDeletingExpenseId] = useState(null);
+    const [expenseToDelete, setExpenseToDelete] = useState(null);
 
     // Loading and notification states
     const [loading, setLoading] = useState(true);
@@ -207,18 +207,21 @@ const WydatkiSection = () => {
     };
 
     // Handle delete expense - open dialog
-    const handleDeleteExpense = (id) => {
-        setDeletingExpenseId(id);
+    const handleDeleteExpense = (expense) => {
+        setExpenseToDelete(expense);
         setOpenDeleteDialog(true);
     };
 
     // Confirm delete expense
     const confirmDeleteExpense = async () => {
+        if (!expenseToDelete) return;
+
         try {
             setSaving(true);
-            await deleteExpense(deletingExpenseId);
+            await deleteExpense(expenseToDelete.id);
             showSnackbar('Wydatek został usunięty', 'success');
             setOpenDeleteDialog(false);
+            setExpenseToDelete(null);
             fetchExpenses(); // Refresh list
         } catch (err) {
             console.error('Error deleting expense:', err);
@@ -281,10 +284,11 @@ const WydatkiSection = () => {
                             boxShadow: '0 4px 12px rgba(239, 83, 80, 0.25), inset 0 1px 0 rgba(239, 83, 80, 0.25)',
                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                             '&:hover': {
-                                background: 'linear-gradient(135deg, rgba(239, 83, 80, 0.3), rgba(239, 83, 80, 0.18))',
-                                borderColor: 'rgba(239, 83, 80, 0.7)',
-                                boxShadow: '0 6px 16px rgba(239, 83, 80, 0.35), inset 0 1px 0 rgba(239, 83, 80, 0.35)',
-                                transform: 'translateY(-2px)',
+                                background: 'linear-gradient(135deg, rgba(239, 83, 80, 0.2), rgba(239, 83, 80, 0.08))',
+                                borderColor: 'rgba(239, 83, 80, 0.5)',
+                                color: '#ef5350',
+                                boxShadow: '0 0 12px 3px rgba(239, 83, 80, 0.2)',
+                                transform: 'none',
                             },
                         }}
                     >
@@ -304,9 +308,9 @@ const WydatkiSection = () => {
                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                             textShadow: '0 0 10px rgba(239, 83, 80, 0.5)',
                             '&:hover': {
-                                background: 'linear-gradient(135deg, rgba(239, 83, 80, 0.45), rgba(239, 83, 80, 0.35))',
-                                boxShadow: '0 6px 16px rgba(239, 83, 80, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
-                                transform: 'translateY(-2px)',
+                                background: 'linear-gradient(135deg, rgba(239, 83, 80, 0.35), rgba(239, 83, 80, 0.25))',
+                                boxShadow: '0 0 12px 3px rgba(239, 83, 80, 0.2)',
+                                transform: 'none',
                             },
                         }}
                     >
@@ -552,7 +556,7 @@ const WydatkiSection = () => {
                                                 </IconButton>
                                                 <IconButton
                                                     size="small"
-                                                    onClick={() => handleDeleteExpense(expense.id)}
+                                                    onClick={() => handleDeleteExpense(expense)}
                                                     sx={{ color: 'error.main' }}
                                                 >
                                                     <DeleteIcon fontSize="small" />
@@ -701,6 +705,12 @@ const WydatkiSection = () => {
                         onClick={handleSaveExpense}
                         variant="contained"
                         disabled={!expenseForm.name || !expenseForm.categoryId || !expenseForm.amount || saving}
+                        sx={{
+                            '&:hover': {
+                                transform: 'none',
+                                boxShadow: '0 0 12px 3px rgba(0, 240, 255, 0.2)',
+                            },
+                        }}
                     >
                         {saving ? <CircularProgress size={24} /> : (editingExpense ? 'Zapisz' : 'Dodaj')}
                     </Button>
@@ -801,6 +811,12 @@ const WydatkiSection = () => {
                         onClick={handleSaveCategory}
                         variant="contained"
                         disabled={!categoryForm.name || saving}
+                        sx={{
+                            '&:hover': {
+                                transform: 'none',
+                                boxShadow: '0 0 12px 3px rgba(0, 240, 255, 0.2)',
+                            },
+                        }}
                     >
                         {saving ? <CircularProgress size={24} /> : 'Dodaj'}
                     </Button>
@@ -823,10 +839,14 @@ const WydatkiSection = () => {
                     }
                 }}
             >
-                <DialogTitle>Usuń wydatek</DialogTitle>
+                <DialogTitle sx={{ color: 'text.primary' }}>
+                    Potwierdź usunięcie
+                </DialogTitle>
                 <DialogContent>
-                    <Typography variant="body1" sx={{ color: 'text.secondary', pt: 2 }}>
-                        Czy na pewno chcesz usunąć ten wydatek? Ta operacja jest nieodwracalna.
+                    <Typography sx={{ color: 'text.secondary' }}>
+                        Czy na pewno chcesz usunąć wydatek "{expenseToDelete?.name}"?
+                        <br />
+                        Ta operacja jest nieodwracalna.
                     </Typography>
                 </DialogContent>
                 <DialogActions>
@@ -841,9 +861,12 @@ const WydatkiSection = () => {
                         variant="contained"
                         disabled={saving}
                         sx={{
-                            background: 'linear-gradient(135deg, #f44336 0%, #d32f2f 100%)',
+                            backgroundColor: '#f44336',
+                            color: '#fff',
                             '&:hover': {
-                                background: 'linear-gradient(135deg, #d32f2f 0%, #c62828 100%)',
+                                backgroundColor: '#d32f2f',
+                                transform: 'none',
+                                boxShadow: '0 0 12px 3px rgba(244, 67, 54, 0.2)',
                             },
                         }}
                     >

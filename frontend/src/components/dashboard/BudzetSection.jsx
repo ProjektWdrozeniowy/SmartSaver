@@ -52,7 +52,9 @@ const BudzetSection = () => {
     // UI states
     const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7)); // YYYY-MM
     const [openIncomeDialog, setOpenIncomeDialog] = useState(false);
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [editingIncome, setEditingIncome] = useState(null);
+    const [incomeToDelete, setIncomeToDelete] = useState(null);
 
     // Loading and notification states
     const [loading, setLoading] = useState(true);
@@ -173,18 +175,26 @@ const BudzetSection = () => {
         }
     };
 
-    // Handle delete income
-    const handleDeleteIncome = async (id) => {
-        if (window.confirm('Czy na pewno chcesz usunąć ten przychód?')) {
-            try {
-                await deleteIncome(id);
-                showSnackbar('Przychód został usunięty', 'success');
-                fetchIncomes(); // Refresh list
-                fetchBudgetSummary(); // Refresh summary
-            } catch (err) {
-                console.error('Error deleting income:', err);
-                showSnackbar(err.message || 'Nie udało się usunąć przychodu', 'error');
-            }
+    // Handle delete income - open confirmation dialog
+    const handleDeleteIncome = (income) => {
+        setIncomeToDelete(income);
+        setOpenDeleteDialog(true);
+    };
+
+    // Confirm delete income
+    const confirmDeleteIncome = async () => {
+        if (!incomeToDelete) return;
+
+        try {
+            await deleteIncome(incomeToDelete.id);
+            showSnackbar('Przychód został usunięty', 'success');
+            setOpenDeleteDialog(false);
+            setIncomeToDelete(null);
+            fetchIncomes(); // Refresh list
+            fetchBudgetSummary(); // Refresh summary
+        } catch (err) {
+            console.error('Error deleting income:', err);
+            showSnackbar(err.message || 'Nie udało się usunąć przychodu', 'error');
         }
     };
 
@@ -217,9 +227,9 @@ const BudzetSection = () => {
                         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                         textShadow: '0 0 10px rgba(168, 230, 207, 0.5)',
                         '&:hover': {
-                            background: 'linear-gradient(135deg, rgba(168, 230, 207, 0.4), rgba(168, 230, 207, 0.3))',
-                            boxShadow: '0 6px 16px rgba(168, 230, 207, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
-                            transform: 'translateY(-2px)',
+                            background: 'linear-gradient(135deg, rgba(168, 230, 207, 0.3), rgba(168, 230, 207, 0.2))',
+                            boxShadow: '0 0 12px 3px rgba(168, 230, 207, 0.2)',
+                            transform: 'none',
                         },
                     }}
                 >
@@ -557,7 +567,7 @@ const BudzetSection = () => {
                                             </IconButton>
                                             <IconButton
                                                 size="small"
-                                                onClick={() => handleDeleteIncome(income.id)}
+                                                onClick={() => handleDeleteIncome(income)}
                                                 sx={{ color: 'error.main' }}
                                             >
                                                 <DeleteIcon fontSize="small" />
@@ -684,14 +694,61 @@ const BudzetSection = () => {
                         variant="contained"
                         disabled={!incomeForm.name || !incomeForm.amount || saving}
                         sx={{
-                            background: 'linear-gradient(135deg, #66bb6a 0%, #84dcc6 100%)',
-                            color: '#000',
                             '&:hover': {
-                                background: 'linear-gradient(135deg, #84dcc6 0%, #5ec9b5 100%)',
+                                transform: 'none',
+                                boxShadow: '0 0 12px 3px rgba(0, 240, 255, 0.2)',
                             },
                         }}
                     >
                         {saving ? <CircularProgress size={24} /> : (editingIncome ? 'Zapisz' : 'Dodaj')}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Dialog - Delete Confirmation */}
+            <Dialog
+                open={openDeleteDialog}
+                onClose={() => setOpenDeleteDialog(false)}
+                maxWidth="xs"
+                fullWidth
+                PaperProps={{
+                    sx: {
+                        background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                        backdropFilter: 'blur(20px)',
+                        WebkitBackdropFilter: 'blur(20px)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                    }
+                }}
+            >
+                <DialogTitle sx={{ color: 'text.primary' }}>
+                    Potwierdź usunięcie
+                </DialogTitle>
+                <DialogContent>
+                    <Typography sx={{ color: 'text.secondary' }}>
+                        Czy na pewno chcesz usunąć przychód "{incomeToDelete?.name}"?
+                        <br />
+                        Ta operacja jest nieodwracalna.
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenDeleteDialog(false)}>
+                        Anuluj
+                    </Button>
+                    <Button
+                        onClick={confirmDeleteIncome}
+                        variant="contained"
+                        sx={{
+                            backgroundColor: '#f44336',
+                            color: '#fff',
+                            '&:hover': {
+                                backgroundColor: '#d32f2f',
+                                transform: 'none',
+                                boxShadow: '0 0 12px 3px rgba(244, 67, 54, 0.2)',
+                            },
+                        }}
+                    >
+                        Usuń
                     </Button>
                 </DialogActions>
             </Dialog>
