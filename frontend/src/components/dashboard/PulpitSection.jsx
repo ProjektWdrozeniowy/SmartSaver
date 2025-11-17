@@ -57,7 +57,7 @@ const PulpitSection = ({ user, onNavigate }) => {
             change: '0%',
             positive: true,
             icon: <AttachMoneyIcon />,
-            color: '#00f0ff',
+            color: '#00b8d4',
             navigateTo: 'budzet',
         },
         {
@@ -66,7 +66,7 @@ const PulpitSection = ({ user, onNavigate }) => {
             change: '0%',
             positive: true,
             icon: <TrendingUpIcon />,
-            color: '#a8e6cf',
+            color: '#66bb6a',
             navigateTo: 'budzet',
         },
         {
@@ -75,7 +75,7 @@ const PulpitSection = ({ user, onNavigate }) => {
             change: '0%',
             positive: true,
             icon: <AccountBalanceWalletIcon />,
-            color: '#ff6b9d',
+            color: '#ef5350',
             navigateTo: 'wydatki',
         },
         {
@@ -84,7 +84,7 @@ const PulpitSection = ({ user, onNavigate }) => {
             change: '0%',
             positive: true,
             icon: <TrackChangesIcon />,
-            color: '#c77dff',
+            color: '#ab47bc',
             navigateTo: 'cele',
         },
     ];
@@ -163,18 +163,18 @@ const PulpitSection = ({ user, onNavigate }) => {
                             onClick={() => onNavigate(stat.navigateTo)}
                             sx={{
                                 height: '100%',
-                                background: `linear-gradient(135deg, ${stat.color}15, ${stat.color}05)`,
+                                background: `linear-gradient(135deg, ${stat.color}25, ${stat.color}10)`,
                                 backdropFilter: 'blur(10px)',
                                 WebkitBackdropFilter: 'blur(10px)',
                                 border: '1px solid',
-                                borderColor: `${stat.color}40`,
-                                boxShadow: `0 4px 12px ${stat.color}20, inset 0 1px 0 ${stat.color}30`,
+                                borderColor: `${stat.color}50`,
+                                boxShadow: `0 4px 12px ${stat.color}15, inset 0 1px 0 ${stat.color}25`,
                                 cursor: 'pointer',
                                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                 '&:hover': {
                                     transform: 'translateY(-5px)',
-                                    boxShadow: `0 12px 28px ${stat.color}40, inset 0 1px 0 ${stat.color}50`,
-                                    borderColor: `${stat.color}60`,
+                                    boxShadow: `0 12px 28px ${stat.color}30, inset 0 1px 0 ${stat.color}40`,
+                                    borderColor: `${stat.color}70`,
                                 },
                             }}
                         >
@@ -188,7 +188,7 @@ const PulpitSection = ({ user, onNavigate }) => {
                                             width: 40,
                                             height: 40,
                                             borderRadius: '50%',
-                                            backgroundColor: `${stat.color}20`,
+                                            backgroundColor: `${stat.color}30`,
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
@@ -204,7 +204,7 @@ const PulpitSection = ({ user, onNavigate }) => {
                                         fontWeight: 700,
                                         mb: 1,
                                         color: 'text.primary',
-                                        textShadow: `0 0 20px ${stat.color}60, 0 0 40px ${stat.color}40`
+                                        textShadow: `0 0 15px ${stat.color}40, 0 0 30px ${stat.color}20`
                                     }}
                                 >
                                     {stat.value}

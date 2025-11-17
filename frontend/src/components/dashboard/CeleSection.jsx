@@ -292,11 +292,11 @@ const CeleSection = () => {
                                         width: 40,
                                         height: 40,
                                         borderRadius: '50%',
-                                        backgroundColor: '#c77dff20',
+                                        backgroundColor: '#ab47bc20',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        color: '#c77dff',
+                                        color: '#ab47bc',
                                     }}
                                 >
                                     <TrackChangesIcon />
@@ -308,7 +308,7 @@ const CeleSection = () => {
                                     fontWeight: 700,
                                     mb: 1,
                                     color: 'text.primary',
-                                    textShadow: '0 0 20px #c77dff60, 0 0 40px #c77dff40'
+                                    textShadow: '0 0 20px #ab47bc60, 0 0 40px #ab47bc40'
                                 }}
                             >
                                 {statistics.totalGoals}
@@ -351,11 +351,11 @@ const CeleSection = () => {
                                         width: 40,
                                         height: 40,
                                         borderRadius: '50%',
-                                        backgroundColor: '#00f0ff20',
+                                        backgroundColor: '#00b8d420',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        color: '#00f0ff',
+                                        color: '#00b8d4',
                                     }}
                                 >
                                     <SavingsIcon />
@@ -367,7 +367,7 @@ const CeleSection = () => {
                                     fontWeight: 700,
                                     mb: 1,
                                     color: 'text.primary',
-                                    textShadow: '0 0 20px #00f0ff60, 0 0 40px #00f0ff40'
+                                    textShadow: '0 0 20px #00b8d460, 0 0 40px #00b8d440'
                                 }}
                             >
                                 {statistics.totalSaved.toFixed(2).replace('.', ',')} zł
@@ -473,7 +473,7 @@ const CeleSection = () => {
                             alignItems: 'center',
                             justifyContent: 'center',
                             margin: '0 auto 24px',
-                            color: '#c77dff',
+                            color: '#ab47bc',
                         }}
                     >
                         <TrackChangesIcon sx={{ fontSize: 40 }} />
@@ -489,7 +489,7 @@ const CeleSection = () => {
                         startIcon={<AddIcon />}
                         onClick={handleAddGoal}
                         sx={{
-                            background: 'linear-gradient(135deg, #c77dff 0%, #9d4edd 100%)',
+                            background: 'linear-gradient(135deg, #ab47bc 0%, #9d4edd 100%)',
                             '&:hover': {
                                 background: 'linear-gradient(135deg, #9d4edd 0%, #7b2cbf 100%)',
                             },
@@ -599,7 +599,7 @@ const CeleSection = () => {
                                                     borderRadius: 4,
                                                     backgroundColor: 'rgba(255, 255, 255, 0.1)',
                                                     '& .MuiLinearProgress-bar': {
-                                                        backgroundColor: isCompleted ? '#4caf50' : '#c77dff',
+                                                        backgroundColor: isCompleted ? '#4caf50' : '#ab47bc',
                                                         borderRadius: 4,
                                                     },
                                                 }}
@@ -612,7 +612,7 @@ const CeleSection = () => {
                                                 <Typography variant="body2" sx={{ color: 'text.secondary', mb: 0.5 }}>
                                                     Zaoszczędzone
                                                 </Typography>
-                                                <Typography variant="h6" sx={{ color: '#00f0ff', fontWeight: 600 }}>
+                                                <Typography variant="h6" sx={{ color: '#00b8d4', fontWeight: 600 }}>
                                                     {goal.currentAmount.toFixed(2).replace('.', ',')} zł
                                                 </Typography>
                                             </Box>
@@ -682,7 +682,7 @@ const CeleSection = () => {
                                                     WebkitBackdropFilter: 'blur(8px)',
                                                     border: '1px solid rgba(0, 240, 255, 0.3)',
                                                     borderRadius: '20px',
-                                                    color: '#00f0ff',
+                                                    color: '#00b8d4',
                                                     padding: '6px 16px',
                                                     minHeight: '36px',
                                                     flexShrink: 0,
@@ -810,14 +810,14 @@ const CeleSection = () => {
                                                     backgroundColor: 'rgba(199, 125, 255, 0.2)',
                                                 },
                                                 '&.Mui-selected': {
-                                                    backgroundColor: '#c77dff',
+                                                    backgroundColor: '#ab47bc',
                                                     '&:hover': {
                                                         backgroundColor: '#9d4edd',
                                                     },
                                                 },
                                             },
                                             '& .MuiPickersDay-today': {
-                                                border: '1px solid #c77dff',
+                                                border: '1px solid #ab47bc',
                                             },
                                             '& .MuiDayCalendar-weekDayLabel': {
                                                 color: 'rgba(255, 255, 255, 0.7)',
@@ -850,7 +850,7 @@ const CeleSection = () => {
                         variant="contained"
                         disabled={!goalForm.name || !goalForm.targetAmount || !goalForm.dueDate || saving}
                         sx={{
-                            background: 'linear-gradient(135deg, #c77dff 0%, #9d4edd 100%)',
+                            background: 'linear-gradient(135deg, #ab47bc 0%, #9d4edd 100%)',
                             '&:hover': {
                                 background: 'linear-gradient(135deg, #9d4edd 0%, #7b2cbf 100%)',
                             },
@@ -932,7 +932,7 @@ const CeleSection = () => {
                         variant="contained"
                         disabled={!contributeAmount || parseFloat(contributeAmount) <= 0 || saving}
                         sx={{
-                            background: 'linear-gradient(135deg, #c77dff 0%, #9d4edd 100%)',
+                            background: 'linear-gradient(135deg, #ab47bc 0%, #9d4edd 100%)',
                             '&:hover': {
                                 background: 'linear-gradient(135deg, #9d4edd 0%, #7b2cbf 100%)',
                             },

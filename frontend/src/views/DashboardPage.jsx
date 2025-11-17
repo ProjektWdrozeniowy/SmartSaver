@@ -77,12 +77,12 @@ const DashboardPage = () => {
 
     // Menu items with colors matching dashboard cards
     const menuItems = [
-        { id: 'pulpit', label: 'Pulpit', icon: <DashboardIcon />, color: '#00f0ff' }, // Aktualne saldo - cyan
-        { id: 'wydatki', label: 'Wydatki', icon: <AccountBalanceWalletIcon />, color: '#ff6b9d' }, // Wydatki - różowy
-        { id: 'budzet', label: 'Budżet', icon: <TrendingUpIcon />, color: '#a8e6cf' }, // Przychody - zielony
-        { id: 'cele', label: 'Cele', icon: <TrackChangesIcon />, color: '#c77dff' }, // Twój cel - fioletowy
-        { id: 'analizy', label: 'Analizy', icon: <BarChartIcon />, color: '#ffd93d' }, // Oszczędności - żółty
-        { id: 'ustawienia', label: 'Ustawienia', icon: <SettingsIcon />, color: '#90a4ae' }, // Ustawienia - blue-grey
+        { id: 'pulpit', label: 'Pulpit', icon: <DashboardIcon />, color: '#00b8d4' }, // Aktualne saldo - cyan
+        { id: 'wydatki', label: 'Wydatki', icon: <AccountBalanceWalletIcon />, color: '#ef5350' }, // Wydatki - różowy
+        { id: 'budzet', label: 'Budżet', icon: <TrendingUpIcon />, color: '#66bb6a' }, // Przychody - zielony
+        { id: 'cele', label: 'Cele', icon: <TrackChangesIcon />, color: '#ab47bc' }, // Twój cel - fioletowy
+        { id: 'analizy', label: 'Analizy', icon: <BarChartIcon />, color: '#fbc02d' }, // Oszczędności - żółty
+        { id: 'ustawienia', label: 'Ustawienia', icon: <SettingsIcon />, color: '#78909c' }, // Ustawienia - blue-grey
     ];
 
     // Titles for AppBar (can be different from menu labels)

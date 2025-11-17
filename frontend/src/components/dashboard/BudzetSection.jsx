@@ -266,11 +266,11 @@ const BudzetSection = () => {
                                         width: 40,
                                         height: 40,
                                         borderRadius: '50%',
-                                        backgroundColor: '#00f0ff20',
+                                        backgroundColor: '#00b8d420',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        color: '#00f0ff',
+                                        color: '#00b8d4',
                                     }}
                                 >
                                     <AttachMoneyIcon />
@@ -282,7 +282,7 @@ const BudzetSection = () => {
                                     fontWeight: 700,
                                     mb: 1,
                                     color: 'text.primary',
-                                    textShadow: '0 0 20px #00f0ff60, 0 0 40px #00f0ff40'
+                                    textShadow: '0 0 20px #00b8d460, 0 0 40px #00b8d440'
                                 }}
                             >
                                 {budgetSummary.balance.toFixed(2).replace('.', ',')} zł
@@ -322,11 +322,11 @@ const BudzetSection = () => {
                                         width: 40,
                                         height: 40,
                                         borderRadius: '50%',
-                                        backgroundColor: '#a8e6cf20',
+                                        backgroundColor: '#66bb6a20',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        color: '#a8e6cf',
+                                        color: '#66bb6a',
                                     }}
                                 >
                                     <TrendingUpIcon />
@@ -338,7 +338,7 @@ const BudzetSection = () => {
                                     fontWeight: 700,
                                     mb: 1,
                                     color: 'text.primary',
-                                    textShadow: '0 0 20px #a8e6cf60, 0 0 40px #a8e6cf40'
+                                    textShadow: '0 0 20px #66bb6a60, 0 0 40px #66bb6a40'
                                 }}
                             >
                                 {budgetSummary.totalIncome.toFixed(2).replace('.', ',')} zł
@@ -459,7 +459,7 @@ const BudzetSection = () => {
                                                     backgroundColor: 'rgba(168, 230, 207, 0.2)',
                                                 },
                                                 '&.Mui-selected': {
-                                                    backgroundColor: '#a8e6cf',
+                                                    backgroundColor: '#66bb6a',
                                                     color: '#000000',
                                                     '&:hover': {
                                                         backgroundColor: '#84dcc6',
@@ -472,7 +472,7 @@ const BudzetSection = () => {
                                                     backgroundColor: 'rgba(168, 230, 207, 0.2)',
                                                 },
                                                 '&.Mui-selected': {
-                                                    backgroundColor: '#a8e6cf',
+                                                    backgroundColor: '#66bb6a',
                                                     color: '#000000',
                                                     '&:hover': {
                                                         backgroundColor: '#84dcc6',
@@ -544,7 +544,7 @@ const BudzetSection = () => {
                                         <TableCell sx={{ color: 'text.secondary', maxWidth: 250 }}>
                                             {income.description || '-'}
                                         </TableCell>
-                                        <TableCell align="right" sx={{ color: '#a8e6cf', fontWeight: 700, fontSize: '1.1rem' }}>
+                                        <TableCell align="right" sx={{ color: '#66bb6a', fontWeight: 700, fontSize: '1.1rem' }}>
                                             {income.amount.toFixed(2).replace('.', ',')} zł
                                         </TableCell>
                                         <TableCell align="center">
@@ -631,7 +631,7 @@ const BudzetSection = () => {
                                                     backgroundColor: 'rgba(168, 230, 207, 0.2)',
                                                 },
                                                 '&.Mui-selected': {
-                                                    backgroundColor: '#a8e6cf',
+                                                    backgroundColor: '#66bb6a',
                                                     color: '#000000',
                                                     '&:hover': {
                                                         backgroundColor: '#84dcc6',
@@ -639,7 +639,7 @@ const BudzetSection = () => {
                                                 },
                                             },
                                             '& .MuiPickersDay-today': {
-                                                border: '1px solid #a8e6cf',
+                                                border: '1px solid #66bb6a',
                                             },
                                             '& .MuiDayCalendar-weekDayLabel': {
                                                 color: 'rgba(255, 255, 255, 0.7)',
@@ -684,7 +684,7 @@ const BudzetSection = () => {
                         variant="contained"
                         disabled={!incomeForm.name || !incomeForm.amount || saving}
                         sx={{
-                            background: 'linear-gradient(135deg, #a8e6cf 0%, #84dcc6 100%)',
+                            background: 'linear-gradient(135deg, #66bb6a 0%, #84dcc6 100%)',
                             color: '#000',
                             '&:hover': {
                                 background: 'linear-gradient(135deg, #84dcc6 0%, #5ec9b5 100%)',

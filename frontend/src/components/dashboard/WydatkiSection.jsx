@@ -80,7 +80,7 @@ const WydatkiSection = () => {
     // Form state for new category
     const [categoryForm, setCategoryForm] = useState({
         name: '',
-        color: '#ff6b9d',
+        color: '#ef5350',
         icon: '🍕',
     });
 
@@ -230,7 +230,7 @@ const WydatkiSection = () => {
 
     // Handle add category
     const handleAddCategory = () => {
-        setCategoryForm({ name: '', color: '#ff6b9d', icon: '🍕' });
+        setCategoryForm({ name: '', color: '#ef5350', icon: '🍕' });
         setOpenCategoryDialog(true);
     };
 
@@ -273,17 +273,17 @@ const WydatkiSection = () => {
                         startIcon={<CategoryIcon />}
                         onClick={handleAddCategory}
                         sx={{
-                            background: 'linear-gradient(135deg, rgba(255, 107, 157, 0.15), rgba(255, 107, 157, 0.05))',
+                            background: 'linear-gradient(135deg, rgba(239, 83, 80, 0.2), rgba(239, 83, 80, 0.08))',
                             backdropFilter: 'blur(8px)',
                             WebkitBackdropFilter: 'blur(8px)',
-                            borderColor: 'rgba(255, 107, 157, 0.4)',
-                            color: '#ff6b9d',
-                            boxShadow: '0 4px 12px rgba(255, 107, 157, 0.2), inset 0 1px 0 rgba(255, 107, 157, 0.2)',
+                            borderColor: 'rgba(239, 83, 80, 0.5)',
+                            color: '#ef5350',
+                            boxShadow: '0 4px 12px rgba(239, 83, 80, 0.25), inset 0 1px 0 rgba(239, 83, 80, 0.25)',
                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                             '&:hover': {
-                                background: 'linear-gradient(135deg, rgba(255, 107, 157, 0.25), rgba(255, 107, 157, 0.15))',
-                                borderColor: 'rgba(255, 107, 157, 0.6)',
-                                boxShadow: '0 6px 16px rgba(255, 107, 157, 0.3), inset 0 1px 0 rgba(255, 107, 157, 0.3)',
+                                background: 'linear-gradient(135deg, rgba(239, 83, 80, 0.3), rgba(239, 83, 80, 0.18))',
+                                borderColor: 'rgba(239, 83, 80, 0.7)',
+                                boxShadow: '0 6px 16px rgba(239, 83, 80, 0.35), inset 0 1px 0 rgba(239, 83, 80, 0.35)',
                                 transform: 'translateY(-2px)',
                             },
                         }}
@@ -295,17 +295,17 @@ const WydatkiSection = () => {
                         startIcon={<AddIcon />}
                         onClick={handleAddExpense}
                         sx={{
-                            background: 'linear-gradient(135deg, rgba(255, 107, 157, 0.3), rgba(255, 107, 157, 0.2))',
+                            background: 'linear-gradient(135deg, rgba(239, 83, 80, 0.35), rgba(239, 83, 80, 0.25))',
                             backdropFilter: 'blur(8px)',
                             WebkitBackdropFilter: 'blur(8px)',
-                            border: '1px solid rgba(255, 107, 157, 0.5)',
+                            border: '1px solid rgba(239, 83, 80, 0.5)',
                             color: '#ffffff',
-                            boxShadow: '0 4px 12px rgba(255, 107, 157, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+                            boxShadow: '0 4px 12px rgba(239, 83, 80, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                            textShadow: '0 0 10px rgba(255, 107, 157, 0.5)',
+                            textShadow: '0 0 10px rgba(239, 83, 80, 0.5)',
                             '&:hover': {
-                                background: 'linear-gradient(135deg, rgba(255, 107, 157, 0.4), rgba(255, 107, 157, 0.3))',
-                                boxShadow: '0 6px 16px rgba(255, 107, 157, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+                                background: 'linear-gradient(135deg, rgba(239, 83, 80, 0.45), rgba(239, 83, 80, 0.35))',
+                                boxShadow: '0 6px 16px rgba(239, 83, 80, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
                                 transform: 'translateY(-2px)',
                             },
                         }}
@@ -341,7 +341,7 @@ const WydatkiSection = () => {
                                 <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
                                     Suma wydatków
                                 </Typography>
-                                <Typography variant="h3" sx={{ fontWeight: 700, color: '#ff6b9d' }}>
+                                <Typography variant="h3" sx={{ fontWeight: 700, color: '#ef5350' }}>
                                     {totalExpenses.toFixed(2).replace('.', ',')} zł
                                 </Typography>
                             </Box>
@@ -377,7 +377,7 @@ const WydatkiSection = () => {
                                                         backgroundColor: 'rgba(255, 107, 157, 0.2)',
                                                     },
                                                     '&.Mui-selected': {
-                                                        backgroundColor: '#ff6b9d',
+                                                        backgroundColor: '#ef5350',
                                                         color: '#000000',
                                                         '&:hover': {
                                                             backgroundColor: '#ff5c8d',
@@ -390,7 +390,7 @@ const WydatkiSection = () => {
                                                         backgroundColor: 'rgba(255, 107, 157, 0.2)',
                                                     },
                                                     '&.Mui-selected': {
-                                                        backgroundColor: '#ff6b9d',
+                                                        backgroundColor: '#ef5350',
                                                         color: '#000000',
                                                         '&:hover': {
                                                             backgroundColor: '#ff5c8d',
