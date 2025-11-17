@@ -30,7 +30,6 @@ const Navbar = () => {
         { label: 'Start', href: '#hero' },
         { label: 'Funkcje', href: '#features' },
         { label: 'Jak to działa?', href: '#how-it-works' },
-        { label: 'Opinie', href: '#testimonials' },
     ];
 
     // Smooth scroll do sekcji
@@ -108,15 +107,17 @@ const Navbar = () => {
             {/* Action Buttons (mobile) */}
             <Box sx={{ px: 3, pt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
                 <Button
-                    variant="text"
+                    variant="outlined"
                     onClick={() => {
                         setDrawerOpen(false);
                         navigate('/signin');
                     }}
                     sx={{
                         color: 'text.secondary',
+                        borderColor: 'text.secondary',
                         '&:hover': {
                             color: 'text.primary',
+                            borderColor: 'text.primary',
                         },
                     }}
                 >

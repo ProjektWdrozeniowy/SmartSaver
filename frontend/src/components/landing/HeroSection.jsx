@@ -2,7 +2,7 @@
 import React from 'react';
 import { Box, Typography, Button, Container } from '@mui/material';
 import { motion } from 'framer-motion';
-import phoneImage from '../../assets/images/macbook.png';
+import HeroImage from '../../assets/images/heroimage.png';
 import ParticlesBackground from '../common/ParticlesBackground';
 
 const HeroSection = () => {
@@ -154,19 +154,13 @@ const HeroSection = () => {
                 >
                     <Box
                         component="img"
-                        src={phoneImage}
+                        src={HeroImage}
                         alt="SmartSaver app mockups"
                         sx={{
-                            maxWidth: { xs: '280px', sm: '350px', md: '400px' },
+                            maxWidth: { xs: '280px', sm: '350px', md: '600px' },
                             width: '100%',
                             height: 'auto',
                             opacity: 0.85,
-                            filter: 'drop-shadow(0 10px 30px rgba(0, 240, 255, 0.2))',
-                            transition: 'transform 0.3s ease, opacity 0.3s ease',
-                            '&:hover': {
-                                transform: 'scale(1.05)',
-                                opacity: 1,
-                            },
                         }}
                     />
                 </Box>

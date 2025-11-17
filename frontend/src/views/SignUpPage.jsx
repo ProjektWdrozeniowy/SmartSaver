@@ -183,15 +183,17 @@ const handleSubmit = async (e) => {
                             }}
                         >
                             <Paper
-                                elevation={3}
                                 sx={{
                                     maxWidth: '450px',
                                     width: '100%',
                                     p: { xs: 3, sm: 4 },
-                                    backgroundColor: 'background.paper',
+                                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                                    backdropFilter: 'blur(10px)',
+                                    WebkitBackdropFilter: 'blur(10px)',
                                     border: '1px solid',
-                                    borderColor: 'divider',
+                                    borderColor: 'rgba(255, 255, 255, 0.1)',
                                     borderRadius: 3,
+                                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                                 }}
                             >
                                 {/* Title */}
@@ -376,7 +378,7 @@ const handleSubmit = async (e) => {
                                                     Akceptuję{' '}
                                                     <MuiLink
                                                         component={Link}
-                                                        to="/regulamin"
+                                                        to="/terms"
                                                         target="_blank"
                                                         sx={{
                                                             color: 'primary.main',
@@ -389,7 +391,7 @@ const handleSubmit = async (e) => {
                                                     i{' '}
                                                     <MuiLink
                                                         component={Link}
-                                                        to="/pp"
+                                                        to="/privacy-policy"
                                                         target="_blank"
                                                         sx={{
                                                             color: 'primary.main',
@@ -460,7 +462,7 @@ const handleSubmit = async (e) => {
                             initial="hidden"
                             animate="visible"
                             sx={{
-                                display: { xs: 'flex', sm: 'flex' },
+                                display: { xs: 'none', md: 'flex' },
                                 justifyContent: 'center',
                                 alignItems: 'center',
                                 order: { xs: 1, md: 2 },
@@ -476,7 +478,6 @@ const handleSubmit = async (e) => {
                                     height: 'auto',
                                     borderRadius: 2,
                                     objectFit: 'contain',
-                                    filter: 'drop-shadow(0 10px 30px rgba(0, 240, 255, 0.2))',
                                 }}
                             />
                         </Box>

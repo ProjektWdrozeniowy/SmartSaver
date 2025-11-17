@@ -63,7 +63,7 @@ const Footer = () => {
                 >
                     <Box
                         component={Link}
-                        to="/regulamin"
+                        to="/terms"
                         sx={{
                             color: 'text.secondary',
                             fontSize: '0.85rem',
@@ -78,7 +78,7 @@ const Footer = () => {
                     </Box>
                     <Box
                         component={Link}
-                        to="/pp"
+                        to="/privacy-policy"
                         sx={{
                             color: 'text.secondary',
                             fontSize: '0.85rem',
@@ -93,7 +93,7 @@ const Footer = () => {
                     </Box>
                     <Box
                         component={Link}
-                        to="/warunki"
+                        to="/terms-of-service"
                         sx={{
                             color: 'text.secondary',
                             fontSize: '0.85rem',
@@ -108,7 +108,7 @@ const Footer = () => {
                     </Box>
                     <Box
                         component={Link}
-                        to="/kontakt"
+                        to="/contact"
                         sx={{
                             color: 'text.secondary',
                             fontSize: '0.85rem',

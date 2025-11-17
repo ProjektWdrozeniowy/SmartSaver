@@ -42,13 +42,15 @@ const PrivacyPolicyPage = () => {
             variants={fadeIn}
             initial="hidden"
             animate="visible"
-            elevation={2}
             sx={{
               p: { xs: 3, sm: 5 },
-              backgroundColor: 'background.paper',
+              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
               border: '1px solid',
-              borderColor: 'divider',
+              borderColor: 'rgba(255, 255, 255, 0.1)',
               borderRadius: 2,
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
             }}
           >
             {/* Title */}

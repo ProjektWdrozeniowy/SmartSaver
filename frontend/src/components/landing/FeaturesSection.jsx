@@ -108,6 +108,18 @@ const FeaturesSection = () => {
                                 flexDirection: 'column',
                                 textAlign: 'center',
                                 p: 2,
+                                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                                backdropFilter: 'blur(10px)',
+                                WebkitBackdropFilter: 'blur(10px)',
+                                border: '1px solid',
+                                borderColor: 'rgba(255, 255, 255, 0.1)',
+                                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                '&:hover': {
+                                    transform: 'translateY(-5px)',
+                                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                                    boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+                                },
                             }}
                         >
                             <CardContent

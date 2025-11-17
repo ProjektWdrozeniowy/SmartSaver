@@ -5,7 +5,8 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
 // Importuj obrazek
-import macbookImage from '../../assets/images/macbook.png';
+import howitworks1 from '../../assets/images/howitworks1.png';
+import howitworks2 from '../../assets/images/howitworks2.png';
 
 const HowItWorksSection = () => {
     const navigate = useNavigate();
@@ -60,6 +61,7 @@ const HowItWorksSection = () => {
                             flex: 1,
                             maxWidth: { xs: '100%', md: '45%' },
                             textAlign: { xs: 'center', md: 'left' },
+                            order: { xs: 2, md: 1 },
                         }}
                     >
                         <Typography
@@ -105,23 +107,18 @@ const HowItWorksSection = () => {
                             maxWidth: { xs: '100%', md: '45%' },
                             display: 'flex',
                             justifyContent: 'center',
+                            order: { xs: 1, md: 2 },
                         }}
                     >
                         <Box
                             component="img"
-                            src={macbookImage}
+                            src={howitworks1}
                             alt="SmartSaver Dashboard"
                             sx={{
-                                maxWidth: { xs: '100%', sm: '400px', md: '450px' },
+                                maxWidth: { xs: '100%', sm: '400px', md: '400px' },
                                 width: '100%',
                                 height: 'auto',
                                 opacity: 0.85,
-                                filter: 'drop-shadow(0 10px 30px rgba(0, 240, 255, 0.15))',
-                                transition: 'transform 0.3s ease, opacity 0.3s ease',
-                                '&:hover': {
-                                    transform: 'scale(1.03)',
-                                    opacity: 1,
-                                },
                             }}
                         />
                     </Box>
@@ -163,19 +160,13 @@ const HowItWorksSection = () => {
                     >
                         <Box
                             component="img"
-                            src={macbookImage}
+                            src={howitworks2}
                             alt="SmartSaver Analytics"
                             sx={{
-                                maxWidth: { xs: '100%', sm: '400px', md: '450px' },
+                                maxWidth: { xs: '100%', sm: '400px', md: '400px' },
                                 width: '100%',
                                 height: 'auto',
                                 opacity: 0.85,
-                                filter: 'drop-shadow(0 10px 30px rgba(0, 240, 255, 0.15))',
-                                transition: 'transform 0.3s ease, opacity 0.3s ease',
-                                '&:hover': {
-                                    transform: 'scale(1.03)',
-                                    opacity: 1,
-                                },
                             }}
                         />
                     </Box>

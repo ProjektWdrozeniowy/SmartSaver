@@ -5,6 +5,8 @@ import { Box } from '@mui/material';
 import LandingPage from './views/LandingPage';
 import SignInPage from './views/SignInPage';
 import SignUpPage from './views/SignUpPage';
+import ForgotPasswordPage from './views/ForgotPasswordPage';
+import ResetPasswordPage from './views/ResetPasswordPage';
 import TermsPage from './views/TermsPage';
 import PrivacyPolicyPage from './views/PrivacyPolicyPage';
 import TermsOfServicePage from './views/TermsOfServicePage';
@@ -29,12 +31,14 @@ function App() {
 
                      <Route path="/signin" element={<SignInPage />} />
                      <Route path="/signup" element={<SignUpPage />} />
+                     <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                     <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-                    <Route path="/regulamin" element={<TermsPage />} />
-                    <Route path="/pp" element={<PrivacyPolicyPage />} />
-                    <Route path="/warunki" element={<TermsOfServicePage />} />
+                    <Route path="/terms" element={<TermsPage />} />
+                    <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+                    <Route path="/terms-of-service" element={<TermsOfServicePage />} />
 
-                    <Route path="/kontakt" element={<ContactPage />} />
+                    <Route path="/contact" element={<ContactPage />} />
 
                     <Route
                         path="/dashboard"

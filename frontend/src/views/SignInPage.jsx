@@ -82,7 +82,7 @@ const SignInPage = () => {
                 setModalConfig({
                     type: 'success',
                     title: 'Zalogowano pomyślnie!',
-                    message: `Witaj ${data.user.username}! Logowanie przebiegło pomyślnie. Za chwilę zostaniesz przekierowany do dashboardu.`,
+                    message: `Witaj ${data.user.username}! Logowanie przebiegło pomyślnie. Za chwilę zostaniesz przekierowany do Pulpitu.`,
                 });
                 setModalOpen(true);
 
@@ -157,15 +157,17 @@ const SignInPage = () => {
                             }}
                         >
                             <Paper
-                                elevation={3}
                                 sx={{
                                     maxWidth: '450px',
                                     width: '100%',
                                     p: { xs: 3, sm: 4 },
-                                    backgroundColor: 'background.paper',
+                                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                                    backdropFilter: 'blur(10px)',
+                                    WebkitBackdropFilter: 'blur(10px)',
                                     border: '1px solid',
-                                    borderColor: 'divider',
+                                    borderColor: 'rgba(255, 255, 255, 0.1)',
                                     borderRadius: 3,
+                                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                                 }}
                             >
                                 {/* Title */}
@@ -204,7 +206,7 @@ const SignInPage = () => {
                                             id="email"
                                             name="email"
                                             type="email"
-                                            placeholder="wpisz swój email"
+                                            placeholder="Wpisz swój email"
                                             value={formData.email}
                                             onChange={handleChange}
                                             error={!!errors.email}
@@ -240,7 +242,7 @@ const SignInPage = () => {
                                             id="password"
                                             name="password"
                                             type="password"
-                                            placeholder="wpisz swoje hasło"
+                                            placeholder="Wpisz swoje hasło"
                                             value={formData.password}
                                             onChange={handleChange}
                                             error={!!errors.password}
@@ -325,7 +327,7 @@ const SignInPage = () => {
                             initial="hidden"
                             animate="visible"
                             sx={{
-                                display: { xs: 'flex', sm: 'flex' },
+                                display: { xs: 'none', md: 'flex' },
                                 justifyContent: 'center',
                                 alignItems: 'center',
                                 order: { xs: 1, md: 2 },
@@ -341,7 +343,6 @@ const SignInPage = () => {
                                     height: 'auto',
                                     borderRadius: 2,
                                     objectFit: 'contain',
-                                    filter: 'drop-shadow(0 10px 30px rgba(0, 240, 255, 0.2))',
                                 }}
                             />
                         </Box>
