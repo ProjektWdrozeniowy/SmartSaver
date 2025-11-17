@@ -140,7 +140,7 @@ const DashboardPage = () => {
                 </Typography>
             </Box>
 
-            <Divider sx={{ borderColor: 'rgba(0, 240, 255, 0.2)', boxShadow: '0 1px 2px rgba(0, 240, 255, 0.1)' }} />
+            <Divider sx={{ borderColor: 'rgba(0, 184, 212, 0.2)', boxShadow: '0 1px 2px rgba(0, 184, 212, 0.1)' }} />
 
             {/* Menu */}
             <List sx={{ flex: 1, pt: 2 }}>
@@ -193,7 +193,7 @@ const DashboardPage = () => {
                 ))}
             </List>
 
-            <Divider sx={{ borderColor: 'rgba(0, 240, 255, 0.2)', boxShadow: '0 1px 2px rgba(0, 240, 255, 0.1)' }} />
+            <Divider sx={{ borderColor: 'rgba(0, 184, 212, 0.2)', boxShadow: '0 1px 2px rgba(0, 184, 212, 0.1)' }} />
 
             {/* Logout */}
             <List sx={{ pb: 2 }}>
@@ -217,11 +217,11 @@ const DashboardPage = () => {
                 sx={{
                     width: { md: `calc(100% - ${drawerWidth}px)` },
                     ml: { md: `${drawerWidth}px` },
-                    background: 'linear-gradient(135deg, rgba(0, 240, 255, 0.08), rgba(0, 240, 255, 0.02))',
+                    background: 'linear-gradient(135deg, rgba(0, 184, 212, 0.08), rgba(0, 184, 212, 0.02))',
                     backdropFilter: 'blur(10px)',
                     WebkitBackdropFilter: 'blur(10px)',
-                    borderBottom: '1px solid rgba(0, 240, 255, 0.2)',
-                    boxShadow: '0 4px 12px rgba(0, 240, 255, 0.1), inset 0 1px 0 rgba(0, 240, 255, 0.15)',
+                    borderBottom: '1px solid rgba(0, 184, 212, 0.2)',
+                    boxShadow: '0 4px 12px rgba(0, 184, 212, 0.1), inset 0 1px 0 rgba(0, 184, 212, 0.15)',
                 }}
             >
                 <Toolbar sx={{ minHeight: 64, px: 3 }}>
@@ -282,11 +282,11 @@ const DashboardPage = () => {
                         '& .MuiDrawer-paper': {
                             boxSizing: 'border-box',
                             width: drawerWidth,
-                            background: 'linear-gradient(135deg, rgba(0, 240, 255, 0.08), rgba(0, 240, 255, 0.02))',
+                            background: 'linear-gradient(135deg, rgba(0, 184, 212, 0.08), rgba(0, 184, 212, 0.02))',
                             backdropFilter: 'blur(10px)',
                             WebkitBackdropFilter: 'blur(10px)',
-                            borderRight: '1px solid rgba(0, 240, 255, 0.2)',
-                            boxShadow: '4px 0 12px rgba(0, 240, 255, 0.1)',
+                            borderRight: '1px solid rgba(0, 184, 212, 0.2)',
+                            boxShadow: '4px 0 12px rgba(0, 184, 212, 0.1)',
                         },
                     }}
                 >
@@ -301,11 +301,11 @@ const DashboardPage = () => {
                         '& .MuiDrawer-paper': {
                             boxSizing: 'border-box',
                             width: drawerWidth,
-                            background: 'linear-gradient(135deg, rgba(0, 240, 255, 0.08), rgba(0, 240, 255, 0.02))',
+                            background: 'linear-gradient(135deg, rgba(0, 184, 212, 0.08), rgba(0, 184, 212, 0.02))',
                             backdropFilter: 'blur(10px)',
                             WebkitBackdropFilter: 'blur(10px)',
-                            borderRight: '1px solid rgba(0, 240, 255, 0.2)',
-                            boxShadow: '4px 0 12px rgba(0, 240, 255, 0.1)',
+                            borderRight: '1px solid rgba(0, 184, 212, 0.2)',
+                            boxShadow: '4px 0 12px rgba(0, 184, 212, 0.1)',
                         },
                     }}
                     open
