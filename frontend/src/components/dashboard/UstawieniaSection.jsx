@@ -35,10 +35,12 @@ import {
     deleteAccount,
 } from '../../api/settings';
 import { useNavigate } from 'react-router-dom';
+import { useThemeMode } from '../../context/ThemeContext';
 
 const UstawieniaSection = () => {
     const theme = useTheme();
     const navigate = useNavigate();
+    const { mode, toggleTheme } = useThemeMode();
 
     // Stan dla informacji o profilu
     const [profileData, setProfileData] = useState({
@@ -58,9 +60,6 @@ const UstawieniaSection = () => {
         budgetAlerts: false,
         goalReminders: false,
     });
-
-    // Stan dla motywu (na razie tylko w localStorage)
-    const [darkMode, setDarkMode] = useState(true);
 
     // Stan dla komunikatów
     const [snackbar, setSnackbar] = useState({
@@ -237,12 +236,11 @@ const UstawieniaSection = () => {
 
     // Obsługa zmiany motywu
     const handleThemeChange = () => {
-        setDarkMode(!darkMode);
-        // TODO: Implementacja zmiany motywu w całej aplikacji
+        toggleTheme();
         setSnackbar({
             open: true,
-            message: 'Funkcja zmiany motywu będzie dostępna wkrótce',
-            severity: 'info',
+            message: `Zmieniono na motyw ${mode === 'dark' ? 'jasny' : 'ciemny'}`,
+            severity: 'success',
         });
     };
 
@@ -630,11 +628,11 @@ const UstawieniaSection = () => {
                             Motyw ciemny
                         </Typography>
                         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                            Przełącz na motyw jasny
+                            {mode === 'dark' ? 'Przełącz na motyw jasny' : 'Przełącz na motyw ciemny'}
                         </Typography>
                     </Box>
                     <Switch
-                        checked={darkMode}
+                        checked={mode === 'dark'}
                         onChange={handleThemeChange}
                         color="primary"
                     />
