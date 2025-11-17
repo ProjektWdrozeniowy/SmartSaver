@@ -673,6 +673,15 @@ const BudzetSection = () => {
                             InputProps={{
                                 endAdornment: <InputAdornment position="end">zł</InputAdornment>,
                             }}
+                            sx={{
+                                '& input[type=number]': {
+                                    MozAppearance: 'textfield',
+                                },
+                                '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
+                                    WebkitAppearance: 'none',
+                                    margin: 0,
+                                },
+                            }}
                         />
                         <TextField
                             label="Opis (opcjonalnie)"
