@@ -82,7 +82,7 @@ const SignInPage = () => {
                 setModalConfig({
                     type: 'success',
                     title: 'Zalogowano pomyślnie!',
-                    message: `Witaj ${data.user.username}! Logowanie przebiegło pomyślnie. Za chwilę zostaniesz przekierowany do dashboardu.`,
+                    message: `Witaj ${data.user.username}! Logowanie przebiegło pomyślnie. Za chwilę zostaniesz przekierowany do Pulpitu.`,
                 });
                 setModalOpen(true);
 
