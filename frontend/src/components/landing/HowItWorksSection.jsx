@@ -61,6 +61,7 @@ const HowItWorksSection = () => {
                             flex: 1,
                             maxWidth: { xs: '100%', md: '45%' },
                             textAlign: { xs: 'center', md: 'left' },
+                            order: { xs: 2, md: 1 },
                         }}
                     >
                         <Typography
@@ -106,6 +107,7 @@ const HowItWorksSection = () => {
                             maxWidth: { xs: '100%', md: '45%' },
                             display: 'flex',
                             justifyContent: 'center',
+                            order: { xs: 1, md: 2 },
                         }}
                     >
                         <Box

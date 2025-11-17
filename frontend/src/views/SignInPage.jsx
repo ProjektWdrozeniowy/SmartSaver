@@ -327,7 +327,7 @@ const SignInPage = () => {
                             initial="hidden"
                             animate="visible"
                             sx={{
-                                display: { xs: 'flex', sm: 'flex' },
+                                display: { xs: 'none', md: 'flex' },
                                 justifyContent: 'center',
                                 alignItems: 'center',
                                 order: { xs: 1, md: 2 },

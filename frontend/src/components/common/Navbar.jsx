@@ -107,15 +107,17 @@ const Navbar = () => {
             {/* Action Buttons (mobile) */}
             <Box sx={{ px: 3, pt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
                 <Button
-                    variant="text"
+                    variant="outlined"
                     onClick={() => {
                         setDrawerOpen(false);
                         navigate('/signin');
                     }}
                     sx={{
                         color: 'text.secondary',
+                        borderColor: 'text.secondary',
                         '&:hover': {
                             color: 'text.primary',
+                            borderColor: 'text.primary',
                         },
                     }}
                 >

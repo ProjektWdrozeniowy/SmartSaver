@@ -20,8 +20,13 @@ const AuthModal = ({ open, onClose, type = 'success', title, message, actionText
             maxWidth="sm"
             PaperProps={{
                 sx: {
-                    backgroundColor: 'background.paper',
+                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.08))',
+                    backdropFilter: 'blur(10px)',
+                    WebkitBackdropFilter: 'blur(10px)',
+                    border: '1px solid',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
                     borderRadius: 3,
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                     textAlign: 'center',
                     p: 2,
                 },
