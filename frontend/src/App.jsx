@@ -34,11 +34,11 @@ function App() {
                      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                      <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-                    <Route path="/regulamin" element={<TermsPage />} />
-                    <Route path="/pp" element={<PrivacyPolicyPage />} />
-                    <Route path="/warunki" element={<TermsOfServicePage />} />
+                    <Route path="/terms" element={<TermsPage />} />
+                    <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+                    <Route path="/terms-of-service" element={<TermsOfServicePage />} />
 
-                    <Route path="/kontakt" element={<ContactPage />} />
+                    <Route path="/contact" element={<ContactPage />} />
 
                     <Route
                         path="/dashboard"

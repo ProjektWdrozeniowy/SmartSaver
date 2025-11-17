@@ -378,7 +378,7 @@ const handleSubmit = async (e) => {
                                                     Akceptuję{' '}
                                                     <MuiLink
                                                         component={Link}
-                                                        to="/regulamin"
+                                                        to="/terms"
                                                         target="_blank"
                                                         sx={{
                                                             color: 'primary.main',
@@ -391,7 +391,7 @@ const handleSubmit = async (e) => {
                                                     i{' '}
                                                     <MuiLink
                                                         component={Link}
-                                                        to="/pp"
+                                                        to="/privacy-policy"
                                                         target="_blank"
                                                         sx={{
                                                             color: 'primary.main',
