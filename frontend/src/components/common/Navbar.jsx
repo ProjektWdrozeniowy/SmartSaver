@@ -30,7 +30,6 @@ const Navbar = () => {
         { label: 'Start', href: '#hero' },
         { label: 'Funkcje', href: '#features' },
         { label: 'Jak to działa?', href: '#how-it-works' },
-        { label: 'Opinie', href: '#testimonials' },
     ];
 
     // Smooth scroll do sekcji
