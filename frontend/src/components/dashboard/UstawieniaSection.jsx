@@ -40,7 +40,7 @@ import { useThemeMode } from '../../context/ThemeContext';
 const UstawieniaSection = () => {
     const theme = useTheme();
     const navigate = useNavigate();
-    const { mode, toggleTheme } = useThemeMode();
+    const { userMode, toggleTheme } = useThemeMode();
 
     // Stan dla informacji o profilu
     const [profileData, setProfileData] = useState({
@@ -239,7 +239,7 @@ const UstawieniaSection = () => {
         toggleTheme();
         setSnackbar({
             open: true,
-            message: `Zmieniono na motyw ${mode === 'dark' ? 'jasny' : 'ciemny'}`,
+            message: `Zmieniono na motyw ${userMode === 'dark' ? 'jasny' : 'ciemny'}`,
             severity: 'success',
         });
     };
@@ -628,11 +628,11 @@ const UstawieniaSection = () => {
                             Motyw ciemny
                         </Typography>
                         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                            {mode === 'dark' ? 'Przełącz na motyw jasny' : 'Przełącz na motyw ciemny'}
+                            {userMode === 'dark' ? 'Przełącz na motyw jasny' : 'Przełącz na motyw ciemny'}
                         </Typography>
                     </Box>
                     <Switch
-                        checked={mode === 'dark'}
+                        checked={userMode === 'dark'}
                         onChange={handleThemeChange}
                         color="primary"
                     />

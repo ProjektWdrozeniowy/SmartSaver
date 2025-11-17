@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
 import { ThemeProvider as MuiThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import { useLocation } from 'react-router-dom';
 
 const ThemeContext = createContext();
 
@@ -14,20 +15,26 @@ export const useThemeMode = () => {
 };
 
 export const ThemeProvider = ({ children }) => {
+    const location = useLocation();
+
     // Wczytaj preferencje z localStorage lub użyj domyślnie dark mode
-    const [mode, setMode] = useState(() => {
+    const [userMode, setUserMode] = useState(() => {
         const savedMode = localStorage.getItem('themeMode');
         return savedMode || 'dark';
     });
 
     // Zapisz preferencje do localStorage przy zmianie
     useEffect(() => {
-        localStorage.setItem('themeMode', mode);
-    }, [mode]);
+        localStorage.setItem('themeMode', userMode);
+    }, [userMode]);
 
     const toggleTheme = () => {
-        setMode((prevMode) => (prevMode === 'dark' ? 'light' : 'dark'));
+        setUserMode((prevMode) => (prevMode === 'dark' ? 'light' : 'dark'));
     };
+
+    // Sprawdź czy jesteśmy w dashboardzie - tylko tam może być light mode
+    const isDashboard = location.pathname.startsWith('/dashboard');
+    const mode = isDashboard ? userMode : 'dark';
 
     const theme = useMemo(
         () =>
@@ -45,14 +52,14 @@ export const ThemeProvider = ({ children }) => {
                         contrastText: '#121212',
                     },
                     background: {
-                        default: mode === 'dark' ? '#121212' : '#f5f5f5',
-                        paper: mode === 'dark' ? '#1a1a1a' : '#ffffff',
+                        default: mode === 'dark' ? '#121212' : '#e8e8e8',
+                        paper: mode === 'dark' ? '#1a1a1a' : '#f5f5f5',
                     },
                     text: {
-                        primary: mode === 'dark' ? '#ffffff' : '#212121',
-                        secondary: mode === 'dark' ? '#b0b0b0' : '#757575',
+                        primary: mode === 'dark' ? '#ffffff' : '#2c2c2c',
+                        secondary: mode === 'dark' ? '#b0b0b0' : '#666666',
                     },
-                    divider: mode === 'dark' ? '#333333' : '#e0e0e0',
+                    divider: mode === 'dark' ? '#333333' : '#d0d0d0',
                 },
                 typography: {
                     fontFamily: '"Poppins", sans-serif',
@@ -60,29 +67,29 @@ export const ThemeProvider = ({ children }) => {
                         fontSize: 'clamp(2.5rem, 5vw, 3.8rem)',
                         fontWeight: 700,
                         lineHeight: 1.2,
-                        color: mode === 'dark' ? '#ffffff' : '#212121',
+                        color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                     },
                     h2: {
                         fontSize: 'clamp(2rem, 4vw, 2.8rem)',
                         fontWeight: 600,
                         marginBottom: '3rem',
-                        color: mode === 'dark' ? '#ffffff' : '#212121',
+                        color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                     },
                     h3: {
                         fontSize: '1.4rem',
                         fontWeight: 600,
                         marginBottom: '0.5rem',
-                        color: mode === 'dark' ? '#ffffff' : '#212121',
+                        color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                     },
                     body1: {
                         fontSize: '1rem',
                         lineHeight: 1.7,
                         fontWeight: 300,
-                        color: mode === 'dark' ? '#b0b0b0' : '#757575',
+                        color: mode === 'dark' ? '#b0b0b0' : '#666666',
                     },
                     body2: {
                         fontSize: '0.95rem',
-                        color: mode === 'dark' ? '#b0b0b0' : '#757575',
+                        color: mode === 'dark' ? '#b0b0b0' : '#666666',
                     },
                 },
                 components: {
@@ -124,23 +131,23 @@ export const ThemeProvider = ({ children }) => {
                                 backgroundColor:
                                     mode === 'dark'
                                         ? 'rgba(18, 18, 18, 0.8)'
-                                        : 'rgba(255, 255, 255, 0.8)',
+                                        : 'rgba(245, 245, 245, 0.9)',
                                 backdropFilter: 'blur(10px)',
                                 boxShadow:
                                     mode === 'dark'
                                         ? '0 2px 10px rgba(0, 0, 0, 0.3)'
-                                        : '0 2px 10px rgba(0, 0, 0, 0.1)',
+                                        : '0 2px 10px rgba(0, 0, 0, 0.08)',
                                 borderBottom:
-                                    mode === 'dark' ? '1px solid #333333' : '1px solid #e0e0e0',
+                                    mode === 'dark' ? '1px solid #333333' : '1px solid #d0d0d0',
                             },
                         },
                     },
                     MuiCard: {
                         styleOverrides: {
                             root: {
-                                backgroundColor: mode === 'dark' ? '#121212' : '#ffffff',
+                                backgroundColor: mode === 'dark' ? '#121212' : '#f5f5f5',
                                 border:
-                                    mode === 'dark' ? '1px solid #333333' : '1px solid #e0e0e0',
+                                    mode === 'dark' ? '1px solid #333333' : '1px solid #d0d0d0',
                                 borderRadius: '10px',
                                 transition: 'transform 0.3s ease, box-shadow 0.3s ease',
                                 '&:hover': {
@@ -148,7 +155,7 @@ export const ThemeProvider = ({ children }) => {
                                     boxShadow:
                                         mode === 'dark'
                                             ? '0 10px 20px rgba(0, 0, 0, 0.2)'
-                                            : '0 10px 20px rgba(0, 0, 0, 0.1)',
+                                            : '0 10px 20px rgba(0, 0, 0, 0.08)',
                                 },
                             },
                         },
@@ -156,7 +163,7 @@ export const ThemeProvider = ({ children }) => {
                     MuiDrawer: {
                         styleOverrides: {
                             paper: {
-                                backgroundColor: mode === 'dark' ? '#1a1a1a' : '#ffffff',
+                                backgroundColor: mode === 'dark' ? '#1a1a1a' : '#f5f5f5',
                             },
                         },
                     },
@@ -171,11 +178,12 @@ export const ThemeProvider = ({ children }) => {
                     },
                 },
             }),
-        [mode]
+        [mode, isDashboard]
     );
 
     const value = {
         mode,
+        userMode,
         toggleTheme,
     };
 
