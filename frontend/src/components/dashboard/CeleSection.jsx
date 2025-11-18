@@ -35,7 +35,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { getGoals, createGoal, updateGoal, deleteGoal, contributeToGoal } from '../../api/goals';
 import { useThemeMode } from '../../context/ThemeContext';
 
-const CeleSection = () => {
+const CeleSection = ({ onGoalChange }) => {
     const { mode } = useThemeMode();
 
     // Data states
@@ -174,6 +174,8 @@ const CeleSection = () => {
                 // Update existing
                 await updateGoal(editingGoal.id, goalData);
                 showSnackbar('Cel został zaktualizowany', 'success');
+                // Refresh notification count as goal might have been achieved
+                if (onGoalChange) onGoalChange();
             } else {
                 // Add new
                 await createGoal(goalData);
@@ -227,6 +229,8 @@ const CeleSection = () => {
             showSnackbar('Wpłata została dodana', 'success');
             setOpenContributeDialog(false);
             fetchGoals(); // Refresh list
+            // Refresh notification count as contribution might achieve the goal
+            if (onGoalChange) onGoalChange();
         } catch (err) {
             console.error('Error contributing:', err);
             showSnackbar(err.message || 'Nie udało się dodać wpłaty', 'error');

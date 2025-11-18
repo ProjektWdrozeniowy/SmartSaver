@@ -17,8 +17,6 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import TrackChangesIcon from '@mui/icons-material/TrackChanges';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { getDashboardStats, getRecentTransactions, getExpensesByCategory } from '../../api/dashboard';
 
@@ -54,8 +52,6 @@ const PulpitSection = ({ user, onNavigate }) => {
         {
             title: 'Aktualne saldo',
             value: '0 zł',
-            change: '0%',
-            positive: true,
             icon: <AttachMoneyIcon />,
             color: '#00b8d4',
             navigateTo: 'budzet',
@@ -63,8 +59,6 @@ const PulpitSection = ({ user, onNavigate }) => {
         {
             title: 'Przychody (miesiąc)',
             value: '0 zł',
-            change: '0%',
-            positive: true,
             icon: <TrendingUpIcon />,
             color: '#66bb6a',
             navigateTo: 'budzet',
@@ -72,8 +66,6 @@ const PulpitSection = ({ user, onNavigate }) => {
         {
             title: 'Wydatki (miesiąc)',
             value: '0 zł',
-            change: '0%',
-            positive: true,
             icon: <AccountBalanceWalletIcon />,
             color: '#ef5350',
             navigateTo: 'wydatki',
@@ -81,8 +73,6 @@ const PulpitSection = ({ user, onNavigate }) => {
         {
             title: 'Twój cel',
             value: '0%',
-            change: '0%',
-            positive: true,
             icon: <TrackChangesIcon />,
             color: '#ab47bc',
             navigateTo: 'cele',
@@ -178,7 +168,7 @@ const PulpitSection = ({ user, onNavigate }) => {
                                 },
                             }}
                         >
-                            <CardContent>
+                            <CardContent sx={{ pb: 2, '&:last-child': { pb: 2 } }}>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                                     <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>
                                         {stat.title}
@@ -202,35 +192,39 @@ const PulpitSection = ({ user, onNavigate }) => {
                                     variant="h4"
                                     sx={{
                                         fontWeight: 700,
-                                        mb: 1,
                                         color: 'text.primary',
                                         textShadow: `0 0 15px ${stat.color}40, 0 0 30px ${stat.color}20`
                                     }}
                                 >
                                     {stat.value}
                                 </Typography>
-                                <Box
-                                    sx={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 0.5,
-                                    }}
-                                >
-                                    {stat.positive ? (
-                                        <ArrowUpwardIcon sx={{ fontSize: 16, color: '#4caf50' }} />
-                                    ) : (
-                                        <ArrowDownwardIcon sx={{ fontSize: 16, color: '#f44336' }} />
-                                    )}
-                                    <Typography
-                                        variant="body2"
+                                {stat.budgetPercentage !== null && stat.budgetPercentage !== undefined && (
+                                    <Box
                                         sx={{
-                                            color: stat.positive ? '#4caf50' : '#f44336',
-                                            fontWeight: 500,
+                                            mt: 0.5,
+                                            pt: 0.5,
+                                            borderTop: '1px solid',
+                                            borderColor: 'rgba(255, 255, 255, 0.1)',
                                         }}
                                     >
-                                        {stat.change}
-                                    </Typography>
-                                </Box>
+                                        <Typography
+                                            variant="caption"
+                                            sx={{
+                                                color: parseFloat(stat.budgetPercentage) >= 100
+                                                    ? '#f44336'
+                                                    : parseFloat(stat.budgetPercentage) >= 90
+                                                    ? '#ff6b9d'
+                                                    : parseFloat(stat.budgetPercentage) >= 70
+                                                    ? '#ffa726'
+                                                    : '#4caf50',
+                                                fontWeight: 600,
+                                                fontSize: '0.85rem',
+                                            }}
+                                        >
+                                            {stat.budgetPercentage}% budżetu
+                                        </Typography>
+                                    </Box>
+                                )}
                             </CardContent>
                         </Card>
                     </Box>

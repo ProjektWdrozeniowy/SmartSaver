@@ -36,7 +36,7 @@ router.get('/stats', authenticateToken, async (req, res) => {
     const previousMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
 
     // Get current month data
-    const [currentIncome, currentExpenses, previousIncome, previousExpenses, totalBalance, activeGoal] = await Promise.all([
+    const [currentIncome, currentExpenses, previousIncome, previousExpenses, totalBalance, activeGoal, userSettings] = await Promise.all([
       // Current month income
       prisma.income.aggregate({
         where: {
@@ -84,6 +84,14 @@ router.get('/stats', authenticateToken, async (req, res) => {
       prisma.goal.findFirst({
         where: { userId: req.user.id },
         orderBy: { updatedAt: 'desc' }
+      }),
+      // Get user settings for budget limit
+      prisma.userSettings.findUnique({
+        where: { userId: req.user.id },
+        select: {
+          monthlyBudgetLimit: true,
+          budgetAlerts: true
+        }
       })
     ]);
 
@@ -96,6 +104,13 @@ router.get('/stats', authenticateToken, async (req, res) => {
     // Calculate changes
     const incomeChange = calculateChange(currentIncomeAmount, previousIncomeAmount);
     const expensesChange = calculateChange(currentExpensesAmount, previousExpensesAmount);
+
+    // Calculate budget percentage if limit is set AND alerts are enabled
+    const budgetLimit = userSettings?.monthlyBudgetLimit || null;
+    const budgetAlertsEnabled = userSettings?.budgetAlerts || false;
+    const budgetPercentage = budgetLimit && budgetLimit > 0 && budgetAlertsEnabled
+      ? ((currentExpensesAmount / budgetLimit) * 100).toFixed(1)
+      : null;
 
     const stats = [
       {
@@ -123,7 +138,8 @@ router.get('/stats', authenticateToken, async (req, res) => {
         positive: parseFloat(expensesChange) < 0, // Less expenses is positive
         iconKey: 'expenses',
         color: '#ff6b9d',
-        navigateTo: 'wydatki'
+        navigateTo: 'wydatki',
+        budgetPercentage: budgetPercentage
       }
     ];
 

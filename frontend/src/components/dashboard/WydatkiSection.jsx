@@ -42,7 +42,7 @@ import { getExpenses, createExpense, updateExpense, deleteExpense } from '../../
 import { getCategories, createCategory } from '../../api/categories';
 import { useThemeMode } from '../../context/ThemeContext';
 
-const WydatkiSection = () => {
+const WydatkiSection = ({ onExpenseChange }) => {
     const { mode } = useThemeMode();
 
     // Available icons for categories
@@ -193,10 +193,14 @@ const WydatkiSection = () => {
                 // Update existing
                 await updateExpense(editingExpense.id, expenseData);
                 showSnackbar('Wydatek został zaktualizowany', 'success');
+                // Refresh notification count as update might change budget status
+                if (onExpenseChange) onExpenseChange();
             } else {
                 // Add new
                 await createExpense(expenseData);
                 showSnackbar('Wydatek został dodany', 'success');
+                // Refresh notification count if expense might trigger budget alert
+                if (onExpenseChange) onExpenseChange();
             }
 
             setOpenExpenseDialog(false);
@@ -226,6 +230,8 @@ const WydatkiSection = () => {
             setOpenDeleteDialog(false);
             setExpenseToDelete(null);
             fetchExpenses(); // Refresh list
+            // Refresh notification count as deletion might change budget status
+            if (onExpenseChange) onExpenseChange();
         } catch (err) {
             console.error('Error deleting expense:', err);
             showSnackbar(err.message || 'Nie udało się usunąć wydatku', 'error');

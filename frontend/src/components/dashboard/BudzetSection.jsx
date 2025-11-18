@@ -26,6 +26,7 @@ import {
     CircularProgress,
     Alert,
     Snackbar,
+    LinearProgress,
 } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -39,6 +40,8 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import { getIncome, createIncome, updateIncome, deleteIncome, getBudgetSummary } from '../../api/budget';
+import { getNotificationSettings } from '../../api/settings';
+import { getExpenses } from '../../api/expenses';
 import { useThemeMode } from '../../context/ThemeContext';
 
 const BudzetSection = () => {
@@ -51,6 +54,9 @@ const BudzetSection = () => {
         totalExpenses: 0,
         balance: 0,
     });
+    const [budgetLimit, setBudgetLimit] = useState(null);
+    const [budgetAlertsEnabled, setBudgetAlertsEnabled] = useState(false);
+    const [currentExpenses, setCurrentExpenses] = useState(0);
 
     // UI states
     const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7)); // YYYY-MM
@@ -77,6 +83,8 @@ const BudzetSection = () => {
         if (selectedMonth) {
             fetchIncomes();
             fetchBudgetSummary();
+            fetchBudgetSettings();
+            fetchCurrentExpenses();
         }
     }, [selectedMonth]);
 
@@ -106,6 +114,26 @@ const BudzetSection = () => {
         } catch (err) {
             console.error('Error fetching budget summary:', err);
             showSnackbar('Nie udało się pobrać podsumowania budżetu', 'error');
+        }
+    };
+
+    const fetchBudgetSettings = async () => {
+        try {
+            const data = await getNotificationSettings();
+            setBudgetLimit(data.monthlyBudgetLimit || null);
+            setBudgetAlertsEnabled(data.budgetAlerts || false);
+        } catch (err) {
+            console.error('Error fetching budget settings:', err);
+        }
+    };
+
+    const fetchCurrentExpenses = async () => {
+        try {
+            const data = await getExpenses(selectedMonth);
+            const total = data.expenses.reduce((sum, expense) => sum + expense.amount, 0);
+            setCurrentExpenses(total);
+        } catch (err) {
+            console.error('Error fetching expenses:', err);
         }
     };
 
@@ -416,6 +444,76 @@ const BudzetSection = () => {
                     </Card>
                 </Box>
             </Box>
+
+            {/* Budget Progress Bar */}
+            {budgetLimit && budgetLimit > 0 && budgetAlertsEnabled && (
+                <Card
+                    sx={{
+                        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                        backdropFilter: 'blur(10px)',
+                        WebkitBackdropFilter: 'blur(10px)',
+                        border: '1px solid',
+                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                        mb: 3,
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        '&:hover': {
+                            transform: 'none',
+                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                            borderColor: 'rgba(255, 255, 255, 0.15)',
+                        },
+                    }}
+                >
+                    <CardContent>
+                        <Box sx={{ mb: 2 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                                <Typography variant="h6" sx={{ color: 'text.primary', fontWeight: 600 }}>
+                                    Wykorzystanie budżetu
+                                </Typography>
+                                <Typography variant="h6" sx={{
+                                    color: (currentExpenses / budgetLimit) * 100 >= 90
+                                        ? '#ff6b9d'
+                                        : (currentExpenses / budgetLimit) * 100 >= 70
+                                        ? '#ffa726'
+                                        : '#66bb6a',
+                                    fontWeight: 700
+                                }}>
+                                    {((currentExpenses / budgetLimit) * 100).toFixed(1)}%
+                                </Typography>
+                            </Box>
+                            <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2 }}>
+                                {currentExpenses.toFixed(2).replace('.', ',')} zł / {budgetLimit.toFixed(2).replace('.', ',')} zł
+                            </Typography>
+                            <LinearProgress
+                                variant="determinate"
+                                value={Math.min((currentExpenses / budgetLimit) * 100, 100)}
+                                sx={{
+                                    height: 12,
+                                    borderRadius: 2,
+                                    backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                                    '& .MuiLinearProgress-bar': {
+                                        borderRadius: 2,
+                                        background: (currentExpenses / budgetLimit) * 100 >= 100
+                                            ? 'linear-gradient(90deg, #f44336, #d32f2f)'
+                                            : (currentExpenses / budgetLimit) * 100 >= 90
+                                            ? 'linear-gradient(90deg, #ff6b9d, #ff4081)'
+                                            : (currentExpenses / budgetLimit) * 100 >= 70
+                                            ? 'linear-gradient(90deg, #ffa726, #fb8c00)'
+                                            : 'linear-gradient(90deg, #66bb6a, #4caf50)',
+                                        boxShadow: (currentExpenses / budgetLimit) * 100 >= 100
+                                            ? '0 0 10px rgba(244, 67, 54, 0.5)'
+                                            : (currentExpenses / budgetLimit) * 100 >= 90
+                                            ? '0 0 10px rgba(255, 107, 157, 0.5)'
+                                            : (currentExpenses / budgetLimit) * 100 >= 70
+                                            ? '0 0 10px rgba(255, 167, 38, 0.5)'
+                                            : '0 0 10px rgba(102, 187, 106, 0.5)',
+                                    },
+                                }}
+                            />
+                        </Box>
+                    </CardContent>
+                </Card>
+            )}
 
             {/* Month Selector */}
             <Card

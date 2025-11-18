@@ -26,8 +26,11 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import TrackChangesIcon from '@mui/icons-material/TrackChanges';
 import BarChartIcon from '@mui/icons-material/BarChart';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import Badge from '@mui/material/Badge';
 import { useNavigate } from 'react-router-dom';
 import { getUser, logout } from '../api/auth';
+import { getNotifications } from '../api/notifications';
 
 // Import dashboard sections
 import PulpitSection from '../components/dashboard/PulpitSection';
@@ -36,6 +39,7 @@ import BudzetSection from '../components/dashboard/BudzetSection';
 import CeleSection from '../components/dashboard/CeleSection';
 import AnalizySection from '../components/dashboard/AnalizySection';
 import UstawieniaSection from '../components/dashboard/UstawieniaSection';
+import PowiadomieniaSection from '../components/dashboard/PowiadomieniaSection';
 
 const drawerWidth = 260;
 
@@ -45,6 +49,7 @@ const DashboardPage = () => {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [selectedMenu, setSelectedMenu] = useState('pulpit');
     const [user, setUser] = useState(null);
+    const [unreadCount, setUnreadCount] = useState(0);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -53,10 +58,30 @@ const DashboardPage = () => {
         if (userData) {
             setUser(userData);
         }
+
+        // Pobierz liczbę nieprzeczytanych powiadomień
+        fetchUnreadCount();
     }, []);
+
+    const fetchUnreadCount = async () => {
+        try {
+            const data = await getNotifications('unread');
+            setUnreadCount(data.unreadCount || 0);
+        } catch (error) {
+            console.error('Error fetching unread count:', error);
+        }
+    };
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
+    };
+
+    const handleMenuSelect = (menuId) => {
+        setSelectedMenu(menuId);
+        // Refresh unread count when leaving notifications section
+        if (menuId !== 'powiadomienia') {
+            fetchUnreadCount();
+        }
     };
 
     const handleLogout = () => {
@@ -82,6 +107,18 @@ const DashboardPage = () => {
         { id: 'budzet', label: 'Budżet', icon: <TrendingUpIcon />, color: '#66bb6a' }, // Przychody - zielony
         { id: 'cele', label: 'Cele', icon: <TrackChangesIcon />, color: '#ab47bc' }, // Twój cel - fioletowy
         { id: 'analizy', label: 'Analizy', icon: <BarChartIcon />, color: '#fbc02d' }, // Oszczędności - żółty
+        {
+            id: 'powiadomienia',
+            label: 'Powiadomienia',
+            icon: unreadCount > 0 ? (
+                <Badge badgeContent={unreadCount} color="error">
+                    <NotificationsIcon />
+                </Badge>
+            ) : (
+                <NotificationsIcon />
+            ),
+            color: '#ff9800'
+        }, // Powiadomienia - pomarańczowy
         { id: 'ustawienia', label: 'Ustawienia', icon: <SettingsIcon />, color: '#78909c' }, // Ustawienia - blue-grey
     ];
 
@@ -92,6 +129,7 @@ const DashboardPage = () => {
         budzet: 'Budżet',
         cele: 'Cele oszczędnościowe',
         analizy: 'Analizy i statystyki',
+        powiadomienia: 'Powiadomienia',
         ustawienia: 'Ustawienia',
     };
 
@@ -101,13 +139,15 @@ const DashboardPage = () => {
             case 'pulpit':
                 return <PulpitSection user={user} onNavigate={setSelectedMenu} />;
             case 'wydatki':
-                return <WydatkiSection />;
+                return <WydatkiSection onExpenseChange={fetchUnreadCount} />;
             case 'budzet':
                 return <BudzetSection />;
             case 'cele':
-                return <CeleSection />;
+                return <CeleSection onGoalChange={fetchUnreadCount} />;
             case 'analizy':
                 return <AnalizySection />;
+            case 'powiadomienia':
+                return <PowiadomieniaSection onNotificationChange={fetchUnreadCount} />;
             case 'ustawienia':
                 return <UstawieniaSection />;
             default:
@@ -148,7 +188,7 @@ const DashboardPage = () => {
                     <ListItem key={item.id} disablePadding sx={{ px: 1.5, mb: 0.5 }}>
                         <ListItemButton
                             selected={selectedMenu === item.id}
-                            onClick={() => setSelectedMenu(item.id)}
+                            onClick={() => handleMenuSelect(item.id)}
                             sx={{
                                 borderRadius: 2,
                                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',

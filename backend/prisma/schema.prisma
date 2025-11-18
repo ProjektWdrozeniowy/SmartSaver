@@ -8,16 +8,17 @@ datasource db {
 }
 
 model Account {
-  id            Int            @id @default(autoincrement())
+  id            Int             @id @default(autoincrement())
   username      String
-  email         String         @unique
-  passwordHash  String         @map("password")
-  createdAt     DateTime       @default(now())
+  email         String          @unique
+  passwordHash  String          @map("password")
+  createdAt     DateTime        @default(now())
   categories    Category[]
   expenses      Expense[]
   goals         Goal[]
   incomes       Income[]
   settings      UserSettings?
+  notifications Notification[]
 
   @@map("accounts")
 }
@@ -98,13 +99,29 @@ model GoalContribution {
 }
 
 model UserSettings {
-  id            Int      @id @default(autoincrement())
-  userId        Int      @unique
-  budgetAlerts  Boolean  @default(true)
-  goalReminders Boolean  @default(false)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  user          Account  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                   Int      @id @default(autoincrement())
+  userId               Int      @unique
+  budgetAlerts         Boolean  @default(true)
+  goalReminders        Boolean  @default(false)
+  monthlyBudgetLimit   Float?
+  budgetAlertThreshold Int      @default(80)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  user                 Account  @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_settings")
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  type      String
+  title     String
+  message   String   @db.Text
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      Account  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "notifications_userId_fkey")
+  @@map("notifications")
 }

@@ -17,6 +17,8 @@ import {
     DialogContentText,
     DialogActions,
     useTheme,
+    Slider,
+    InputAdornment,
 } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import LockIcon from '@mui/icons-material/Lock';
@@ -59,6 +61,8 @@ const UstawieniaSection = () => {
     const [notifications, setNotifications] = useState({
         budgetAlerts: false,
         goalReminders: false,
+        monthlyBudgetLimit: null,
+        budgetAlertThreshold: 80,
     });
 
     // Stan dla komunikatów
@@ -94,6 +98,8 @@ const UstawieniaSection = () => {
             setNotifications({
                 budgetAlerts: settings.budgetAlerts || false,
                 goalReminders: settings.goalReminders || false,
+                monthlyBudgetLimit: settings.monthlyBudgetLimit || null,
+                budgetAlertThreshold: settings.budgetAlertThreshold || 80,
             });
         } catch (error) {
             console.error('Błąd ładowania ustawień powiadomień:', error);
@@ -231,6 +237,50 @@ const UstawieniaSection = () => {
                 message: error.message || 'Błąd podczas aktualizacji powiadomień',
                 severity: 'error',
             });
+        }
+    };
+
+    // Obsługa zmiany limitu budżetu
+    const handleBudgetLimitChange = async (value) => {
+        const limit = value === '' ? null : parseFloat(value);
+        setNotifications({
+            ...notifications,
+            monthlyBudgetLimit: limit,
+        });
+    };
+
+    // Zapisz limit budżetu
+    const handleBudgetLimitSave = async () => {
+        try {
+            await updateNotificationSettings(notifications);
+            setSnackbar({
+                open: true,
+                message: 'Limit budżetu zaktualizowany',
+                severity: 'success',
+            });
+        } catch (error) {
+            setSnackbar({
+                open: true,
+                message: error.message || 'Błąd podczas aktualizacji limitu',
+                severity: 'error',
+            });
+        }
+    };
+
+    // Obsługa zmiany progu alertu
+    const handleThresholdChange = async (event, newValue) => {
+        setNotifications({
+            ...notifications,
+            budgetAlertThreshold: newValue,
+        });
+
+        try {
+            await updateNotificationSettings({
+                ...notifications,
+                budgetAlertThreshold: newValue,
+            });
+        } catch (error) {
+            console.error('Error updating threshold:', error);
         }
     };
 
@@ -558,6 +608,64 @@ const UstawieniaSection = () => {
                             color="primary"
                         />
                     </Box>
+
+                    {/* Budget limit settings - visible when budgetAlerts is enabled */}
+                    {notifications.budgetAlerts && (
+                        <Box sx={{ pl: 2, pr: 2, pb: 2 }}>
+                            <Box sx={{ mb: 3 }}>
+                                <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1.5 }}>
+                                    Miesięczny limit budżetu
+                                </Typography>
+                                <Box sx={{ display: 'flex', gap: 1 }}>
+                                    <TextField
+                                        type="number"
+                                        value={notifications.monthlyBudgetLimit || ''}
+                                        onChange={(e) => handleBudgetLimitChange(e.target.value)}
+                                        placeholder="Wprowadź limit"
+                                        fullWidth
+                                        InputProps={{
+                                            endAdornment: <InputAdornment position="end">zł</InputAdornment>,
+                                        }}
+                                        inputProps={{
+                                            min: 0,
+                                            step: 100
+                                        }}
+                                    />
+                                    <Button
+                                        variant="contained"
+                                        onClick={handleBudgetLimitSave}
+                                        disabled={!notifications.monthlyBudgetLimit}
+                                        sx={{ minWidth: 100 }}
+                                    >
+                                        Zapisz
+                                    </Button>
+                                </Box>
+                            </Box>
+
+                            {notifications.monthlyBudgetLimit && (
+                                <Box>
+                                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
+                                        Ostrzegaj przy: {notifications.budgetAlertThreshold}% budżetu
+                                    </Typography>
+                                    <Slider
+                                        value={notifications.budgetAlertThreshold}
+                                        onChange={handleThresholdChange}
+                                        min={70}
+                                        max={100}
+                                        step={10}
+                                        marks={[
+                                            { value: 70, label: '70%' },
+                                            { value: 80, label: '80%' },
+                                            { value: 90, label: '90%' },
+                                            { value: 100, label: '100%' },
+                                        ]}
+                                        valueLabelDisplay="auto"
+                                        valueLabelFormat={(value) => `${value}%`}
+                                    />
+                                </Box>
+                            )}
+                        </Box>
+                    )}
 
                     <Divider />
 

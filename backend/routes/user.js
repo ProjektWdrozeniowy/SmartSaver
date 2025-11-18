@@ -20,7 +20,9 @@ const ChangePasswordSchema = z.object({
 
 const UpdateNotificationsSchema = z.object({
   budgetAlerts: z.boolean(),
-  goalReminders: z.boolean()
+  goalReminders: z.boolean(),
+  monthlyBudgetLimit: z.number().positive().nullable().optional(),
+  budgetAlertThreshold: z.number().int().min(1).max(100).optional()
 });
 
 const DeleteAccountSchema = z.object({
@@ -142,7 +144,9 @@ router.get('/notifications', authenticateToken, async (req, res) => {
       where: { userId: req.user.id },
       select: {
         budgetAlerts: true,
-        goalReminders: true
+        goalReminders: true,
+        monthlyBudgetLimit: true,
+        budgetAlertThreshold: true
       }
     });
 
@@ -152,11 +156,14 @@ router.get('/notifications', authenticateToken, async (req, res) => {
         data: {
           userId: req.user.id,
           budgetAlerts: true,
-          goalReminders: false
+          goalReminders: false,
+          budgetAlertThreshold: 80
         },
         select: {
           budgetAlerts: true,
-          goalReminders: true
+          goalReminders: true,
+          monthlyBudgetLimit: true,
+          budgetAlertThreshold: true
         }
       });
     }
@@ -171,23 +178,35 @@ router.get('/notifications', authenticateToken, async (req, res) => {
 // PUT /api/user/notifications - Update notification settings
 router.put('/notifications', authenticateToken, async (req, res) => {
   try {
-    const { budgetAlerts, goalReminders } = UpdateNotificationsSchema.parse(req.body);
+    const { budgetAlerts, goalReminders, monthlyBudgetLimit, budgetAlertThreshold } = UpdateNotificationsSchema.parse(req.body);
+
+    // Prepare update data
+    const updateData = {
+      budgetAlerts,
+      goalReminders
+    };
+
+    // Only update budget fields if provided
+    if (monthlyBudgetLimit !== undefined) {
+      updateData.monthlyBudgetLimit = monthlyBudgetLimit;
+    }
+    if (budgetAlertThreshold !== undefined) {
+      updateData.budgetAlertThreshold = budgetAlertThreshold;
+    }
 
     // Upsert (update or create) settings
     const settings = await prisma.userSettings.upsert({
       where: { userId: req.user.id },
-      update: {
-        budgetAlerts,
-        goalReminders
-      },
+      update: updateData,
       create: {
         userId: req.user.id,
-        budgetAlerts,
-        goalReminders
+        ...updateData
       },
       select: {
         budgetAlerts: true,
-        goalReminders: true
+        goalReminders: true,
+        monthlyBudgetLimit: true,
+        budgetAlertThreshold: true
       }
     });
 
