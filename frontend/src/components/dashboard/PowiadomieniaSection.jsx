@@ -152,26 +152,42 @@ const PowiadomieniaSection = ({ onNotificationChange }) => {
         });
     };
 
+    const filterLabels = {
+        'all': 'Wszystkie',
+        'unread': 'Nieprzeczytane',
+        'budget_alert': 'Alerty budżetu',
+        'goal_achieved': 'Osiągnięte cele',
+        'goal_reminder': 'Przypomnienia'
+    };
+
     return (
         <Box sx={{ width: '100%' }}>
             {/* Header */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3, flexWrap: 'wrap', gap: 2 }}>
                 <Box>
-                    <Typography variant="h5" sx={{ fontWeight: 600, mb: 0.5 }}>
-                        Powiadomienia
-                    </Typography>
                     <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                         {unreadCount > 0 ? `${unreadCount} nieprzeczytanych` : 'Brak nowych powiadomień'}
                     </Typography>
                 </Box>
-                <Box sx={{ display: 'flex', gap: 1 }}>
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                     <Button
                         variant="outlined"
                         startIcon={<FilterListIcon />}
                         onClick={(e) => setAnchorEl(e.currentTarget)}
-                        sx={{ textTransform: 'none' }}
+                        sx={{
+                            textTransform: 'none',
+                            fontSize: { xs: '0.8rem', sm: '0.875rem' },
+                            padding: { xs: '4px 8px', sm: '6px 16px' },
+                            '&:hover': {
+                                transform: 'none',
+                                backgroundColor: 'transparent',
+                                color: '#00b8d4',
+                                borderColor: '#00b8d4',
+                                boxShadow: '0 0 12px 3px rgba(0, 184, 212, 0.2)',
+                            }
+                        }}
                     >
-                        {filter === 'all' ? 'Wszystkie' : filter === 'unread' ? 'Nieprzeczytane' : filter}
+                        {filterLabels[filter] || 'Wszystkie'}
                     </Button>
                     <Menu
                         anchorEl={anchorEl}
@@ -189,9 +205,20 @@ const PowiadomieniaSection = ({ onNotificationChange }) => {
                             variant="outlined"
                             startIcon={<DoneAllIcon />}
                             onClick={handleMarkAllAsRead}
-                            sx={{ textTransform: 'none' }}
+                            sx={{
+                                textTransform: 'none',
+                                fontSize: { xs: '0.8rem', sm: '0.875rem' },
+                                padding: { xs: '4px 8px', sm: '6px 16px' },
+                                '&:hover': {
+                                    transform: 'none',
+                                    backgroundColor: 'transparent',
+                                    color: '#00b8d4',
+                                    borderColor: '#00b8d4',
+                                    boxShadow: '0 0 12px 3px rgba(0, 184, 212, 0.2)',
+                                }
+                            }}
                         >
-                            Oznacz wszystkie
+                            Odznacz wszystkie
                         </Button>
                     )}
                     {notifications.length > 0 && (
@@ -200,7 +227,18 @@ const PowiadomieniaSection = ({ onNotificationChange }) => {
                             color="error"
                             startIcon={<DeleteIcon />}
                             onClick={handleDeleteAll}
-                            sx={{ textTransform: 'none' }}
+                            sx={{
+                                textTransform: 'none',
+                                fontSize: { xs: '0.8rem', sm: '0.875rem' },
+                                padding: { xs: '4px 8px', sm: '6px 16px' },
+                                '&:hover': {
+                                    transform: 'none',
+                                    backgroundColor: 'transparent',
+                                    color: '#f44336',
+                                    borderColor: '#f44336',
+                                    boxShadow: '0 0 12px 3px rgba(244, 67, 54, 0.2)',
+                                }
+                            }}
                         >
                             Usuń wszystkie
                         </Button>
@@ -227,6 +265,13 @@ const PowiadomieniaSection = ({ onNotificationChange }) => {
                         borderRadius: 3,
                         textAlign: 'center',
                         py: 8,
+                        transition: 'border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        transform: 'none',
+                        '&:hover': {
+                            borderColor: 'rgba(255, 255, 255, 0.2)',
+                            transform: 'none',
+                            boxShadow: 'none',
+                        },
                     }}
                 >
                     <NotificationsIcon sx={{ fontSize: 80, color: 'text.secondary', opacity: 0.5, mb: 2 }} />
@@ -249,6 +294,13 @@ const PowiadomieniaSection = ({ onNotificationChange }) => {
                         border: '1px solid',
                         borderColor: 'rgba(255, 255, 255, 0.1)',
                         borderRadius: 3,
+                        transition: 'border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        transform: 'none',
+                        '&:hover': {
+                            borderColor: 'rgba(255, 255, 255, 0.2)',
+                            transform: 'none',
+                            boxShadow: 'none',
+                        },
                     }}
                 >
                     <List sx={{ p: 0 }}>

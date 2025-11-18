@@ -155,7 +155,7 @@ router.get('/notifications', authenticateToken, async (req, res) => {
       settings = await prisma.userSettings.create({
         data: {
           userId: req.user.id,
-          budgetAlerts: true,
+          budgetAlerts: false,
           goalReminders: false,
           budgetAlertThreshold: 80
         },

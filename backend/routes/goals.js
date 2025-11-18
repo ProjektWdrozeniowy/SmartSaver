@@ -166,7 +166,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
     });
 
     // Check if goal was achieved and create notification
-    checkGoalAchievedAndNotify(
+    await checkGoalAchievedAndNotify(
       req.user.id,
       goalId,
       goal.currentAmount,
@@ -254,7 +254,7 @@ router.post('/:id/contribute', authenticateToken, async (req, res) => {
     });
 
     // Check if goal was achieved and create notification
-    checkGoalAchievedAndNotify(
+    await checkGoalAchievedAndNotify(
       req.user.id,
       goalId,
       goal.currentAmount,

@@ -117,7 +117,7 @@ const DashboardPage = () => {
             ) : (
                 <NotificationsIcon />
             ),
-            color: '#ff9800'
+            color: '#ff9a76'
         }, // Powiadomienia - pomarańczowy
         { id: 'ustawienia', label: 'Ustawienia', icon: <SettingsIcon />, color: '#78909c' }, // Ustawienia - blue-grey
     ];

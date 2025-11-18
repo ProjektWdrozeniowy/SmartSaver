@@ -49,8 +49,12 @@ async function checkBudgetAndNotify(userId, expenseDate) {
     const userThreshold = settings.budgetAlertThreshold || 80;
 
     // Check only two thresholds: user's chosen threshold and 100%
+    // Priority: check from highest to lowest
     const thresholdsToCheck = [100, userThreshold];
 
+    let thresholdToNotify = null;
+
+    // Find the highest exceeded threshold that doesn't have a notification yet
     for (const threshold of thresholdsToCheck) {
       if (percentage >= threshold) {
         // Check if notification already exists for this threshold this month
@@ -67,27 +71,33 @@ async function checkBudgetAndNotify(userId, expenseDate) {
           }
         });
 
-        // Create notification if it doesn't exist
+        // If no notification exists for this threshold, use it
         if (!existingNotification) {
-          let title, message;
-          if (threshold === 100) {
-            title = '🚨 Przekroczono budżet!';
-            message = `Przekroczyłeś limit budżetu na ten miesiąc! Wydatki: ${totalExpenses.toFixed(2)} zł / ${budgetLimit.toFixed(2)} zł (${percentage.toFixed(0)}%)`;
-          } else {
-            title = `⚠️ Osiągnięto ${threshold}% budżetu`;
-            message = `Wykorzystałeś ${threshold}% miesięcznego budżetu. Wydatki: ${totalExpenses.toFixed(2)} zł / ${budgetLimit.toFixed(2)} zł`;
-          }
-
-          await prisma.notification.create({
-            data: {
-              userId,
-              type: 'budget_alert',
-              title,
-              message
-            }
-          });
+          thresholdToNotify = threshold;
+          break; // Take the highest threshold and stop
         }
       }
+    }
+
+    // Create notification only for the highest exceeded threshold
+    if (thresholdToNotify !== null) {
+      let title, message;
+      if (thresholdToNotify === 100) {
+        title = '🚨 Przekroczono budżet!';
+        message = `Przekroczyłeś limit budżetu na ten miesiąc! Wydatki: ${totalExpenses.toFixed(2)} zł / ${budgetLimit.toFixed(2)} zł (${percentage.toFixed(0)}%)`;
+      } else {
+        title = `⚠️ Osiągnięto ${thresholdToNotify}% budżetu`;
+        message = `Wykorzystałeś ${thresholdToNotify}% miesięcznego budżetu. Wydatki: ${totalExpenses.toFixed(2)} zł / ${budgetLimit.toFixed(2)} zł`;
+      }
+
+      await prisma.notification.create({
+        data: {
+          userId,
+          type: 'budget_alert',
+          title,
+          message
+        }
+      });
     }
   } catch (error) {
     console.error('Error checking budget:', error);
