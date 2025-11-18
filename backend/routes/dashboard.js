@@ -183,14 +183,20 @@ router.get('/transactions', authenticateToken, async (req, res) => {
           }
         }
       },
-      orderBy: { date: 'desc' },
+      orderBy: [
+        { date: 'desc' },
+        { id: 'desc' }
+      ],
       take: limit
     });
 
     // Get recent incomes
     const incomes = await prisma.income.findMany({
       where: { userId: req.user.id },
-      orderBy: { date: 'desc' },
+      orderBy: [
+        { date: 'desc' },
+        { id: 'desc' }
+      ],
       take: limit
     });
 

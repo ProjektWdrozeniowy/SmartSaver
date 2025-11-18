@@ -39,7 +39,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useThemeMode } from '../../context/ThemeContext';
 
-const UstawieniaSection = () => {
+const UstawieniaSection = ({ scrollToSection, onScrollComplete }) => {
     const theme = useTheme();
     const navigate = useNavigate();
     const { userMode, toggleTheme } = useThemeMode();
@@ -91,6 +91,22 @@ const UstawieniaSection = () => {
         // Wczytaj ustawienia powiadomień
         loadNotificationSettings();
     }, []);
+
+    // Scroll to section when scrollToSection changes
+    useEffect(() => {
+        if (scrollToSection) {
+            const sectionId = `settings-${scrollToSection}`;
+            const element = document.getElementById(sectionId);
+            if (element) {
+                setTimeout(() => {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    if (onScrollComplete) {
+                        onScrollComplete();
+                    }
+                }, 100);
+            }
+        }
+    }, [scrollToSection, onScrollComplete]);
 
     const loadNotificationSettings = async () => {
         try {
@@ -369,24 +385,35 @@ const UstawieniaSection = () => {
                 </Typography>
             </Box>
 
-            {/* Informacje o profilu */}
-            <Card
+            {/* Container for Profile and Password cards */}
+            <Box
+                id="settings-profile"
                 sx={{
-                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
-                    backdropFilter: 'blur(10px)',
-                    WebkitBackdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-                    p: 3,
+                    display: 'flex',
+                    flexDirection: { xs: 'column', lg: 'row' },
+                    gap: 3,
                     mb: 3,
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    '&:hover': {
-                        transform: 'none',
-                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-                        borderColor: 'rgba(255, 255, 255, 0.15)',
-                    },
+                    scrollMarginTop: '100px'
                 }}
             >
+                {/* Informacje o profilu */}
+                <Card
+                    sx={{
+                        flex: 1,
+                        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                        backdropFilter: 'blur(10px)',
+                        WebkitBackdropFilter: 'blur(10px)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                        p: 3,
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        '&:hover': {
+                            transform: 'none',
+                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                            borderColor: 'rgba(255, 255, 255, 0.15)',
+                        },
+                    }}
+                >
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                     <PersonIcon sx={{ fontSize: 24, mr: 1, color: 'primary.main' }} />
                     <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
@@ -455,24 +482,24 @@ const UstawieniaSection = () => {
                 </Box>
             </Card>
 
-            {/* Zmiana hasła */}
-            <Card
-                sx={{
-                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
-                    backdropFilter: 'blur(10px)',
-                    WebkitBackdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-                    p: 3,
-                    mb: 3,
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    '&:hover': {
-                        transform: 'none',
+                {/* Zmiana hasła */}
+                <Card
+                    sx={{
+                        flex: 1,
+                        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                        backdropFilter: 'blur(10px)',
+                        WebkitBackdropFilter: 'blur(10px)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
                         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-                        borderColor: 'rgba(255, 255, 255, 0.15)',
-                    },
-                }}
-            >
+                        p: 3,
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        '&:hover': {
+                            transform: 'none',
+                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                            borderColor: 'rgba(255, 255, 255, 0.15)',
+                        },
+                    }}
+                >
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                     <LockIcon sx={{ fontSize: 24, mr: 1, color: 'primary.main' }} />
                     <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
@@ -553,10 +580,12 @@ const UstawieniaSection = () => {
                         Zmień hasło
                     </Button>
                 </Box>
-            </Card>
+                </Card>
+            </Box>
 
             {/* Powiadomienia */}
             <Card
+                id="settings-notifications"
                 sx={{
                     background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
                     backdropFilter: 'blur(10px)',
@@ -565,6 +594,7 @@ const UstawieniaSection = () => {
                     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                     p: 3,
                     mb: 3,
+                    scrollMarginTop: '100px',
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     '&:hover': {
                         transform: 'none',
@@ -710,6 +740,7 @@ const UstawieniaSection = () => {
 
             {/* Wygląd */}
             <Card
+                id="settings-appearance"
                 sx={{
                     background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
                     backdropFilter: 'blur(10px)',
@@ -718,6 +749,7 @@ const UstawieniaSection = () => {
                     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                     p: 3,
                     mb: 3,
+                    scrollMarginTop: '100px',
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     '&:hover': {
                         transform: 'none',
@@ -762,6 +794,7 @@ const UstawieniaSection = () => {
 
             {/* Dane i prywatność */}
             <Card
+                id="settings-privacy"
                 sx={{
                     background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
                     backdropFilter: 'blur(10px)',
@@ -770,6 +803,7 @@ const UstawieniaSection = () => {
                     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                     p: 3,
                     mb: 3,
+                    scrollMarginTop: '100px',
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     '&:hover': {
                         transform: 'none',

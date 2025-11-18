@@ -17,6 +17,8 @@ import {
     Avatar,
     useTheme,
     useMediaQuery,
+    Menu,
+    MenuItem,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -27,6 +29,9 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import TrackChangesIcon from '@mui/icons-material/TrackChanges';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import NotificationsIcon from '@mui/icons-material/Notifications';
+import PersonIcon from '@mui/icons-material/Person';
+import PaletteIcon from '@mui/icons-material/Palette';
+import SecurityIcon from '@mui/icons-material/Security';
 import Badge from '@mui/material/Badge';
 import { useNavigate } from 'react-router-dom';
 import { getUser, logout } from '../api/auth';
@@ -50,6 +55,8 @@ const DashboardPage = () => {
     const [selectedMenu, setSelectedMenu] = useState('pulpit');
     const [user, setUser] = useState(null);
     const [unreadCount, setUnreadCount] = useState(0);
+    const [avatarMenuAnchor, setAvatarMenuAnchor] = useState(null);
+    const [settingsScrollTo, setSettingsScrollTo] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -88,6 +95,24 @@ const DashboardPage = () => {
         // Wyloguj użytkownika (usuń token i dane z localStorage)
         logout();
         navigate('/signin');
+    };
+
+    const handleAvatarClick = (event) => {
+        setAvatarMenuAnchor(event.currentTarget);
+    };
+
+    const handleAvatarMenuClose = () => {
+        setAvatarMenuAnchor(null);
+    };
+
+    const handleAvatarMenuItemClick = (action) => {
+        handleAvatarMenuClose();
+        if (action === 'logout') {
+            handleLogout();
+        } else {
+            setSelectedMenu('ustawienia');
+            setSettingsScrollTo(action);
+        }
     };
 
     // Funkcja do wygenerowania inicjałów
@@ -149,7 +174,7 @@ const DashboardPage = () => {
             case 'powiadomienia':
                 return <PowiadomieniaSection onNotificationChange={fetchUnreadCount} />;
             case 'ustawienia':
-                return <UstawieniaSection />;
+                return <UstawieniaSection scrollToSection={settingsScrollTo} onScrollComplete={() => setSettingsScrollTo(null)} />;
             default:
                 return <PulpitSection user={user} onNavigate={setSelectedMenu} />;
         }
@@ -291,6 +316,7 @@ const DashboardPage = () => {
                             </Typography>
                         </Box>
                         <Avatar
+                            onClick={handleAvatarClick}
                             sx={{
                                 width: 40,
                                 height: 40,
@@ -303,6 +329,66 @@ const DashboardPage = () => {
                     </Box>
                 </Toolbar>
             </AppBar>
+
+            {/* Avatar Menu - tylko na desktop */}
+            <Menu
+                anchorEl={avatarMenuAnchor}
+                open={Boolean(avatarMenuAnchor)}
+                onClose={handleAvatarMenuClose}
+                sx={{ display: { xs: 'none', md: 'block' } }}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                }}
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                }}
+                PaperProps={{
+                    sx: {
+                        mt: 1.5,
+                        minWidth: 220,
+                        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                        backdropFilter: 'blur(10px)',
+                        WebkitBackdropFilter: 'blur(10px)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                        borderRadius: 2,
+                    }
+                }}
+            >
+                <MenuItem onClick={() => handleAvatarMenuItemClick('profile')}>
+                    <ListItemIcon>
+                        <PersonIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>Informacje o profilu</ListItemText>
+                </MenuItem>
+                <MenuItem onClick={() => handleAvatarMenuItemClick('notifications')}>
+                    <ListItemIcon>
+                        <NotificationsIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>Powiadomienia</ListItemText>
+                </MenuItem>
+                <MenuItem onClick={() => handleAvatarMenuItemClick('appearance')}>
+                    <ListItemIcon>
+                        <PaletteIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>Wygląd</ListItemText>
+                </MenuItem>
+                <MenuItem onClick={() => handleAvatarMenuItemClick('privacy')}>
+                    <ListItemIcon>
+                        <SecurityIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>Dane i prywatność</ListItemText>
+                </MenuItem>
+                <Divider />
+                <MenuItem onClick={() => handleAvatarMenuItemClick('logout')}>
+                    <ListItemIcon>
+                        <LogoutIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>Wyloguj</ListItemText>
+                </MenuItem>
+            </Menu>
 
             {/* Sidebar Drawer */}
             <Box
