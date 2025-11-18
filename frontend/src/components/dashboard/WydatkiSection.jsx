@@ -40,8 +40,11 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import CategoryIcon from '@mui/icons-material/Category';
 import { getExpenses, createExpense, updateExpense, deleteExpense } from '../../api/expenses';
 import { getCategories, createCategory } from '../../api/categories';
+import { useThemeMode } from '../../context/ThemeContext';
 
 const WydatkiSection = () => {
+    const { mode } = useThemeMode();
+
     // Available icons for categories
     const availableIcons = [
         '🍕', '🛒', '🚗', '⚡', '🎬', '🏠', '🏥', '👕',
@@ -276,18 +279,18 @@ const WydatkiSection = () => {
                         startIcon={<CategoryIcon />}
                         onClick={handleAddCategory}
                         sx={{
-                            background: 'linear-gradient(135deg, rgba(239, 83, 80, 0.2), rgba(239, 83, 80, 0.08))',
+                            background: 'linear-gradient(135deg, rgba(255, 107, 157, 0.2), rgba(255, 107, 157, 0.08))',
                             backdropFilter: 'blur(8px)',
                             WebkitBackdropFilter: 'blur(8px)',
-                            borderColor: 'rgba(239, 83, 80, 0.5)',
-                            color: '#ef5350',
-                            boxShadow: '0 4px 12px rgba(239, 83, 80, 0.25), inset 0 1px 0 rgba(239, 83, 80, 0.25)',
+                            borderColor: 'rgba(255, 107, 157, 0.5)',
+                            color: '#FF6B9D',
+                            boxShadow: '0 4px 12px rgba(255, 107, 157, 0.25), inset 0 1px 0 rgba(255, 107, 157, 0.25)',
                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                             '&:hover': {
-                                background: 'linear-gradient(135deg, rgba(239, 83, 80, 0.2), rgba(239, 83, 80, 0.08))',
-                                borderColor: 'rgba(239, 83, 80, 0.5)',
-                                color: '#ef5350',
-                                boxShadow: '0 0 12px 3px rgba(239, 83, 80, 0.2)',
+                                background: 'linear-gradient(135deg, rgba(255, 107, 157, 0.2), rgba(255, 107, 157, 0.08))',
+                                borderColor: 'rgba(255, 107, 157, 0.5)',
+                                color: '#FF6B9D',
+                                boxShadow: '0 0 12px 3px rgba(255, 107, 157, 0.2)',
                                 transform: 'none',
                             },
                         }}
@@ -299,17 +302,17 @@ const WydatkiSection = () => {
                         startIcon={<AddIcon />}
                         onClick={handleAddExpense}
                         sx={{
-                            background: 'linear-gradient(135deg, rgba(239, 83, 80, 0.35), rgba(239, 83, 80, 0.25))',
+                            background: 'linear-gradient(135deg, rgba(255, 107, 157, 0.35), rgba(255, 107, 157, 0.25))',
                             backdropFilter: 'blur(8px)',
                             WebkitBackdropFilter: 'blur(8px)',
-                            border: '1px solid rgba(239, 83, 80, 0.5)',
+                            border: '1px solid rgba(255, 107, 157, 0.5)',
                             color: '#ffffff',
-                            boxShadow: '0 4px 12px rgba(239, 83, 80, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+                            boxShadow: '0 4px 12px rgba(255, 107, 157, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                            textShadow: '0 0 10px rgba(239, 83, 80, 0.5)',
+                            textShadow: '0 0 10px rgba(255, 107, 157, 0.5)',
                             '&:hover': {
-                                background: 'linear-gradient(135deg, rgba(239, 83, 80, 0.35), rgba(239, 83, 80, 0.25))',
-                                boxShadow: '0 0 12px 3px rgba(239, 83, 80, 0.2)',
+                                background: 'linear-gradient(135deg, rgba(255, 107, 157, 0.35), rgba(255, 107, 157, 0.25))',
+                                boxShadow: '0 0 12px 3px rgba(255, 107, 157, 0.2)',
                                 transform: 'none',
                             },
                         }}
@@ -345,7 +348,7 @@ const WydatkiSection = () => {
                                 <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
                                     Suma wydatków
                                 </Typography>
-                                <Typography variant="h3" sx={{ fontWeight: 700, color: '#ef5350' }}>
+                                <Typography variant="h3" sx={{ fontWeight: 700, color: '#FF6B9D' }}>
                                     {totalExpenses.toFixed(2).replace('.', ',')} zł
                                 </Typography>
                             </Box>
@@ -363,25 +366,30 @@ const WydatkiSection = () => {
                                         popper: {
                                             sx: {
                                                 '& .MuiPaper-root': {
-                                                    background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                                                    background: mode === 'dark'
+                                                        ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                                                        : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
                                                     backdropFilter: 'blur(20px)',
                                                     WebkitBackdropFilter: 'blur(20px)',
-                                                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                                                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                                                    border: '1px solid',
+                                                    borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                                                    boxShadow: mode === 'dark'
+                                                        ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                                                        : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                                                 },
                                                 '& .MuiPickersCalendarHeader-root': {
-                                                    color: '#ffffff',
+                                                    color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                                 },
                                                 '& .MuiPickersCalendarHeader-label': {
-                                                    color: '#ffffff',
+                                                    color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                                 },
                                                 '& .MuiPickersMonth-monthButton': {
-                                                    color: '#ffffff',
+                                                    color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                                     '&:hover': {
                                                         backgroundColor: 'rgba(255, 107, 157, 0.2)',
                                                     },
                                                     '&.Mui-selected': {
-                                                        backgroundColor: '#ef5350',
+                                                        backgroundColor: '#FF6B9D',
                                                         color: '#000000',
                                                         '&:hover': {
                                                             backgroundColor: '#ff5c8d',
@@ -389,12 +397,12 @@ const WydatkiSection = () => {
                                                     },
                                                 },
                                                 '& .MuiPickersYear-yearButton': {
-                                                    color: '#ffffff',
+                                                    color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                                     '&:hover': {
                                                         backgroundColor: 'rgba(255, 107, 157, 0.2)',
                                                     },
                                                     '&.Mui-selected': {
-                                                        backgroundColor: '#ef5350',
+                                                        backgroundColor: '#FF6B9D',
                                                         color: '#000000',
                                                         '&:hover': {
                                                             backgroundColor: '#ff5c8d',
@@ -402,7 +410,7 @@ const WydatkiSection = () => {
                                                     },
                                                 },
                                                 '& .MuiIconButton-root': {
-                                                    color: '#ffffff',
+                                                    color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                                 },
                                             },
                                         },
@@ -455,11 +463,16 @@ const WydatkiSection = () => {
                                     MenuProps={{
                                         PaperProps: {
                                             sx: {
-                                                background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                                                background: mode === 'dark'
+                                                    ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                                                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
                                                 backdropFilter: 'blur(20px)',
                                                 WebkitBackdropFilter: 'blur(20px)',
-                                                border: '1px solid rgba(255, 255, 255, 0.1)',
-                                                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                                                border: '1px solid',
+                                                borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                                                boxShadow: mode === 'dark'
+                                                    ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                                                    : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                                             }
                                         }
                                     }}
@@ -579,11 +592,16 @@ const WydatkiSection = () => {
                 fullWidth
                 PaperProps={{
                     sx: {
-                        background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                        background: mode === 'dark'
+                            ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
                         backdropFilter: 'blur(20px)',
                         WebkitBackdropFilter: 'blur(20px)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                        border: '1px solid',
+                        borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                        boxShadow: mode === 'dark'
+                            ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                            : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                     }
                 }}
             >
@@ -608,11 +626,16 @@ const WydatkiSection = () => {
                                 MenuProps={{
                                     PaperProps: {
                                         sx: {
-                                            background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                                            background: mode === 'dark'
+                                                ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                                                : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
                                             backdropFilter: 'blur(20px)',
                                             WebkitBackdropFilter: 'blur(20px)',
-                                            border: '1px solid rgba(255, 255, 255, 0.1)',
-                                            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                                            border: '1px solid',
+                                            borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                                            boxShadow: mode === 'dark'
+                                                ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                                                : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                                         }
                                     }
                                 }}
@@ -637,20 +660,25 @@ const WydatkiSection = () => {
                                     popper: {
                                         sx: {
                                             '& .MuiPaper-root': {
-                                                background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                                                background: mode === 'dark'
+                                                    ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                                                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
                                                 backdropFilter: 'blur(20px)',
                                                 WebkitBackdropFilter: 'blur(20px)',
-                                                border: '1px solid rgba(255, 255, 255, 0.1)',
-                                                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                                                border: '1px solid',
+                                                borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                                                boxShadow: mode === 'dark'
+                                                    ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                                                    : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                                             },
                                             '& .MuiPickersCalendarHeader-root': {
-                                                color: '#ffffff',
+                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                             },
                                             '& .MuiPickersCalendarHeader-label': {
-                                                color: '#ffffff',
+                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                             },
                                             '& .MuiPickersDay-root': {
-                                                color: '#ffffff',
+                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                                 '&:hover': {
                                                     backgroundColor: 'rgba(255, 107, 157, 0.2)',
                                                 },
@@ -665,10 +693,10 @@ const WydatkiSection = () => {
                                                 border: '1px solid #ff6b9d',
                                             },
                                             '& .MuiDayCalendar-weekDayLabel': {
-                                                color: 'rgba(255, 255, 255, 0.7)',
+                                                color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
                                             },
                                             '& .MuiIconButton-root': {
-                                                color: '#ffffff',
+                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                             },
                                         },
                                     },
@@ -734,11 +762,16 @@ const WydatkiSection = () => {
                 fullWidth
                 PaperProps={{
                     sx: {
-                        background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                        background: mode === 'dark'
+                            ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
                         backdropFilter: 'blur(20px)',
                         WebkitBackdropFilter: 'blur(20px)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                        border: '1px solid',
+                        borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                        boxShadow: mode === 'dark'
+                            ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                            : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                     }
                 }}
             >
@@ -840,11 +873,16 @@ const WydatkiSection = () => {
                 fullWidth
                 PaperProps={{
                     sx: {
-                        background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                        background: mode === 'dark'
+                            ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
                         backdropFilter: 'blur(20px)',
                         WebkitBackdropFilter: 'blur(20px)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                        border: '1px solid',
+                        borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                        boxShadow: mode === 'dark'
+                            ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                            : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                     }
                 }}
             >

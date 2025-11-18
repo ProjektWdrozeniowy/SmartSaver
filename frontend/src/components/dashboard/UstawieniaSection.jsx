@@ -775,6 +775,20 @@ const UstawieniaSection = () => {
             <Dialog
                 open={deleteDialog.open}
                 onClose={() => setDeleteDialog({ open: false, password: '' })}
+                PaperProps={{
+                    sx: {
+                        background: userMode === 'dark'
+                            ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
+                        backdropFilter: 'blur(20px)',
+                        WebkitBackdropFilter: 'blur(20px)',
+                        border: '1px solid',
+                        borderColor: userMode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                        boxShadow: userMode === 'dark'
+                            ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                            : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
+                    }
+                }}
             >
                 <DialogTitle>Usuń konto</DialogTitle>
                 <DialogContent>

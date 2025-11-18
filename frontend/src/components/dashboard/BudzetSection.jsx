@@ -39,8 +39,11 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import { getIncome, createIncome, updateIncome, deleteIncome, getBudgetSummary } from '../../api/budget';
+import { useThemeMode } from '../../context/ThemeContext';
 
 const BudzetSection = () => {
+    const { mode } = useThemeMode();
+
     // Data states
     const [incomes, setIncomes] = useState([]);
     const [budgetSummary, setBudgetSummary] = useState({
@@ -325,7 +328,7 @@ const BudzetSection = () => {
                         <CardContent>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                                 <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>
-                                    Przychody (mies.)
+                                    Przychody (miesiąc)
                                 </Typography>
                                 <Box
                                     sx={{
@@ -451,20 +454,25 @@ const BudzetSection = () => {
                                     popper: {
                                         sx: {
                                             '& .MuiPaper-root': {
-                                                background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                                                background: mode === 'dark'
+                                                    ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                                                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
                                                 backdropFilter: 'blur(20px)',
                                                 WebkitBackdropFilter: 'blur(20px)',
-                                                border: '1px solid rgba(255, 255, 255, 0.1)',
-                                                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                                                border: '1px solid',
+                                                borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                                                boxShadow: mode === 'dark'
+                                                    ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                                                    : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                                             },
                                             '& .MuiPickersCalendarHeader-root': {
-                                                color: '#ffffff',
+                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                             },
                                             '& .MuiPickersCalendarHeader-label': {
-                                                color: '#ffffff',
+                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                             },
                                             '& .MuiPickersMonth-monthButton': {
-                                                color: '#ffffff',
+                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                                 '&:hover': {
                                                     backgroundColor: 'rgba(168, 230, 207, 0.2)',
                                                 },
@@ -477,7 +485,7 @@ const BudzetSection = () => {
                                                 },
                                             },
                                             '& .MuiPickersYear-yearButton': {
-                                                color: '#ffffff',
+                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                                 '&:hover': {
                                                     backgroundColor: 'rgba(168, 230, 207, 0.2)',
                                                 },
@@ -490,7 +498,7 @@ const BudzetSection = () => {
                                                 },
                                             },
                                             '& .MuiIconButton-root': {
-                                                color: '#ffffff',
+                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                             },
                                         },
                                     },
@@ -589,11 +597,16 @@ const BudzetSection = () => {
                 fullWidth
                 PaperProps={{
                     sx: {
-                        background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                        background: mode === 'dark'
+                            ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
                         backdropFilter: 'blur(20px)',
                         WebkitBackdropFilter: 'blur(20px)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                        border: '1px solid',
+                        borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                        boxShadow: mode === 'dark'
+                            ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                            : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                     }
                 }}
             >
@@ -623,20 +636,25 @@ const BudzetSection = () => {
                                     popper: {
                                         sx: {
                                             '& .MuiPaper-root': {
-                                                background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                                                background: mode === 'dark'
+                                                    ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                                                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
                                                 backdropFilter: 'blur(20px)',
                                                 WebkitBackdropFilter: 'blur(20px)',
-                                                border: '1px solid rgba(255, 255, 255, 0.1)',
-                                                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                                                border: '1px solid',
+                                                borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                                                boxShadow: mode === 'dark'
+                                                    ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                                                    : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                                             },
                                             '& .MuiPickersCalendarHeader-root': {
-                                                color: '#ffffff',
+                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                             },
                                             '& .MuiPickersCalendarHeader-label': {
-                                                color: '#ffffff',
+                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                             },
                                             '& .MuiPickersDay-root': {
-                                                color: '#ffffff',
+                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                                 '&:hover': {
                                                     backgroundColor: 'rgba(168, 230, 207, 0.2)',
                                                 },
@@ -652,10 +670,10 @@ const BudzetSection = () => {
                                                 border: '1px solid #66bb6a',
                                             },
                                             '& .MuiDayCalendar-weekDayLabel': {
-                                                color: 'rgba(255, 255, 255, 0.7)',
+                                                color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
                                             },
                                             '& .MuiIconButton-root': {
-                                                color: '#ffffff',
+                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                             },
                                         },
                                     },
@@ -722,11 +740,16 @@ const BudzetSection = () => {
                 fullWidth
                 PaperProps={{
                     sx: {
-                        background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                        background: mode === 'dark'
+                            ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
                         backdropFilter: 'blur(20px)',
                         WebkitBackdropFilter: 'blur(20px)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                        border: '1px solid',
+                        borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                        boxShadow: mode === 'dark'
+                            ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                            : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                     }
                 }}
             >

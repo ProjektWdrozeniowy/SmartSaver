@@ -78,7 +78,7 @@ const DashboardPage = () => {
     // Menu items with colors matching dashboard cards
     const menuItems = [
         { id: 'pulpit', label: 'Pulpit', icon: <DashboardIcon />, color: '#00b8d4' }, // Aktualne saldo - cyan
-        { id: 'wydatki', label: 'Wydatki', icon: <AccountBalanceWalletIcon />, color: '#ef5350' }, // Wydatki - różowy
+        { id: 'wydatki', label: 'Wydatki', icon: <AccountBalanceWalletIcon />, color: '#FF6B9D' }, // Wydatki - różowy
         { id: 'budzet', label: 'Budżet', icon: <TrendingUpIcon />, color: '#66bb6a' }, // Przychody - zielony
         { id: 'cele', label: 'Cele', icon: <TrackChangesIcon />, color: '#ab47bc' }, // Twój cel - fioletowy
         { id: 'analizy', label: 'Analizy', icon: <BarChartIcon />, color: '#fbc02d' }, // Oszczędności - żółty

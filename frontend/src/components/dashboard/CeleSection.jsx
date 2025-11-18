@@ -33,8 +33,11 @@ import SavingsIcon from '@mui/icons-material/Savings';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { getGoals, createGoal, updateGoal, deleteGoal, contributeToGoal } from '../../api/goals';
+import { useThemeMode } from '../../context/ThemeContext';
 
 const CeleSection = () => {
+    const { mode } = useThemeMode();
+
     // Data states
     const [goals, setGoals] = useState([]);
 
@@ -744,11 +747,16 @@ const CeleSection = () => {
                 fullWidth
                 PaperProps={{
                     sx: {
-                        background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                        background: mode === 'dark'
+                            ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
                         backdropFilter: 'blur(20px)',
                         WebkitBackdropFilter: 'blur(20px)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                        border: '1px solid',
+                        borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                        boxShadow: mode === 'dark'
+                            ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                            : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                     }
                 }}
             >
@@ -820,20 +828,25 @@ const CeleSection = () => {
                                     popper: {
                                         sx: {
                                             '& .MuiPaper-root': {
-                                                background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                                                background: mode === 'dark'
+                                                    ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                                                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
                                                 backdropFilter: 'blur(20px)',
                                                 WebkitBackdropFilter: 'blur(20px)',
-                                                border: '1px solid rgba(255, 255, 255, 0.1)',
-                                                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                                                border: '1px solid',
+                                                borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                                                boxShadow: mode === 'dark'
+                                                    ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                                                    : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                                             },
                                             '& .MuiPickersCalendarHeader-root': {
-                                                color: '#ffffff',
+                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                             },
                                             '& .MuiPickersCalendarHeader-label': {
-                                                color: '#ffffff',
+                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                             },
                                             '& .MuiPickersDay-root': {
-                                                color: '#ffffff',
+                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                                 '&:hover': {
                                                     backgroundColor: 'rgba(199, 125, 255, 0.2)',
                                                 },
@@ -848,10 +861,10 @@ const CeleSection = () => {
                                                 border: '1px solid #ab47bc',
                                             },
                                             '& .MuiDayCalendar-weekDayLabel': {
-                                                color: 'rgba(255, 255, 255, 0.7)',
+                                                color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
                                             },
                                             '& .MuiIconButton-root': {
-                                                color: '#ffffff',
+                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                             },
                                         },
                                     },
@@ -897,11 +910,16 @@ const CeleSection = () => {
                 fullWidth
                 PaperProps={{
                     sx: {
-                        background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                        background: mode === 'dark'
+                            ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
                         backdropFilter: 'blur(20px)',
                         WebkitBackdropFilter: 'blur(20px)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                        border: '1px solid',
+                        borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                        boxShadow: mode === 'dark'
+                            ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                            : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                     }
                 }}
             >
@@ -988,11 +1006,16 @@ const CeleSection = () => {
                 fullWidth
                 PaperProps={{
                     sx: {
-                        background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                        background: mode === 'dark'
+                            ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
                         backdropFilter: 'blur(20px)',
                         WebkitBackdropFilter: 'blur(20px)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                        border: '1px solid',
+                        borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                        boxShadow: mode === 'dark'
+                            ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                            : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                     }
                 }}
             >

@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
 function getIconKey(title) {
   const iconMap = {
     'Aktualne saldo': 'balance',
-    'Przychody (mies)': 'income',
+    'Przychody (miesiąc)': 'income',
     'Wydatki (miesiąc)': 'expenses',
     'Twój cel': 'goal'
   };
@@ -108,7 +108,7 @@ router.get('/stats', authenticateToken, async (req, res) => {
         navigateTo: 'budzet'
       },
       {
-        title: 'Przychody (mies)',
+        title: 'Przychody (miesiąc)',
         value: formatCurrency(currentIncomeAmount),
         change: `${incomeChange >= 0 ? '+' : ''}${incomeChange}%`,
         positive: parseFloat(incomeChange) >= 0,

@@ -61,7 +61,7 @@ const PulpitSection = ({ user, onNavigate }) => {
             navigateTo: 'budzet',
         },
         {
-            title: 'Przychody (mies)',
+            title: 'Przychody (miesiąc)',
             value: '0 zł',
             change: '0%',
             positive: true,
