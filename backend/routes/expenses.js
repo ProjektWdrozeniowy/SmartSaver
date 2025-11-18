@@ -150,7 +150,10 @@ router.get('/', authenticateToken, async (req, res) => {
         description: true,
         amount: true
       },
-      orderBy: { date: 'desc' }
+      orderBy: [
+        { date: 'desc' },
+        { id: 'desc' }
+      ]
     });
 
     res.json({ expenses });
