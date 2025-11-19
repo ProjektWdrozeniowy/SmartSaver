@@ -63,6 +63,9 @@ const DashboardPage = () => {
     const hasCheckedReminders = useRef(false);
 
     useEffect(() => {
+        // Ustaw tytuł strony
+        document.title = 'SmartSaver - Pulpit';
+
         // Pobierz dane użytkownika z localStorage
         const userData = getUser();
         if (userData) {
