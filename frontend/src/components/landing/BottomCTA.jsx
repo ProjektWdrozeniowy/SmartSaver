@@ -91,6 +91,10 @@ const BottomCTA = () => {
                             fontSize: { xs: '1rem', sm: '1.1rem' },
                             px: { xs: 3, sm: 5 },
                             py: { xs: 1.3, sm: 1.6 },
+                            '&:hover': {
+                                transform: 'none',
+                                boxShadow: '0 0 12px 3px rgba(0, 240, 255, 0.2)',
+                            },
                         }}
                     >
                         Zarejestruj się za darmo

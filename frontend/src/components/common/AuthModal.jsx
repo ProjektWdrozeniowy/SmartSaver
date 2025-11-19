@@ -9,9 +9,11 @@ import {
 } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import { useThemeMode } from '../../context/ThemeContext';
 
 const AuthModal = ({ open, onClose, type = 'success', title, message, actionText = 'OK, rozumiem' }) => {
     const isSuccess = type === 'success';
+    const { mode } = useThemeMode();
 
     return (
         <Dialog
@@ -20,13 +22,17 @@ const AuthModal = ({ open, onClose, type = 'success', title, message, actionText
             maxWidth="sm"
             PaperProps={{
                 sx: {
-                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.08))',
+                    background: mode === 'dark'
+                        ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.08))'
+                        : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
                     backdropFilter: 'blur(10px)',
                     WebkitBackdropFilter: 'blur(10px)',
                     border: '1px solid',
-                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
                     borderRadius: 3,
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                    boxShadow: mode === 'dark'
+                        ? '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                        : '0 4px 20px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                     textAlign: 'center',
                     p: 2,
                 },
@@ -92,6 +98,10 @@ const AuthModal = ({ open, onClose, type = 'success', title, message, actionText
                     fullWidth
                     sx={{
                         py: 1.5,
+                        '&:hover': {
+                            transform: 'none',
+                            boxShadow: '0 0 12px 3px rgba(0, 240, 255, 0.2)',
+                        },
                     }}
                 >
                     {actionText}

@@ -20,7 +20,11 @@ const ChangePasswordSchema = z.object({
 
 const UpdateNotificationsSchema = z.object({
   budgetAlerts: z.boolean(),
-  goalReminders: z.boolean()
+  goalReminders: z.boolean(),
+  monthlyBudgetLimit: z.number().positive().nullable().optional(),
+  budgetAlertThreshold: z.number().int().min(1).max(100).optional(),
+  goalReminderDeadlineDays: z.number().int().optional(),
+  goalReminderInactivityDays: z.number().int().optional()
 });
 
 const DeleteAccountSchema = z.object({
@@ -142,7 +146,11 @@ router.get('/notifications', authenticateToken, async (req, res) => {
       where: { userId: req.user.id },
       select: {
         budgetAlerts: true,
-        goalReminders: true
+        goalReminders: true,
+        monthlyBudgetLimit: true,
+        budgetAlertThreshold: true,
+        goalReminderDeadlineDays: true,
+        goalReminderInactivityDays: true
       }
     });
 
@@ -151,12 +159,19 @@ router.get('/notifications', authenticateToken, async (req, res) => {
       settings = await prisma.userSettings.create({
         data: {
           userId: req.user.id,
-          budgetAlerts: true,
-          goalReminders: false
+          budgetAlerts: false,
+          goalReminders: false,
+          budgetAlertThreshold: 80,
+          goalReminderDeadlineDays: 7,
+          goalReminderInactivityDays: 14
         },
         select: {
           budgetAlerts: true,
-          goalReminders: true
+          goalReminders: true,
+          monthlyBudgetLimit: true,
+          budgetAlertThreshold: true,
+          goalReminderDeadlineDays: true,
+          goalReminderInactivityDays: true
         }
       });
     }
@@ -171,23 +186,43 @@ router.get('/notifications', authenticateToken, async (req, res) => {
 // PUT /api/user/notifications - Update notification settings
 router.put('/notifications', authenticateToken, async (req, res) => {
   try {
-    const { budgetAlerts, goalReminders } = UpdateNotificationsSchema.parse(req.body);
+    const { budgetAlerts, goalReminders, monthlyBudgetLimit, budgetAlertThreshold, goalReminderDeadlineDays, goalReminderInactivityDays } = UpdateNotificationsSchema.parse(req.body);
+
+    // Prepare update data
+    const updateData = {
+      budgetAlerts,
+      goalReminders
+    };
+
+    // Only update budget fields if provided
+    if (monthlyBudgetLimit !== undefined) {
+      updateData.monthlyBudgetLimit = monthlyBudgetLimit;
+    }
+    if (budgetAlertThreshold !== undefined) {
+      updateData.budgetAlertThreshold = budgetAlertThreshold;
+    }
+    if (goalReminderDeadlineDays !== undefined) {
+      updateData.goalReminderDeadlineDays = goalReminderDeadlineDays;
+    }
+    if (goalReminderInactivityDays !== undefined) {
+      updateData.goalReminderInactivityDays = goalReminderInactivityDays;
+    }
 
     // Upsert (update or create) settings
     const settings = await prisma.userSettings.upsert({
       where: { userId: req.user.id },
-      update: {
-        budgetAlerts,
-        goalReminders
-      },
+      update: updateData,
       create: {
         userId: req.user.id,
-        budgetAlerts,
-        goalReminders
+        ...updateData
       },
       select: {
         budgetAlerts: true,
-        goalReminders: true
+        goalReminders: true,
+        monthlyBudgetLimit: true,
+        budgetAlertThreshold: true,
+        goalReminderDeadlineDays: true,
+        goalReminderInactivityDays: true
       }
     });
 

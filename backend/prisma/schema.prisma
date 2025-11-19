@@ -8,16 +8,17 @@ datasource db {
 }
 
 model Account {
-  id            Int            @id @default(autoincrement())
+  id            Int             @id @default(autoincrement())
   username      String
-  email         String         @unique
-  passwordHash  String         @map("password")
-  createdAt     DateTime       @default(now())
+  email         String          @unique
+  passwordHash  String          @map("password")
+  createdAt     DateTime        @default(now())
   categories    Category[]
   expenses      Expense[]
   goals         Goal[]
   incomes       Income[]
   settings      UserSettings?
+  notifications Notification[]
 
   @@map("accounts")
 }
@@ -37,50 +38,67 @@ model Category {
 }
 
 model Expense {
-  id          Int      @id @default(autoincrement())
-  userId      Int
-  categoryId  Int
-  name        String
-  amount      Float
-  date        DateTime
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  category    Category @relation(fields: [categoryId], references: [id])
-  user        Account  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                Int       @id @default(autoincrement())
+  userId            Int
+  categoryId        Int
+  name              String
+  amount            Float
+  date              DateTime
+  description       String?
+  isRecurring       Boolean   @default(false)
+  recurringInterval Int?
+  recurringUnit     String?
+  recurringEndDate  DateTime?
+  parentExpenseId   Int?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  category          Category  @relation(fields: [categoryId], references: [id])
+  user              Account   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parentExpense     Expense?  @relation("RecurringExpenses", fields: [parentExpenseId], references: [id], onDelete: Cascade)
+  childExpenses     Expense[] @relation("RecurringExpenses")
 
   @@index([categoryId], map: "expenses_categoryId_fkey")
   @@index([userId], map: "expenses_userId_fkey")
+  @@index([parentExpenseId], map: "expenses_parentExpenseId_fkey")
   @@map("expenses")
 }
 
 model Income {
-  id          Int      @id @default(autoincrement())
-  userId      Int
-  name        String
-  amount      Float
-  date        DateTime
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  user        Account  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                Int      @id @default(autoincrement())
+  userId            Int
+  name              String
+  amount            Float
+  date              DateTime
+  description       String?
+  isRecurring       Boolean  @default(false)
+  recurringInterval Int?
+  recurringUnit     String?
+  recurringEndDate  DateTime?
+  parentIncomeId    Int?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              Account  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parentIncome      Income?  @relation("RecurringIncomes", fields: [parentIncomeId], references: [id], onDelete: Cascade)
+  childIncomes      Income[] @relation("RecurringIncomes")
 
   @@index([userId], map: "incomes_userId_fkey")
+  @@index([parentIncomeId], map: "incomes_parentIncomeId_fkey")
   @@map("incomes")
 }
 
 model Goal {
-  id            Int                @id @default(autoincrement())
-  userId        Int
-  name          String
-  targetAmount  Float
-  currentAmount Float              @default(0)
-  dueDate       DateTime
-  description   String?
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
-  contributions GoalContribution[]
-  user          Account            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                    Int                @id @default(autoincrement())
+  userId                Int
+  name                  String
+  targetAmount          Float
+  currentAmount         Float              @default(0)
+  dueDate               DateTime
+  description           String?
+  deadlineReminderSent  Boolean            @default(false)
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+  contributions         GoalContribution[]
+  user                  Account            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId], map: "goals_userId_fkey")
   @@map("goals")
@@ -98,13 +116,31 @@ model GoalContribution {
 }
 
 model UserSettings {
-  id            Int      @id @default(autoincrement())
-  userId        Int      @unique
-  budgetAlerts  Boolean  @default(true)
-  goalReminders Boolean  @default(false)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  user          Account  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                          Int      @id @default(autoincrement())
+  userId                      Int      @unique
+  budgetAlerts                Boolean  @default(true)
+  goalReminders               Boolean  @default(false)
+  monthlyBudgetLimit          Float?
+  budgetAlertThreshold        Int      @default(80)
+  goalReminderDeadlineDays    Int      @default(7)
+  goalReminderInactivityDays  Int      @default(14)
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @updatedAt
+  user                        Account  @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_settings")
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  type      String
+  title     String
+  message   String   @db.Text
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      Account  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "notifications_userId_fkey")
+  @@map("notifications")
 }

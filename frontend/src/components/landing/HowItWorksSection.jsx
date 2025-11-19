@@ -89,7 +89,16 @@ const HowItWorksSection = () => {
                         <Button
                             variant="outlined"
                             onClick={() => navigate('/signup')}
-                            sx={{ mt: 1 }}
+                            sx={{
+                                mt: 1,
+                                '&:hover': {
+                                    transform: 'none',
+                                    backgroundColor: 'transparent',
+                                    color: '#00f0ff',
+                                    borderColor: '#00f0ff',
+                                    boxShadow: '0 0 12px 3px rgba(0, 240, 255, 0.2)',
+                                },
+                            }}
                         >
                             Dowiedz się więcej
                         </Button>
@@ -215,7 +224,16 @@ const HowItWorksSection = () => {
                                     featuresSection.scrollIntoView({ behavior: 'smooth' });
                                 }
                             }}
-                            sx={{ mt: 1 }}
+                            sx={{
+                                mt: 1,
+                                '&:hover': {
+                                    transform: 'none',
+                                    backgroundColor: 'transparent',
+                                    color: '#00f0ff',
+                                    borderColor: '#00f0ff',
+                                    boxShadow: '0 0 12px 3px rgba(0, 240, 255, 0.2)',
+                                },
+                            }}
                         >
                             Poznaj Funkcje
                         </Button>

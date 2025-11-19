@@ -27,6 +27,12 @@ import {
     CircularProgress,
     Alert,
     Snackbar,
+    Checkbox,
+    Switch,
+    FormControlLabel,
+    Grid,
+    useMediaQuery,
+    useTheme,
 } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -40,8 +46,13 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import CategoryIcon from '@mui/icons-material/Category';
 import { getExpenses, createExpense, updateExpense, deleteExpense } from '../../api/expenses';
 import { getCategories, createCategory } from '../../api/categories';
+import { useThemeMode } from '../../context/ThemeContext';
 
-const WydatkiSection = () => {
+const WydatkiSection = ({ onExpenseChange }) => {
+    const { mode } = useThemeMode();
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
     // Available icons for categories
     const availableIcons = [
         '🍕', '🛒', '🚗', '⚡', '🎬', '🏠', '🏥', '👕',
@@ -61,7 +72,7 @@ const WydatkiSection = () => {
     const [openCategoryDialog, setOpenCategoryDialog] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [editingExpense, setEditingExpense] = useState(null);
-    const [deletingExpenseId, setDeletingExpenseId] = useState(null);
+    const [expenseToDelete, setExpenseToDelete] = useState(null);
 
     // Loading and notification states
     const [loading, setLoading] = useState(true);
@@ -75,12 +86,17 @@ const WydatkiSection = () => {
         date: new Date().toISOString().split('T')[0],
         description: '',
         amount: '',
+        isRecurring: false,
+        recurringInterval: 1,
+        recurringUnit: 'month',
+        recurringEndDate: '',
+        hasEndDate: false,
     });
 
     // Form state for new category
     const [categoryForm, setCategoryForm] = useState({
         name: '',
-        color: '#ff6b9d',
+        color: '#ef5350',
         icon: '🍕',
     });
 
@@ -157,6 +173,11 @@ const WydatkiSection = () => {
             date: new Date().toISOString().split('T')[0],
             description: '',
             amount: '',
+            isRecurring: false,
+            recurringInterval: 1,
+            recurringUnit: 'month',
+            recurringEndDate: '',
+            hasEndDate: false,
         });
         setOpenExpenseDialog(true);
     };
@@ -170,6 +191,11 @@ const WydatkiSection = () => {
             date: expense.date.split('T')[0], // Convert ISO string to YYYY-MM-DD format
             description: expense.description || '',
             amount: expense.amount,
+            isRecurring: expense.isRecurring || false,
+            recurringInterval: expense.recurringInterval || 1,
+            recurringUnit: expense.recurringUnit || 'month',
+            recurringEndDate: expense.recurringEndDate ? expense.recurringEndDate.split('T')[0] : '',
+            hasEndDate: expense.recurringEndDate ? true : false,
         });
         setOpenExpenseDialog(true);
     };
@@ -184,16 +210,24 @@ const WydatkiSection = () => {
                 date: expenseForm.date,
                 amount: parseFloat(expenseForm.amount),
                 description: expenseForm.description,
+                isRecurring: expenseForm.isRecurring,
+                recurringInterval: expenseForm.isRecurring ? parseInt(expenseForm.recurringInterval) : null,
+                recurringUnit: expenseForm.isRecurring ? expenseForm.recurringUnit : null,
+                recurringEndDate: expenseForm.isRecurring && expenseForm.hasEndDate ? expenseForm.recurringEndDate : null,
             };
 
             if (editingExpense) {
                 // Update existing
                 await updateExpense(editingExpense.id, expenseData);
                 showSnackbar('Wydatek został zaktualizowany', 'success');
+                // Refresh notification count as update might change budget status
+                if (onExpenseChange) onExpenseChange();
             } else {
                 // Add new
                 await createExpense(expenseData);
                 showSnackbar('Wydatek został dodany', 'success');
+                // Refresh notification count if expense might trigger budget alert
+                if (onExpenseChange) onExpenseChange();
             }
 
             setOpenExpenseDialog(false);
@@ -207,19 +241,24 @@ const WydatkiSection = () => {
     };
 
     // Handle delete expense - open dialog
-    const handleDeleteExpense = (id) => {
-        setDeletingExpenseId(id);
+    const handleDeleteExpense = (expense) => {
+        setExpenseToDelete(expense);
         setOpenDeleteDialog(true);
     };
 
     // Confirm delete expense
     const confirmDeleteExpense = async () => {
+        if (!expenseToDelete) return;
+
         try {
             setSaving(true);
-            await deleteExpense(deletingExpenseId);
+            await deleteExpense(expenseToDelete.id);
             showSnackbar('Wydatek został usunięty', 'success');
             setOpenDeleteDialog(false);
+            setExpenseToDelete(null);
             fetchExpenses(); // Refresh list
+            // Refresh notification count as deletion might change budget status
+            if (onExpenseChange) onExpenseChange();
         } catch (err) {
             console.error('Error deleting expense:', err);
             showSnackbar(err.message || 'Nie udało się usunąć wydatku', 'error');
@@ -230,7 +269,7 @@ const WydatkiSection = () => {
 
     // Handle add category
     const handleAddCategory = () => {
-        setCategoryForm({ name: '', color: '#ff6b9d', icon: '🍕' });
+        setCategoryForm({ name: '', color: '#ef5350', icon: '🍕' });
         setOpenCategoryDialog(true);
     };
 
@@ -273,18 +312,19 @@ const WydatkiSection = () => {
                         startIcon={<CategoryIcon />}
                         onClick={handleAddCategory}
                         sx={{
-                            background: 'linear-gradient(135deg, rgba(255, 107, 157, 0.15), rgba(255, 107, 157, 0.05))',
+                            background: 'linear-gradient(135deg, rgba(255, 107, 157, 0.2), rgba(255, 107, 157, 0.08))',
                             backdropFilter: 'blur(8px)',
                             WebkitBackdropFilter: 'blur(8px)',
-                            borderColor: 'rgba(255, 107, 157, 0.4)',
-                            color: '#ff6b9d',
-                            boxShadow: '0 4px 12px rgba(255, 107, 157, 0.2), inset 0 1px 0 rgba(255, 107, 157, 0.2)',
+                            borderColor: 'rgba(255, 107, 157, 0.5)',
+                            color: '#FF6B9D',
+                            boxShadow: '0 4px 12px rgba(255, 107, 157, 0.25), inset 0 1px 0 rgba(255, 107, 157, 0.25)',
                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                             '&:hover': {
-                                background: 'linear-gradient(135deg, rgba(255, 107, 157, 0.25), rgba(255, 107, 157, 0.15))',
-                                borderColor: 'rgba(255, 107, 157, 0.6)',
-                                boxShadow: '0 6px 16px rgba(255, 107, 157, 0.3), inset 0 1px 0 rgba(255, 107, 157, 0.3)',
-                                transform: 'translateY(-2px)',
+                                background: 'linear-gradient(135deg, rgba(255, 107, 157, 0.2), rgba(255, 107, 157, 0.08))',
+                                borderColor: 'rgba(255, 107, 157, 0.5)',
+                                color: '#FF6B9D',
+                                boxShadow: '0 0 12px 3px rgba(255, 107, 157, 0.2)',
+                                transform: 'none',
                             },
                         }}
                     >
@@ -295,7 +335,7 @@ const WydatkiSection = () => {
                         startIcon={<AddIcon />}
                         onClick={handleAddExpense}
                         sx={{
-                            background: 'linear-gradient(135deg, rgba(255, 107, 157, 0.3), rgba(255, 107, 157, 0.2))',
+                            background: 'linear-gradient(135deg, rgba(255, 107, 157, 0.35), rgba(255, 107, 157, 0.25))',
                             backdropFilter: 'blur(8px)',
                             WebkitBackdropFilter: 'blur(8px)',
                             border: '1px solid rgba(255, 107, 157, 0.5)',
@@ -304,9 +344,9 @@ const WydatkiSection = () => {
                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                             textShadow: '0 0 10px rgba(255, 107, 157, 0.5)',
                             '&:hover': {
-                                background: 'linear-gradient(135deg, rgba(255, 107, 157, 0.4), rgba(255, 107, 157, 0.3))',
-                                boxShadow: '0 6px 16px rgba(255, 107, 157, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
-                                transform: 'translateY(-2px)',
+                                background: 'linear-gradient(135deg, rgba(255, 107, 157, 0.35), rgba(255, 107, 157, 0.25))',
+                                boxShadow: '0 0 12px 3px rgba(255, 107, 157, 0.2)',
+                                transform: 'none',
                             },
                         }}
                     >
@@ -341,7 +381,7 @@ const WydatkiSection = () => {
                                 <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
                                     Suma wydatków
                                 </Typography>
-                                <Typography variant="h3" sx={{ fontWeight: 700, color: '#ff6b9d' }}>
+                                <Typography variant="h3" sx={{ fontWeight: 700, color: '#FF6B9D' }}>
                                     {totalExpenses.toFixed(2).replace('.', ',')} zł
                                 </Typography>
                             </Box>
@@ -359,25 +399,30 @@ const WydatkiSection = () => {
                                         popper: {
                                             sx: {
                                                 '& .MuiPaper-root': {
-                                                    background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                                                    background: mode === 'dark'
+                                                        ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                                                        : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
                                                     backdropFilter: 'blur(20px)',
                                                     WebkitBackdropFilter: 'blur(20px)',
-                                                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                                                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                                                    border: '1px solid',
+                                                    borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                                                    boxShadow: mode === 'dark'
+                                                        ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                                                        : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                                                 },
                                                 '& .MuiPickersCalendarHeader-root': {
-                                                    color: '#ffffff',
+                                                    color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                                 },
                                                 '& .MuiPickersCalendarHeader-label': {
-                                                    color: '#ffffff',
+                                                    color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                                 },
                                                 '& .MuiPickersMonth-monthButton': {
-                                                    color: '#ffffff',
+                                                    color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                                     '&:hover': {
                                                         backgroundColor: 'rgba(255, 107, 157, 0.2)',
                                                     },
                                                     '&.Mui-selected': {
-                                                        backgroundColor: '#ff6b9d',
+                                                        backgroundColor: '#FF6B9D',
                                                         color: '#000000',
                                                         '&:hover': {
                                                             backgroundColor: '#ff5c8d',
@@ -385,12 +430,12 @@ const WydatkiSection = () => {
                                                     },
                                                 },
                                                 '& .MuiPickersYear-yearButton': {
-                                                    color: '#ffffff',
+                                                    color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                                     '&:hover': {
                                                         backgroundColor: 'rgba(255, 107, 157, 0.2)',
                                                     },
                                                     '&.Mui-selected': {
-                                                        backgroundColor: '#ff6b9d',
+                                                        backgroundColor: '#FF6B9D',
                                                         color: '#000000',
                                                         '&:hover': {
                                                             backgroundColor: '#ff5c8d',
@@ -398,7 +443,7 @@ const WydatkiSection = () => {
                                                     },
                                                 },
                                                 '& .MuiIconButton-root': {
-                                                    color: '#ffffff',
+                                                    color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                                 },
                                             },
                                         },
@@ -451,11 +496,16 @@ const WydatkiSection = () => {
                                     MenuProps={{
                                         PaperProps: {
                                             sx: {
-                                                background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                                                background: mode === 'dark'
+                                                    ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                                                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
                                                 backdropFilter: 'blur(20px)',
                                                 WebkitBackdropFilter: 'blur(20px)',
-                                                border: '1px solid rgba(255, 255, 255, 0.1)',
-                                                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                                                border: '1px solid',
+                                                borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                                                boxShadow: mode === 'dark'
+                                                    ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                                                    : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                                             }
                                         }
                                     }}
@@ -490,81 +540,193 @@ const WydatkiSection = () => {
                     },
                 }}
             >
-                <TableContainer>
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell sx={{ fontWeight: 600, color: 'text.primary' }}>Nazwa</TableCell>
-                                <TableCell sx={{ fontWeight: 600, color: 'text.primary' }}>Kategoria</TableCell>
-                                <TableCell sx={{ fontWeight: 600, color: 'text.primary' }}>Data</TableCell>
-                                <TableCell sx={{ fontWeight: 600, color: 'text.primary' }}>Opis</TableCell>
-                                <TableCell align="right" sx={{ fontWeight: 600, color: 'text.primary' }}>Kwota</TableCell>
-                                <TableCell align="center" sx={{ fontWeight: 600, color: 'text.primary' }}>Akcje</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {filteredExpenses.length === 0 ? (
-                                <TableRow>
-                                    <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
-                                        <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                                            Brak wydatków do wyświetlenia
-                                        </Typography>
-                                    </TableCell>
-                                </TableRow>
-                            ) : (
-                                filteredExpenses.map((expense) => {
+                {isMobile ? (
+                    // Mobile Card Layout
+                    <Box sx={{ p: 2 }}>
+                        {filteredExpenses.length === 0 ? (
+                            <Box sx={{ textAlign: 'center', py: 4 }}>
+                                <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                                    Brak wydatków do wyświetlenia
+                                </Typography>
+                            </Box>
+                        ) : (
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                {filteredExpenses.map((expense) => {
                                     const category = getCategoryById(expense.categoryId);
                                     return (
-                                        <TableRow key={expense.id} hover>
-                                            <TableCell sx={{ color: 'text.primary' }}>{expense.name}</TableCell>
-                                            <TableCell>
-                                                <Chip
-                                                    icon={
-                                                        <Box sx={{ fontSize: '16px', display: 'flex', alignItems: 'center' }}>
-                                                            {category?.icon}
+                                        <Card
+                                            key={expense.id}
+                                            sx={{
+                                                background: mode === 'dark'
+                                                    ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))'
+                                                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(245, 245, 245, 0.9))',
+                                                backdropFilter: 'blur(10px)',
+                                                WebkitBackdropFilter: 'blur(10px)',
+                                                border: '1px solid',
+                                                borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                                                boxShadow: mode === 'dark'
+                                                    ? '0 2px 8px rgba(0, 0, 0, 0.3)'
+                                                    : '0 2px 8px rgba(0, 0, 0, 0.08)',
+                                                transition: 'all 0.2s',
+                                                '&:hover': {
+                                                    transform: 'translateY(-2px)',
+                                                    boxShadow: mode === 'dark'
+                                                        ? '0 4px 12px rgba(0, 0, 0, 0.4)'
+                                                        : '0 4px 12px rgba(0, 0, 0, 0.12)',
+                                                },
+                                            }}
+                                        >
+                                            <CardContent>
+                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                                                    <Box sx={{ flex: 1 }}>
+                                                        <Typography variant="h6" sx={{ color: 'text.primary', fontWeight: 600, mb: 0.5 }}>
+                                                            {expense.name}
+                                                        </Typography>
+                                                        <Typography variant="h5" sx={{ color: 'text.primary', fontWeight: 700, mb: 1 }}>
+                                                            {expense.amount.toFixed(2).replace('.', ',')} zł
+                                                        </Typography>
+                                                    </Box>
+                                                    <Box sx={{ display: 'flex', gap: 0.5 }}>
+                                                        <IconButton
+                                                            size="small"
+                                                            onClick={() => handleEditExpense(expense)}
+                                                            sx={{ color: 'primary.main' }}
+                                                        >
+                                                            <EditIcon fontSize="small" />
+                                                        </IconButton>
+                                                        <IconButton
+                                                            size="small"
+                                                            onClick={() => handleDeleteExpense(expense)}
+                                                            sx={{ color: 'error.main' }}
+                                                        >
+                                                            <DeleteIcon fontSize="small" />
+                                                        </IconButton>
+                                                    </Box>
+                                                </Box>
+                                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                        <Typography variant="body2" sx={{ color: 'text.secondary', minWidth: '60px' }}>
+                                                            📅 Data:
+                                                        </Typography>
+                                                        <Typography variant="body2" sx={{ color: 'text.primary' }}>
+                                                            {new Date(expense.date).toLocaleDateString('pl-PL')}
+                                                        </Typography>
+                                                    </Box>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                        <Typography variant="body2" sx={{ color: 'text.secondary', minWidth: '60px' }}>
+                                                            🏷️ Kategoria:
+                                                        </Typography>
+                                                        <Chip
+                                                            icon={
+                                                                <Box sx={{ fontSize: '14px', display: 'flex', alignItems: 'center' }}>
+                                                                    {category?.icon}
+                                                                </Box>
+                                                            }
+                                                            label={category?.name}
+                                                            size="small"
+                                                            sx={{
+                                                                backgroundColor: `${category?.color}20`,
+                                                                color: category?.color,
+                                                                fontWeight: 500,
+                                                            }}
+                                                        />
+                                                    </Box>
+                                                    {expense.description && (
+                                                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mt: 0.5 }}>
+                                                            <Typography variant="body2" sx={{ color: 'text.secondary', minWidth: '60px' }}>
+                                                                📝 Opis:
+                                                            </Typography>
+                                                            <Typography variant="body2" sx={{ color: 'text.secondary', flex: 1 }}>
+                                                                {expense.description}
+                                                            </Typography>
                                                         </Box>
-                                                    }
-                                                    label={category?.name}
-                                                    size="small"
-                                                    sx={{
-                                                        backgroundColor: `${category?.color}20`,
-                                                        color: category?.color,
-                                                        fontWeight: 500,
-                                                    }}
-                                                />
-                                            </TableCell>
-                                            <TableCell sx={{ color: 'text.secondary' }}>
-                                                {new Date(expense.date).toLocaleDateString('pl-PL')}
-                                            </TableCell>
-                                            <TableCell sx={{ color: 'text.secondary', maxWidth: 200 }}>
-                                                {expense.description || '-'}
-                                            </TableCell>
-                                            <TableCell align="right" sx={{ color: 'text.primary', fontWeight: 600 }}>
-                                                {expense.amount.toFixed(2).replace('.', ',')} zł
-                                            </TableCell>
-                                            <TableCell align="center">
-                                                <IconButton
-                                                    size="small"
-                                                    onClick={() => handleEditExpense(expense)}
-                                                    sx={{ color: 'primary.main' }}
-                                                >
-                                                    <EditIcon fontSize="small" />
-                                                </IconButton>
-                                                <IconButton
-                                                    size="small"
-                                                    onClick={() => handleDeleteExpense(expense.id)}
-                                                    sx={{ color: 'error.main' }}
-                                                >
-                                                    <DeleteIcon fontSize="small" />
-                                                </IconButton>
-                                            </TableCell>
-                                        </TableRow>
+                                                    )}
+                                                </Box>
+                                            </CardContent>
+                                        </Card>
                                     );
-                                })
-                            )}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                                })}
+                            </Box>
+                        )}
+                    </Box>
+                ) : (
+                    // Desktop Table Layout
+                    <TableContainer>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell sx={{ fontWeight: 600, color: 'text.primary' }}>Nazwa</TableCell>
+                                    <TableCell sx={{ fontWeight: 600, color: 'text.primary' }}>Kategoria</TableCell>
+                                    <TableCell sx={{ fontWeight: 600, color: 'text.primary' }}>Data</TableCell>
+                                    <TableCell sx={{ fontWeight: 600, color: 'text.primary' }}>Opis</TableCell>
+                                    <TableCell align="right" sx={{ fontWeight: 600, color: 'text.primary' }}>Kwota</TableCell>
+                                    <TableCell align="center" sx={{ fontWeight: 600, color: 'text.primary' }}>Akcje</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {filteredExpenses.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
+                                            <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                                                Brak wydatków do wyświetlenia
+                                            </Typography>
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    filteredExpenses.map((expense) => {
+                                        const category = getCategoryById(expense.categoryId);
+                                        return (
+                                            <TableRow key={expense.id} hover>
+                                                <TableCell sx={{ color: 'text.primary' }}>{expense.name}</TableCell>
+                                                <TableCell>
+                                                    <Chip
+                                                        icon={
+                                                            <Box sx={{ fontSize: '16px', display: 'flex', alignItems: 'center' }}>
+                                                                {category?.icon}
+                                                            </Box>
+                                                        }
+                                                        label={category?.name}
+                                                        size="small"
+                                                        sx={{
+                                                            backgroundColor: `${category?.color}20`,
+                                                            color: category?.color,
+                                                            fontWeight: 500,
+                                                        }}
+                                                    />
+                                                </TableCell>
+                                                <TableCell sx={{ color: 'text.secondary' }}>
+                                                    {new Date(expense.date).toLocaleDateString('pl-PL')}
+                                                </TableCell>
+                                                <TableCell sx={{ color: 'text.secondary', maxWidth: 200 }}>
+                                                    {expense.description || '-'}
+                                                </TableCell>
+                                                <TableCell align="right" sx={{ color: 'text.primary', fontWeight: 600 }}>
+                                                    {expense.amount.toFixed(2).replace('.', ',')} zł
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={() => handleEditExpense(expense)}
+                                                        sx={{ color: 'primary.main' }}
+                                                    >
+                                                        <EditIcon fontSize="small" />
+                                                    </IconButton>
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={() => handleDeleteExpense(expense)}
+                                                        sx={{ color: 'error.main' }}
+                                                    >
+                                                        <DeleteIcon fontSize="small" />
+                                                    </IconButton>
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })
+                                )}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                )}
             </Card>
 
             {/* Dialog - Add/Edit Expense */}
@@ -575,18 +737,40 @@ const WydatkiSection = () => {
                 fullWidth
                 PaperProps={{
                     sx: {
-                        background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                        background: mode === 'dark'
+                            ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
                         backdropFilter: 'blur(20px)',
                         WebkitBackdropFilter: 'blur(20px)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                        border: '1px solid',
+                        borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                        boxShadow: mode === 'dark'
+                            ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                            : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                     }
                 }}
             >
                 <DialogTitle>
                     {editingExpense ? 'Edytuj wydatek' : 'Dodaj wydatek'}
                 </DialogTitle>
-                <DialogContent>
+                <DialogContent
+                    sx={{
+                        '&::-webkit-scrollbar': {
+                            width: '8px',
+                        },
+                        '&::-webkit-scrollbar-track': {
+                            background: mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
+                            borderRadius: '10px',
+                        },
+                        '&::-webkit-scrollbar-thumb': {
+                            background: mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
+                            borderRadius: '10px',
+                            '&:hover': {
+                                background: mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+                            },
+                        },
+                    }}
+                >
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2 }}>
                         <TextField
                             label="Nazwa wydatku"
@@ -604,11 +788,16 @@ const WydatkiSection = () => {
                                 MenuProps={{
                                     PaperProps: {
                                         sx: {
-                                            background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                                            background: mode === 'dark'
+                                                ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                                                : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
                                             backdropFilter: 'blur(20px)',
                                             WebkitBackdropFilter: 'blur(20px)',
-                                            border: '1px solid rgba(255, 255, 255, 0.1)',
-                                            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                                            border: '1px solid',
+                                            borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                                            boxShadow: mode === 'dark'
+                                                ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                                                : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                                         }
                                     }
                                 }}
@@ -633,20 +822,25 @@ const WydatkiSection = () => {
                                     popper: {
                                         sx: {
                                             '& .MuiPaper-root': {
-                                                background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                                                background: mode === 'dark'
+                                                    ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                                                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
                                                 backdropFilter: 'blur(20px)',
                                                 WebkitBackdropFilter: 'blur(20px)',
-                                                border: '1px solid rgba(255, 255, 255, 0.1)',
-                                                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                                                border: '1px solid',
+                                                borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                                                boxShadow: mode === 'dark'
+                                                    ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                                                    : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                                             },
                                             '& .MuiPickersCalendarHeader-root': {
-                                                color: '#ffffff',
+                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                             },
                                             '& .MuiPickersCalendarHeader-label': {
-                                                color: '#ffffff',
+                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                             },
                                             '& .MuiPickersDay-root': {
-                                                color: '#ffffff',
+                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                                 '&:hover': {
                                                     backgroundColor: 'rgba(255, 107, 157, 0.2)',
                                                 },
@@ -661,10 +855,10 @@ const WydatkiSection = () => {
                                                 border: '1px solid #ff6b9d',
                                             },
                                             '& .MuiDayCalendar-weekDayLabel': {
-                                                color: 'rgba(255, 255, 255, 0.7)',
+                                                color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
                                             },
                                             '& .MuiIconButton-root': {
-                                                color: '#ffffff',
+                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                             },
                                         },
                                     },
@@ -682,6 +876,15 @@ const WydatkiSection = () => {
                             InputProps={{
                                 endAdornment: <InputAdornment position="end">zł</InputAdornment>,
                             }}
+                            sx={{
+                                '& input[type=number]': {
+                                    MozAppearance: 'textfield',
+                                },
+                                '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
+                                    WebkitAppearance: 'none',
+                                    margin: 0,
+                                },
+                            }}
                         />
                         <TextField
                             label="Opis (opcjonalnie)"
@@ -691,6 +894,141 @@ const WydatkiSection = () => {
                             multiline
                             rows={3}
                         />
+
+                        {/* Recurring Expense Section */}
+                        <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={expenseForm.isRecurring}
+                                        onChange={(e) => setExpenseForm({ ...expenseForm, isRecurring: e.target.checked })}
+                                        sx={{
+                                            color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
+                                            '&.Mui-checked': {
+                                                color: '#66bb6a',
+                                            },
+                                        }}
+                                    />
+                                }
+                                label="Wydatek cykliczny"
+                            />
+
+                            {expenseForm.isRecurring && (
+                                <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                    <Grid container spacing={2}>
+                                        <Grid item xs={6}>
+                                            <TextField
+                                                label="Powtarzaj co"
+                                                type="number"
+                                                value={expenseForm.recurringInterval}
+                                                onChange={(e) => setExpenseForm({ ...expenseForm, recurringInterval: parseInt(e.target.value) || 1 })}
+                                                fullWidth
+                                                inputProps={{ min: 1 }}
+                                                sx={{
+                                                    '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
+                                                        WebkitAppearance: 'auto',
+                                                        filter: mode === 'dark' ? 'invert(1)' : 'none',
+                                                    },
+                                                }}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <FormControl fullWidth>
+                                                <InputLabel>Jednostka</InputLabel>
+                                                <Select
+                                                    value={expenseForm.recurringUnit}
+                                                    label="Jednostka"
+                                                    onChange={(e) => setExpenseForm({ ...expenseForm, recurringUnit: e.target.value })}
+                                                >
+                                                    <MenuItem value="day">dzień</MenuItem>
+                                                    <MenuItem value="week">tydzień</MenuItem>
+                                                    <MenuItem value="month">miesiąc</MenuItem>
+                                                    <MenuItem value="year">rok</MenuItem>
+                                                </Select>
+                                            </FormControl>
+                                        </Grid>
+                                    </Grid>
+
+                                    <FormControlLabel
+                                        control={
+                                            <Switch
+                                                checked={!expenseForm.hasEndDate}
+                                                onChange={(e) => setExpenseForm({ ...expenseForm, hasEndDate: !e.target.checked })}
+                                                sx={{
+                                                    '& .MuiSwitch-switchBase.Mui-checked': {
+                                                        color: '#66bb6a',
+                                                    },
+                                                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                                        backgroundColor: '#66bb6a',
+                                                    },
+                                                }}
+                                            />
+                                        }
+                                        label="Do odwołania"
+                                    />
+
+                                    {expenseForm.hasEndDate && (
+                                        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
+                                            <DatePicker
+                                                label="Data zakończenia"
+                                                value={expenseForm.recurringEndDate ? dayjs(expenseForm.recurringEndDate) : null}
+                                                onChange={(newValue) => setExpenseForm({ ...expenseForm, recurringEndDate: newValue ? newValue.format('YYYY-MM-DD') : '' })}
+                                                minDate={dayjs(expenseForm.date).add(1, 'day')}
+                                                slotProps={{
+                                                    textField: {
+                                                        fullWidth: true,
+                                                    },
+                                                    popper: {
+                                                        sx: {
+                                                            '& .MuiPaper-root': {
+                                                                background: mode === 'dark'
+                                                                    ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                                                                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
+                                                                backdropFilter: 'blur(20px)',
+                                                                WebkitBackdropFilter: 'blur(20px)',
+                                                                border: '1px solid',
+                                                                borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                                                                boxShadow: mode === 'dark'
+                                                                    ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                                                                    : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
+                                                            },
+                                                            '& .MuiPickersCalendarHeader-root': {
+                                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
+                                                            },
+                                                            '& .MuiPickersCalendarHeader-label': {
+                                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
+                                                            },
+                                                            '& .MuiPickersDay-root': {
+                                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
+                                                                '&:hover': {
+                                                                    backgroundColor: 'rgba(168, 230, 207, 0.2)',
+                                                                },
+                                                                '&.Mui-selected': {
+                                                                    backgroundColor: '#66bb6a',
+                                                                    color: '#000000',
+                                                                    '&:hover': {
+                                                                        backgroundColor: '#84dcc6',
+                                                                    },
+                                                                },
+                                                            },
+                                                            '& .MuiPickersDay-today': {
+                                                                border: '1px solid #66bb6a',
+                                                            },
+                                                            '& .MuiDayCalendar-weekDayLabel': {
+                                                                color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
+                                                            },
+                                                            '& .MuiIconButton-root': {
+                                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
+                                                            },
+                                                        },
+                                                    },
+                                                }}
+                                            />
+                                        </LocalizationProvider>
+                                    )}
+                                </Box>
+                            )}
+                        </Box>
                     </Box>
                 </DialogContent>
                 <DialogActions>
@@ -701,6 +1039,12 @@ const WydatkiSection = () => {
                         onClick={handleSaveExpense}
                         variant="contained"
                         disabled={!expenseForm.name || !expenseForm.categoryId || !expenseForm.amount || saving}
+                        sx={{
+                            '&:hover': {
+                                transform: 'none',
+                                boxShadow: '0 0 12px 3px rgba(0, 240, 255, 0.2)',
+                            },
+                        }}
                     >
                         {saving ? <CircularProgress size={24} /> : (editingExpense ? 'Zapisz' : 'Dodaj')}
                     </Button>
@@ -715,11 +1059,16 @@ const WydatkiSection = () => {
                 fullWidth
                 PaperProps={{
                     sx: {
-                        background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                        background: mode === 'dark'
+                            ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
                         backdropFilter: 'blur(20px)',
                         WebkitBackdropFilter: 'blur(20px)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                        border: '1px solid',
+                        borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                        boxShadow: mode === 'dark'
+                            ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                            : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                     }
                 }}
             >
@@ -801,6 +1150,12 @@ const WydatkiSection = () => {
                         onClick={handleSaveCategory}
                         variant="contained"
                         disabled={!categoryForm.name || saving}
+                        sx={{
+                            '&:hover': {
+                                transform: 'none',
+                                boxShadow: '0 0 12px 3px rgba(0, 240, 255, 0.2)',
+                            },
+                        }}
                     >
                         {saving ? <CircularProgress size={24} /> : 'Dodaj'}
                     </Button>
@@ -815,18 +1170,27 @@ const WydatkiSection = () => {
                 fullWidth
                 PaperProps={{
                     sx: {
-                        background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                        background: mode === 'dark'
+                            ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
                         backdropFilter: 'blur(20px)',
                         WebkitBackdropFilter: 'blur(20px)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                        border: '1px solid',
+                        borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                        boxShadow: mode === 'dark'
+                            ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                            : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                     }
                 }}
             >
-                <DialogTitle>Usuń wydatek</DialogTitle>
+                <DialogTitle sx={{ color: 'text.primary' }}>
+                    Potwierdź usunięcie
+                </DialogTitle>
                 <DialogContent>
-                    <Typography variant="body1" sx={{ color: 'text.secondary', pt: 2 }}>
-                        Czy na pewno chcesz usunąć ten wydatek? Ta operacja jest nieodwracalna.
+                    <Typography sx={{ color: 'text.secondary' }}>
+                        Czy na pewno chcesz usunąć wydatek "{expenseToDelete?.name}"?
+                        <br />
+                        Ta operacja jest nieodwracalna.
                     </Typography>
                 </DialogContent>
                 <DialogActions>
@@ -841,9 +1205,12 @@ const WydatkiSection = () => {
                         variant="contained"
                         disabled={saving}
                         sx={{
-                            background: 'linear-gradient(135deg, #f44336 0%, #d32f2f 100%)',
+                            backgroundColor: '#f44336',
+                            color: '#fff',
                             '&:hover': {
-                                background: 'linear-gradient(135deg, #d32f2f 0%, #c62828 100%)',
+                                backgroundColor: '#d32f2f',
+                                transform: 'none',
+                                boxShadow: '0 0 12px 3px rgba(244, 67, 54, 0.2)',
                             },
                         }}
                     >
@@ -857,7 +1224,7 @@ const WydatkiSection = () => {
                 open={snackbar.open}
                 autoHideDuration={4000}
                 onClose={handleCloseSnackbar}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             >
                 <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
                     {snackbar.message}

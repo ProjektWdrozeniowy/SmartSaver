@@ -337,6 +337,10 @@ const ContactPage = () => {
                                         fullWidth
                                         sx={{
                                             py: 1.5,
+                                            '&:hover': {
+                                                transform: 'none',
+                                                boxShadow: '0 0 12px 3px rgba(0, 240, 255, 0.2)',
+                                            },
                                         }}
                                     >
                                         Wyślij wiadomość
@@ -505,6 +509,11 @@ const ContactPage = () => {
                                         borderWidth: 2,
                                         '&:hover': {
                                             borderWidth: 2,
+                                            transform: 'none',
+                                            backgroundColor: 'transparent',
+                                            color: '#00f0ff',
+                                            borderColor: '#00f0ff',
+                                            boxShadow: '0 0 12px 3px rgba(0, 240, 255, 0.2)',
                                         },
                                     }}
                                 >
@@ -641,7 +650,13 @@ const ContactPage = () => {
                         <Button
                             variant="contained"
                             onClick={() => setFaqOpen(false)}
-                            sx={{ mt: 1 }}
+                            sx={{
+                                mt: 1,
+                                '&:hover': {
+                                    transform: 'none',
+                                    boxShadow: '0 0 12px 3px rgba(0, 240, 255, 0.2)',
+                                },
+                            }}
                         >
                             Zamknij
                         </Button>
@@ -728,6 +743,10 @@ const ContactPage = () => {
                         fullWidth
                         sx={{
                             py: 1.5,
+                            '&:hover': {
+                                transform: 'none',
+                                boxShadow: '0 0 12px 3px rgba(0, 240, 255, 0.2)',
+                            },
                         }}
                     >
                         OK, rozumiem

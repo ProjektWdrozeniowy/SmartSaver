@@ -17,8 +17,6 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import TrackChangesIcon from '@mui/icons-material/TrackChanges';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { getDashboardStats, getRecentTransactions, getExpensesByCategory } from '../../api/dashboard';
 
@@ -54,37 +52,29 @@ const PulpitSection = ({ user, onNavigate }) => {
         {
             title: 'Aktualne saldo',
             value: '0 zł',
-            change: '0%',
-            positive: true,
             icon: <AttachMoneyIcon />,
-            color: '#00f0ff',
+            color: '#00b8d4',
             navigateTo: 'budzet',
         },
         {
-            title: 'Przychody (mies)',
+            title: 'Przychody (miesiąc)',
             value: '0 zł',
-            change: '0%',
-            positive: true,
             icon: <TrendingUpIcon />,
-            color: '#a8e6cf',
+            color: '#66bb6a',
             navigateTo: 'budzet',
         },
         {
             title: 'Wydatki (miesiąc)',
             value: '0 zł',
-            change: '0%',
-            positive: true,
             icon: <AccountBalanceWalletIcon />,
-            color: '#ff6b9d',
+            color: '#ef5350',
             navigateTo: 'wydatki',
         },
         {
             title: 'Twój cel',
             value: '0%',
-            change: '0%',
-            positive: true,
             icon: <TrackChangesIcon />,
-            color: '#c77dff',
+            color: '#ab47bc',
             navigateTo: 'cele',
         },
     ];
@@ -163,22 +153,22 @@ const PulpitSection = ({ user, onNavigate }) => {
                             onClick={() => onNavigate(stat.navigateTo)}
                             sx={{
                                 height: '100%',
-                                background: `linear-gradient(135deg, ${stat.color}15, ${stat.color}05)`,
+                                background: `linear-gradient(135deg, ${stat.color}25, ${stat.color}10)`,
                                 backdropFilter: 'blur(10px)',
                                 WebkitBackdropFilter: 'blur(10px)',
                                 border: '1px solid',
-                                borderColor: `${stat.color}40`,
-                                boxShadow: `0 4px 12px ${stat.color}20, inset 0 1px 0 ${stat.color}30`,
+                                borderColor: `${stat.color}50`,
+                                boxShadow: `0 4px 12px ${stat.color}15, inset 0 1px 0 ${stat.color}25`,
                                 cursor: 'pointer',
                                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                 '&:hover': {
                                     transform: 'translateY(-5px)',
-                                    boxShadow: `0 12px 28px ${stat.color}40, inset 0 1px 0 ${stat.color}50`,
-                                    borderColor: `${stat.color}60`,
+                                    boxShadow: `0 12px 28px ${stat.color}30, inset 0 1px 0 ${stat.color}40`,
+                                    borderColor: `${stat.color}70`,
                                 },
                             }}
                         >
-                            <CardContent>
+                            <CardContent sx={{ pb: 2, '&:last-child': { pb: 2 } }}>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                                     <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>
                                         {stat.title}
@@ -188,7 +178,7 @@ const PulpitSection = ({ user, onNavigate }) => {
                                             width: 40,
                                             height: 40,
                                             borderRadius: '50%',
-                                            backgroundColor: `${stat.color}20`,
+                                            backgroundColor: `${stat.color}30`,
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
@@ -202,35 +192,39 @@ const PulpitSection = ({ user, onNavigate }) => {
                                     variant="h4"
                                     sx={{
                                         fontWeight: 700,
-                                        mb: 1,
                                         color: 'text.primary',
-                                        textShadow: `0 0 20px ${stat.color}60, 0 0 40px ${stat.color}40`
+                                        textShadow: `0 0 15px ${stat.color}40, 0 0 30px ${stat.color}20`
                                     }}
                                 >
                                     {stat.value}
                                 </Typography>
-                                <Box
-                                    sx={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 0.5,
-                                    }}
-                                >
-                                    {stat.positive ? (
-                                        <ArrowUpwardIcon sx={{ fontSize: 16, color: '#4caf50' }} />
-                                    ) : (
-                                        <ArrowDownwardIcon sx={{ fontSize: 16, color: '#f44336' }} />
-                                    )}
-                                    <Typography
-                                        variant="body2"
+                                {stat.budgetPercentage !== null && stat.budgetPercentage !== undefined && (
+                                    <Box
                                         sx={{
-                                            color: stat.positive ? '#4caf50' : '#f44336',
-                                            fontWeight: 500,
+                                            mt: 0.5,
+                                            pt: 0.5,
+                                            borderTop: '1px solid',
+                                            borderColor: 'rgba(255, 255, 255, 0.1)',
                                         }}
                                     >
-                                        {stat.change}
-                                    </Typography>
-                                </Box>
+                                        <Typography
+                                            variant="caption"
+                                            sx={{
+                                                color: parseFloat(stat.budgetPercentage) >= 100
+                                                    ? '#f44336'
+                                                    : parseFloat(stat.budgetPercentage) >= 90
+                                                    ? '#ff6b9d'
+                                                    : parseFloat(stat.budgetPercentage) >= 70
+                                                    ? '#ffa726'
+                                                    : '#4caf50',
+                                                fontWeight: 600,
+                                                fontSize: '0.85rem',
+                                            }}
+                                        >
+                                            {stat.budgetPercentage}% budżetu
+                                        </Typography>
+                                    </Box>
+                                )}
                             </CardContent>
                         </Card>
                     </Box>
@@ -281,13 +275,13 @@ const PulpitSection = ({ user, onNavigate }) => {
                             ) : (
                                 <List sx={{ p: 0 }}>
                                     {recentTransactions.map((transaction, index) => (
-                                        <React.Fragment key={transaction.id}>
+                                        <React.Fragment key={`${transaction.type}-${transaction.id}`}>
                                             <ListItem
                                                 sx={{
                                                     px: 0,
                                                     py: 2,
                                                     '&:hover': {
-                                                        backgroundColor: 'rgba(0, 240, 255, 0.05)',
+                                                        backgroundColor: 'rgba(0, 184, 212, 0.05)',
                                                         borderRadius: 2,
                                                         cursor: 'pointer',
                                                     },
@@ -436,7 +430,7 @@ const PulpitSection = ({ user, onNavigate }) => {
                 open={snackbar.open}
                 autoHideDuration={6000}
                 onClose={handleCloseSnackbar}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             >
                 <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
                     {snackbar.message}

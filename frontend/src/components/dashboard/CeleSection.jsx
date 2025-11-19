@@ -33,16 +33,21 @@ import SavingsIcon from '@mui/icons-material/Savings';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { getGoals, createGoal, updateGoal, deleteGoal, contributeToGoal } from '../../api/goals';
+import { useThemeMode } from '../../context/ThemeContext';
 
-const CeleSection = () => {
+const CeleSection = ({ onGoalChange }) => {
+    const { mode } = useThemeMode();
+
     // Data states
     const [goals, setGoals] = useState([]);
 
     // UI states
     const [openGoalDialog, setOpenGoalDialog] = useState(false);
     const [openContributeDialog, setOpenContributeDialog] = useState(false);
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [editingGoal, setEditingGoal] = useState(null);
     const [selectedGoal, setSelectedGoal] = useState(null);
+    const [goalToDelete, setGoalToDelete] = useState(null);
 
     // Loading and notification states
     const [loading, setLoading] = useState(true);
@@ -169,6 +174,8 @@ const CeleSection = () => {
                 // Update existing
                 await updateGoal(editingGoal.id, goalData);
                 showSnackbar('Cel został zaktualizowany', 'success');
+                // Refresh notification count as goal might have been achieved
+                if (onGoalChange) onGoalChange();
             } else {
                 // Add new
                 await createGoal(goalData);
@@ -185,17 +192,25 @@ const CeleSection = () => {
         }
     };
 
-    // Handle delete goal
-    const handleDeleteGoal = async (id) => {
-        if (window.confirm('Czy na pewno chcesz usunąć ten cel?')) {
-            try {
-                await deleteGoal(id);
-                showSnackbar('Cel został usunięty', 'success');
-                fetchGoals(); // Refresh list
-            } catch (err) {
-                console.error('Error deleting goal:', err);
-                showSnackbar(err.message || 'Nie udało się usunąć celu', 'error');
-            }
+    // Handle delete goal - open confirmation dialog
+    const handleDeleteGoal = (goal) => {
+        setGoalToDelete(goal);
+        setOpenDeleteDialog(true);
+    };
+
+    // Confirm delete goal
+    const confirmDeleteGoal = async () => {
+        if (!goalToDelete) return;
+
+        try {
+            await deleteGoal(goalToDelete.id);
+            showSnackbar('Cel został usunięty', 'success');
+            setOpenDeleteDialog(false);
+            setGoalToDelete(null);
+            fetchGoals(); // Refresh list
+        } catch (err) {
+            console.error('Error deleting goal:', err);
+            showSnackbar(err.message || 'Nie udało się usunąć celu', 'error');
         }
     };
 
@@ -214,6 +229,8 @@ const CeleSection = () => {
             showSnackbar('Wpłata została dodana', 'success');
             setOpenContributeDialog(false);
             fetchGoals(); // Refresh list
+            // Refresh notification count as contribution might achieve the goal
+            if (onGoalChange) onGoalChange();
         } catch (err) {
             console.error('Error contributing:', err);
             showSnackbar(err.message || 'Nie udało się dodać wpłaty', 'error');
@@ -243,9 +260,9 @@ const CeleSection = () => {
                         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                         textShadow: '0 0 10px rgba(199, 125, 255, 0.5)',
                         '&:hover': {
-                            background: 'linear-gradient(135deg, rgba(199, 125, 255, 0.4), rgba(199, 125, 255, 0.3))',
-                            boxShadow: '0 6px 16px rgba(199, 125, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
-                            transform: 'translateY(-2px)',
+                            background: 'linear-gradient(135deg, rgba(199, 125, 255, 0.3), rgba(199, 125, 255, 0.2))',
+                            boxShadow: '0 0 12px 3px rgba(199, 125, 255, 0.2)',
+                            transform: 'none',
                         },
                     }}
                 >
@@ -292,11 +309,11 @@ const CeleSection = () => {
                                         width: 40,
                                         height: 40,
                                         borderRadius: '50%',
-                                        backgroundColor: '#c77dff20',
+                                        backgroundColor: '#ab47bc20',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        color: '#c77dff',
+                                        color: '#ab47bc',
                                     }}
                                 >
                                     <TrackChangesIcon />
@@ -308,7 +325,7 @@ const CeleSection = () => {
                                     fontWeight: 700,
                                     mb: 1,
                                     color: 'text.primary',
-                                    textShadow: '0 0 20px #c77dff60, 0 0 40px #c77dff40'
+                                    textShadow: '0 0 20px #ab47bc60, 0 0 40px #ab47bc40'
                                 }}
                             >
                                 {statistics.totalGoals}
@@ -351,11 +368,11 @@ const CeleSection = () => {
                                         width: 40,
                                         height: 40,
                                         borderRadius: '50%',
-                                        backgroundColor: '#00f0ff20',
+                                        backgroundColor: '#00b8d420',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        color: '#00f0ff',
+                                        color: '#00b8d4',
                                     }}
                                 >
                                     <SavingsIcon />
@@ -367,7 +384,7 @@ const CeleSection = () => {
                                     fontWeight: 700,
                                     mb: 1,
                                     color: 'text.primary',
-                                    textShadow: '0 0 20px #00f0ff60, 0 0 40px #00f0ff40'
+                                    textShadow: '0 0 20px #00b8d460, 0 0 40px #00b8d440'
                                 }}
                             >
                                 {statistics.totalSaved.toFixed(2).replace('.', ',')} zł
@@ -473,7 +490,7 @@ const CeleSection = () => {
                             alignItems: 'center',
                             justifyContent: 'center',
                             margin: '0 auto 24px',
-                            color: '#c77dff',
+                            color: '#ab47bc',
                         }}
                     >
                         <TrackChangesIcon sx={{ fontSize: 40 }} />
@@ -489,7 +506,7 @@ const CeleSection = () => {
                         startIcon={<AddIcon />}
                         onClick={handleAddGoal}
                         sx={{
-                            background: 'linear-gradient(135deg, #c77dff 0%, #9d4edd 100%)',
+                            background: 'linear-gradient(135deg, #ab47bc 0%, #9d4edd 100%)',
                             '&:hover': {
                                 background: 'linear-gradient(135deg, #9d4edd 0%, #7b2cbf 100%)',
                             },
@@ -599,7 +616,7 @@ const CeleSection = () => {
                                                     borderRadius: 4,
                                                     backgroundColor: 'rgba(255, 255, 255, 0.1)',
                                                     '& .MuiLinearProgress-bar': {
-                                                        backgroundColor: isCompleted ? '#4caf50' : '#c77dff',
+                                                        backgroundColor: isCompleted ? '#4caf50' : '#ab47bc',
                                                         borderRadius: 4,
                                                     },
                                                 }}
@@ -612,7 +629,7 @@ const CeleSection = () => {
                                                 <Typography variant="body2" sx={{ color: 'text.secondary', mb: 0.5 }}>
                                                     Zaoszczędzone
                                                 </Typography>
-                                                <Typography variant="h6" sx={{ color: '#00f0ff', fontWeight: 600 }}>
+                                                <Typography variant="h6" sx={{ color: '#00b8d4', fontWeight: 600 }}>
                                                     {goal.currentAmount.toFixed(2).replace('.', ',')} zł
                                                 </Typography>
                                             </Box>
@@ -682,7 +699,7 @@ const CeleSection = () => {
                                                     WebkitBackdropFilter: 'blur(8px)',
                                                     border: '1px solid rgba(0, 240, 255, 0.3)',
                                                     borderRadius: '20px',
-                                                    color: '#00f0ff',
+                                                    color: '#00b8d4',
                                                     padding: '6px 16px',
                                                     minHeight: '36px',
                                                     flexShrink: 0,
@@ -697,7 +714,7 @@ const CeleSection = () => {
                                             </IconButton>
                                             <IconButton
                                                 size="small"
-                                                onClick={() => handleDeleteGoal(goal.id)}
+                                                onClick={() => handleDeleteGoal(goal)}
                                                 sx={{
                                                     background: 'rgba(244, 67, 54, 0.1)',
                                                     backdropFilter: 'blur(8px)',
@@ -734,11 +751,16 @@ const CeleSection = () => {
                 fullWidth
                 PaperProps={{
                     sx: {
-                        background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                        background: mode === 'dark'
+                            ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
                         backdropFilter: 'blur(20px)',
                         WebkitBackdropFilter: 'blur(20px)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                        border: '1px solid',
+                        borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                        boxShadow: mode === 'dark'
+                            ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                            : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                     }
                 }}
             >
@@ -766,6 +788,15 @@ const CeleSection = () => {
                             InputProps={{
                                 endAdornment: <InputAdornment position="end">zł</InputAdornment>,
                             }}
+                            sx={{
+                                '& input[type=number]': {
+                                    MozAppearance: 'textfield',
+                                },
+                                '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
+                                    WebkitAppearance: 'none',
+                                    margin: 0,
+                                },
+                            }}
                         />
                         <TextField
                             label="Aktualna kwota"
@@ -777,6 +808,15 @@ const CeleSection = () => {
                             inputProps={{ step: '0.01', min: '0' }}
                             InputProps={{
                                 endAdornment: <InputAdornment position="end">zł</InputAdornment>,
+                            }}
+                            sx={{
+                                '& input[type=number]': {
+                                    MozAppearance: 'textfield',
+                                },
+                                '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
+                                    WebkitAppearance: 'none',
+                                    margin: 0,
+                                },
                             }}
                         />
                         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
@@ -792,38 +832,43 @@ const CeleSection = () => {
                                     popper: {
                                         sx: {
                                             '& .MuiPaper-root': {
-                                                background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                                                background: mode === 'dark'
+                                                    ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                                                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
                                                 backdropFilter: 'blur(20px)',
                                                 WebkitBackdropFilter: 'blur(20px)',
-                                                border: '1px solid rgba(255, 255, 255, 0.1)',
-                                                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                                                border: '1px solid',
+                                                borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                                                boxShadow: mode === 'dark'
+                                                    ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                                                    : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                                             },
                                             '& .MuiPickersCalendarHeader-root': {
-                                                color: '#ffffff',
+                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                             },
                                             '& .MuiPickersCalendarHeader-label': {
-                                                color: '#ffffff',
+                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                             },
                                             '& .MuiPickersDay-root': {
-                                                color: '#ffffff',
+                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                                 '&:hover': {
                                                     backgroundColor: 'rgba(199, 125, 255, 0.2)',
                                                 },
                                                 '&.Mui-selected': {
-                                                    backgroundColor: '#c77dff',
+                                                    backgroundColor: '#ab47bc',
                                                     '&:hover': {
                                                         backgroundColor: '#9d4edd',
                                                     },
                                                 },
                                             },
                                             '& .MuiPickersDay-today': {
-                                                border: '1px solid #c77dff',
+                                                border: '1px solid #ab47bc',
                                             },
                                             '& .MuiDayCalendar-weekDayLabel': {
-                                                color: 'rgba(255, 255, 255, 0.7)',
+                                                color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
                                             },
                                             '& .MuiIconButton-root': {
-                                                color: '#ffffff',
+                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
                                             },
                                         },
                                     },
@@ -850,9 +895,9 @@ const CeleSection = () => {
                         variant="contained"
                         disabled={!goalForm.name || !goalForm.targetAmount || !goalForm.dueDate || saving}
                         sx={{
-                            background: 'linear-gradient(135deg, #c77dff 0%, #9d4edd 100%)',
                             '&:hover': {
-                                background: 'linear-gradient(135deg, #9d4edd 0%, #7b2cbf 100%)',
+                                transform: 'none',
+                                boxShadow: '0 0 12px 3px rgba(0, 240, 255, 0.2)',
                             },
                         }}
                     >
@@ -869,11 +914,16 @@ const CeleSection = () => {
                 fullWidth
                 PaperProps={{
                     sx: {
-                        background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                        background: mode === 'dark'
+                            ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
                         backdropFilter: 'blur(20px)',
                         WebkitBackdropFilter: 'blur(20px)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                        border: '1px solid',
+                        borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                        boxShadow: mode === 'dark'
+                            ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                            : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                     }
                 }}
             >
@@ -920,6 +970,15 @@ const CeleSection = () => {
                             InputProps={{
                                 endAdornment: <InputAdornment position="end">zł</InputAdornment>,
                             }}
+                            sx={{
+                                '& input[type=number]': {
+                                    MozAppearance: 'textfield',
+                                },
+                                '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
+                                    WebkitAppearance: 'none',
+                                    margin: 0,
+                                },
+                            }}
                         />
                     </Box>
                 </DialogContent>
@@ -932,13 +991,66 @@ const CeleSection = () => {
                         variant="contained"
                         disabled={!contributeAmount || parseFloat(contributeAmount) <= 0 || saving}
                         sx={{
-                            background: 'linear-gradient(135deg, #c77dff 0%, #9d4edd 100%)',
                             '&:hover': {
-                                background: 'linear-gradient(135deg, #9d4edd 0%, #7b2cbf 100%)',
+                                transform: 'none',
+                                boxShadow: '0 0 12px 3px rgba(0, 240, 255, 0.2)',
                             },
                         }}
                     >
                         {saving ? <CircularProgress size={24} /> : 'Wpłać'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Dialog - Delete Confirmation */}
+            <Dialog
+                open={openDeleteDialog}
+                onClose={() => setOpenDeleteDialog(false)}
+                maxWidth="xs"
+                fullWidth
+                PaperProps={{
+                    sx: {
+                        background: mode === 'dark'
+                            ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
+                        backdropFilter: 'blur(20px)',
+                        WebkitBackdropFilter: 'blur(20px)',
+                        border: '1px solid',
+                        borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                        boxShadow: mode === 'dark'
+                            ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                            : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
+                    }
+                }}
+            >
+                <DialogTitle sx={{ color: 'text.primary' }}>
+                    Potwierdź usunięcie
+                </DialogTitle>
+                <DialogContent>
+                    <Typography sx={{ color: 'text.secondary' }}>
+                        Czy na pewno chcesz usunąć cel "{goalToDelete?.name}"?
+                        <br />
+                        Ta operacja jest nieodwracalna.
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenDeleteDialog(false)}>
+                        Anuluj
+                    </Button>
+                    <Button
+                        onClick={confirmDeleteGoal}
+                        variant="contained"
+                        sx={{
+                            backgroundColor: '#f44336',
+                            color: '#fff',
+                            '&:hover': {
+                                backgroundColor: '#d32f2f',
+                                transform: 'none',
+                                boxShadow: '0 0 12px 3px rgba(244, 67, 54, 0.2)',
+                            },
+                        }}
+                    >
+                        Usuń
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -948,7 +1060,7 @@ const CeleSection = () => {
                 open={snackbar.open}
                 autoHideDuration={4000}
                 onClose={handleCloseSnackbar}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             >
                 <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
                     {snackbar.message}

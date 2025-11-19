@@ -41,8 +41,11 @@ import {
     getWeeklyExpenses,
 } from '../../api/analysis';
 import { getExpensesByCategory } from '../../api/dashboard';
+import { useThemeMode } from '../../context/ThemeContext';
 
 const AnalizySection = () => {
+    const { mode } = useThemeMode();
+
     // Data states
     const [statistics, setStatistics] = useState({
         averageExpenses: 0,
@@ -190,11 +193,16 @@ const AnalizySection = () => {
                         MenuProps={{
                             PaperProps: {
                                 sx: {
-                                    background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))',
+                                    background: mode === 'dark'
+                                        ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                                        : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
                                     backdropFilter: 'blur(20px)',
                                     WebkitBackdropFilter: 'blur(20px)',
-                                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                                    border: '1px solid',
+                                    borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                                    boxShadow: mode === 'dark'
+                                        ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                                        : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                                 }
                             }
                         }}
@@ -800,7 +808,7 @@ const AnalizySection = () => {
                 open={snackbar.open}
                 autoHideDuration={4000}
                 onClose={handleCloseSnackbar}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             >
                 <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
                     {snackbar.message}

@@ -1,5 +1,5 @@
 // src/views/DashboardPage.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Box,
     Drawer,
@@ -17,6 +17,8 @@ import {
     Avatar,
     useTheme,
     useMediaQuery,
+    Menu,
+    MenuItem,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -26,8 +28,16 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import TrackChangesIcon from '@mui/icons-material/TrackChanges';
 import BarChartIcon from '@mui/icons-material/BarChart';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import PersonIcon from '@mui/icons-material/Person';
+import PaletteIcon from '@mui/icons-material/Palette';
+import SecurityIcon from '@mui/icons-material/Security';
+import Badge from '@mui/material/Badge';
 import { useNavigate } from 'react-router-dom';
 import { getUser, logout } from '../api/auth';
+import { getNotifications, checkGoalReminders } from '../api/notifications';
+import { checkRecurringExpenses } from '../api/expenses';
+import { checkRecurringIncomes } from '../api/budget';
 
 // Import dashboard sections
 import PulpitSection from '../components/dashboard/PulpitSection';
@@ -36,6 +46,7 @@ import BudzetSection from '../components/dashboard/BudzetSection';
 import CeleSection from '../components/dashboard/CeleSection';
 import AnalizySection from '../components/dashboard/AnalizySection';
 import UstawieniaSection from '../components/dashboard/UstawieniaSection';
+import PowiadomieniaSection from '../components/dashboard/PowiadomieniaSection';
 
 const drawerWidth = 260;
 
@@ -45,24 +56,94 @@ const DashboardPage = () => {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [selectedMenu, setSelectedMenu] = useState('pulpit');
     const [user, setUser] = useState(null);
+    const [unreadCount, setUnreadCount] = useState(0);
+    const [avatarMenuAnchor, setAvatarMenuAnchor] = useState(null);
+    const [settingsScrollTo, setSettingsScrollTo] = useState(null);
     const navigate = useNavigate();
+    const hasCheckedReminders = useRef(false);
 
     useEffect(() => {
+        // Ustaw tytuł strony
+        document.title = 'SmartSaver - Pulpit';
+
         // Pobierz dane użytkownika z localStorage
         const userData = getUser();
         if (userData) {
             setUser(userData);
         }
+
+        // Pobierz liczbę nieprzeczytanych powiadomień
+        fetchUnreadCount();
+
+        // Sprawdź przypomnienia o celach, cykliczne wydatki i cykliczne przychody tylko raz
+        if (!hasCheckedReminders.current) {
+            hasCheckedReminders.current = true;
+            checkGoalReminders().catch(error => {
+                console.error('Error checking goal reminders:', error);
+            });
+            checkRecurringExpenses().catch(error => {
+                console.error('Error checking recurring expenses:', error);
+            });
+            checkRecurringIncomes().catch(error => {
+                console.error('Error checking recurring incomes:', error);
+            });
+        }
     }, []);
+
+    const fetchUnreadCount = async () => {
+        try {
+            const data = await getNotifications('unread');
+            setUnreadCount(data.unreadCount || 0);
+        } catch (error) {
+            console.error('Error fetching unread count:', error);
+        }
+    };
+
+    const handleGoalChange = async () => {
+        // Check for new goal reminders
+        try {
+            await checkGoalReminders();
+        } catch (error) {
+            console.error('Error checking goal reminders:', error);
+        }
+        // Refresh unread count
+        await fetchUnreadCount();
+    };
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
+    };
+
+    const handleMenuSelect = (menuId) => {
+        setSelectedMenu(menuId);
+        // Refresh unread count when leaving notifications section
+        if (menuId !== 'powiadomienia') {
+            fetchUnreadCount();
+        }
     };
 
     const handleLogout = () => {
         // Wyloguj użytkownika (usuń token i dane z localStorage)
         logout();
         navigate('/signin');
+    };
+
+    const handleAvatarClick = (event) => {
+        setAvatarMenuAnchor(event.currentTarget);
+    };
+
+    const handleAvatarMenuClose = () => {
+        setAvatarMenuAnchor(null);
+    };
+
+    const handleAvatarMenuItemClick = (action) => {
+        handleAvatarMenuClose();
+        if (action === 'logout') {
+            handleLogout();
+        } else {
+            setSelectedMenu('ustawienia');
+            setSettingsScrollTo(action);
+        }
     };
 
     // Funkcja do wygenerowania inicjałów
@@ -77,12 +158,24 @@ const DashboardPage = () => {
 
     // Menu items with colors matching dashboard cards
     const menuItems = [
-        { id: 'pulpit', label: 'Pulpit', icon: <DashboardIcon />, color: '#00f0ff' }, // Aktualne saldo - cyan
-        { id: 'wydatki', label: 'Wydatki', icon: <AccountBalanceWalletIcon />, color: '#ff6b9d' }, // Wydatki - różowy
-        { id: 'budzet', label: 'Budżet', icon: <TrendingUpIcon />, color: '#a8e6cf' }, // Przychody - zielony
-        { id: 'cele', label: 'Cele', icon: <TrackChangesIcon />, color: '#c77dff' }, // Twój cel - fioletowy
-        { id: 'analizy', label: 'Analizy', icon: <BarChartIcon />, color: '#ffd93d' }, // Oszczędności - żółty
-        { id: 'ustawienia', label: 'Ustawienia', icon: <SettingsIcon />, color: '#90a4ae' }, // Ustawienia - blue-grey
+        { id: 'pulpit', label: 'Pulpit', icon: <DashboardIcon />, color: '#00b8d4' }, // Aktualne saldo - cyan
+        { id: 'wydatki', label: 'Wydatki', icon: <AccountBalanceWalletIcon />, color: '#FF6B9D' }, // Wydatki - różowy
+        { id: 'budzet', label: 'Budżet', icon: <TrendingUpIcon />, color: '#66bb6a' }, // Przychody - zielony
+        { id: 'cele', label: 'Cele', icon: <TrackChangesIcon />, color: '#ab47bc' }, // Twój cel - fioletowy
+        { id: 'analizy', label: 'Analizy', icon: <BarChartIcon />, color: '#fbc02d' }, // Oszczędności - żółty
+        {
+            id: 'powiadomienia',
+            label: 'Powiadomienia',
+            icon: unreadCount > 0 ? (
+                <Badge badgeContent={unreadCount} color="error">
+                    <NotificationsIcon />
+                </Badge>
+            ) : (
+                <NotificationsIcon />
+            ),
+            color: '#ff9a76'
+        }, // Powiadomienia - pomarańczowy
+        { id: 'ustawienia', label: 'Ustawienia', icon: <SettingsIcon />, color: '#78909c' }, // Ustawienia - blue-grey
     ];
 
     // Titles for AppBar (can be different from menu labels)
@@ -92,6 +185,7 @@ const DashboardPage = () => {
         budzet: 'Budżet',
         cele: 'Cele oszczędnościowe',
         analizy: 'Analizy i statystyki',
+        powiadomienia: 'Powiadomienia',
         ustawienia: 'Ustawienia',
     };
 
@@ -101,15 +195,17 @@ const DashboardPage = () => {
             case 'pulpit':
                 return <PulpitSection user={user} onNavigate={setSelectedMenu} />;
             case 'wydatki':
-                return <WydatkiSection />;
+                return <WydatkiSection onExpenseChange={fetchUnreadCount} />;
             case 'budzet':
                 return <BudzetSection />;
             case 'cele':
-                return <CeleSection />;
+                return <CeleSection onGoalChange={handleGoalChange} />;
             case 'analizy':
                 return <AnalizySection />;
+            case 'powiadomienia':
+                return <PowiadomieniaSection onNotificationChange={fetchUnreadCount} />;
             case 'ustawienia':
-                return <UstawieniaSection />;
+                return <UstawieniaSection scrollToSection={settingsScrollTo} onScrollComplete={() => setSettingsScrollTo(null)} />;
             default:
                 return <PulpitSection user={user} onNavigate={setSelectedMenu} />;
         }
@@ -140,7 +236,7 @@ const DashboardPage = () => {
                 </Typography>
             </Box>
 
-            <Divider sx={{ borderColor: 'rgba(0, 240, 255, 0.2)', boxShadow: '0 1px 2px rgba(0, 240, 255, 0.1)' }} />
+            <Divider sx={{ borderColor: 'rgba(0, 184, 212, 0.2)', boxShadow: '0 1px 2px rgba(0, 184, 212, 0.1)' }} />
 
             {/* Menu */}
             <List sx={{ flex: 1, pt: 2 }}>
@@ -148,7 +244,7 @@ const DashboardPage = () => {
                     <ListItem key={item.id} disablePadding sx={{ px: 1.5, mb: 0.5 }}>
                         <ListItemButton
                             selected={selectedMenu === item.id}
-                            onClick={() => setSelectedMenu(item.id)}
+                            onClick={() => handleMenuSelect(item.id)}
                             sx={{
                                 borderRadius: 2,
                                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -193,7 +289,7 @@ const DashboardPage = () => {
                 ))}
             </List>
 
-            <Divider sx={{ borderColor: 'rgba(0, 240, 255, 0.2)', boxShadow: '0 1px 2px rgba(0, 240, 255, 0.1)' }} />
+            <Divider sx={{ borderColor: 'rgba(0, 184, 212, 0.2)', boxShadow: '0 1px 2px rgba(0, 184, 212, 0.1)' }} />
 
             {/* Logout */}
             <List sx={{ pb: 2 }}>
@@ -217,11 +313,11 @@ const DashboardPage = () => {
                 sx={{
                     width: { md: `calc(100% - ${drawerWidth}px)` },
                     ml: { md: `${drawerWidth}px` },
-                    background: 'linear-gradient(135deg, rgba(0, 240, 255, 0.08), rgba(0, 240, 255, 0.02))',
+                    background: 'linear-gradient(135deg, rgba(0, 184, 212, 0.08), rgba(0, 184, 212, 0.02))',
                     backdropFilter: 'blur(10px)',
                     WebkitBackdropFilter: 'blur(10px)',
-                    borderBottom: '1px solid rgba(0, 240, 255, 0.2)',
-                    boxShadow: '0 4px 12px rgba(0, 240, 255, 0.1), inset 0 1px 0 rgba(0, 240, 255, 0.15)',
+                    borderBottom: '1px solid rgba(0, 184, 212, 0.2)',
+                    boxShadow: '0 4px 12px rgba(0, 184, 212, 0.1), inset 0 1px 0 rgba(0, 184, 212, 0.15)',
                 }}
             >
                 <Toolbar sx={{ minHeight: 64, px: 3 }}>
@@ -251,6 +347,7 @@ const DashboardPage = () => {
                             </Typography>
                         </Box>
                         <Avatar
+                            onClick={handleAvatarClick}
                             sx={{
                                 width: 40,
                                 height: 40,
@@ -263,6 +360,66 @@ const DashboardPage = () => {
                     </Box>
                 </Toolbar>
             </AppBar>
+
+            {/* Avatar Menu - tylko na desktop */}
+            <Menu
+                anchorEl={avatarMenuAnchor}
+                open={Boolean(avatarMenuAnchor)}
+                onClose={handleAvatarMenuClose}
+                sx={{ display: { xs: 'none', md: 'block' } }}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                }}
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                }}
+                PaperProps={{
+                    sx: {
+                        mt: 1.5,
+                        minWidth: 220,
+                        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                        backdropFilter: 'blur(10px)',
+                        WebkitBackdropFilter: 'blur(10px)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                        borderRadius: 2,
+                    }
+                }}
+            >
+                <MenuItem onClick={() => handleAvatarMenuItemClick('profile')}>
+                    <ListItemIcon>
+                        <PersonIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>Informacje o profilu</ListItemText>
+                </MenuItem>
+                <MenuItem onClick={() => handleAvatarMenuItemClick('notifications')}>
+                    <ListItemIcon>
+                        <NotificationsIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>Powiadomienia</ListItemText>
+                </MenuItem>
+                <MenuItem onClick={() => handleAvatarMenuItemClick('appearance')}>
+                    <ListItemIcon>
+                        <PaletteIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>Wygląd</ListItemText>
+                </MenuItem>
+                <MenuItem onClick={() => handleAvatarMenuItemClick('privacy')}>
+                    <ListItemIcon>
+                        <SecurityIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>Dane i prywatność</ListItemText>
+                </MenuItem>
+                <Divider />
+                <MenuItem onClick={() => handleAvatarMenuItemClick('logout')}>
+                    <ListItemIcon>
+                        <LogoutIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>Wyloguj</ListItemText>
+                </MenuItem>
+            </Menu>
 
             {/* Sidebar Drawer */}
             <Box
@@ -282,11 +439,11 @@ const DashboardPage = () => {
                         '& .MuiDrawer-paper': {
                             boxSizing: 'border-box',
                             width: drawerWidth,
-                            background: 'linear-gradient(135deg, rgba(0, 240, 255, 0.08), rgba(0, 240, 255, 0.02))',
+                            background: 'linear-gradient(135deg, rgba(0, 184, 212, 0.08), rgba(0, 184, 212, 0.02))',
                             backdropFilter: 'blur(10px)',
                             WebkitBackdropFilter: 'blur(10px)',
-                            borderRight: '1px solid rgba(0, 240, 255, 0.2)',
-                            boxShadow: '4px 0 12px rgba(0, 240, 255, 0.1)',
+                            borderRight: '1px solid rgba(0, 184, 212, 0.2)',
+                            boxShadow: '4px 0 12px rgba(0, 184, 212, 0.1)',
                         },
                     }}
                 >
@@ -301,11 +458,11 @@ const DashboardPage = () => {
                         '& .MuiDrawer-paper': {
                             boxSizing: 'border-box',
                             width: drawerWidth,
-                            background: 'linear-gradient(135deg, rgba(0, 240, 255, 0.08), rgba(0, 240, 255, 0.02))',
+                            background: 'linear-gradient(135deg, rgba(0, 184, 212, 0.08), rgba(0, 184, 212, 0.02))',
                             backdropFilter: 'blur(10px)',
                             WebkitBackdropFilter: 'blur(10px)',
-                            borderRight: '1px solid rgba(0, 240, 255, 0.2)',
-                            boxShadow: '4px 0 12px rgba(0, 240, 255, 0.1)',
+                            borderRight: '1px solid rgba(0, 184, 212, 0.2)',
+                            boxShadow: '4px 0 12px rgba(0, 184, 212, 0.1)',
                         },
                     }}
                     open

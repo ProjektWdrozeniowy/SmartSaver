@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
 function getIconKey(title) {
   const iconMap = {
     'Aktualne saldo': 'balance',
-    'Przychody (mies)': 'income',
+    'Przychody (miesiąc)': 'income',
     'Wydatki (miesiąc)': 'expenses',
     'Twój cel': 'goal'
   };
@@ -36,7 +36,7 @@ router.get('/stats', authenticateToken, async (req, res) => {
     const previousMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
 
     // Get current month data
-    const [currentIncome, currentExpenses, previousIncome, previousExpenses, totalBalance, activeGoal] = await Promise.all([
+    const [currentIncome, currentExpenses, previousIncome, previousExpenses, totalBalance, activeGoal, userSettings] = await Promise.all([
       // Current month income
       prisma.income.aggregate({
         where: {
@@ -69,7 +69,7 @@ router.get('/stats', authenticateToken, async (req, res) => {
         },
         _sum: { amount: true }
       }),
-      // Total balance (all time income - expenses)
+      // Total balance (all time income - expenses - goal contributions)
       prisma.$transaction([
         prisma.income.aggregate({
           where: { userId: req.user.id },
@@ -78,12 +78,26 @@ router.get('/stats', authenticateToken, async (req, res) => {
         prisma.expense.aggregate({
           where: { userId: req.user.id },
           _sum: { amount: true }
+        }),
+        prisma.goalContribution.aggregate({
+          where: {
+            goal: { userId: req.user.id }
+          },
+          _sum: { amount: true }
         })
       ]),
       // Get the most active goal
       prisma.goal.findFirst({
         where: { userId: req.user.id },
         orderBy: { updatedAt: 'desc' }
+      }),
+      // Get user settings for budget limit
+      prisma.userSettings.findUnique({
+        where: { userId: req.user.id },
+        select: {
+          monthlyBudgetLimit: true,
+          budgetAlerts: true
+        }
       })
     ]);
 
@@ -91,11 +105,18 @@ router.get('/stats', authenticateToken, async (req, res) => {
     const currentExpensesAmount = currentExpenses._sum.amount || 0;
     const previousIncomeAmount = previousIncome._sum.amount || 0;
     const previousExpensesAmount = previousExpenses._sum.amount || 0;
-    const balance = (totalBalance[0]._sum.amount || 0) - (totalBalance[1]._sum.amount || 0);
+    const balance = (totalBalance[0]._sum.amount || 0) - (totalBalance[1]._sum.amount || 0) - (totalBalance[2]._sum.amount || 0);
 
     // Calculate changes
     const incomeChange = calculateChange(currentIncomeAmount, previousIncomeAmount);
     const expensesChange = calculateChange(currentExpensesAmount, previousExpensesAmount);
+
+    // Calculate budget percentage if limit is set AND alerts are enabled
+    const budgetLimit = userSettings?.monthlyBudgetLimit || null;
+    const budgetAlertsEnabled = userSettings?.budgetAlerts || false;
+    const budgetPercentage = budgetLimit && budgetLimit > 0 && budgetAlertsEnabled
+      ? ((currentExpensesAmount / budgetLimit) * 100).toFixed(1)
+      : null;
 
     const stats = [
       {
@@ -108,7 +129,7 @@ router.get('/stats', authenticateToken, async (req, res) => {
         navigateTo: 'budzet'
       },
       {
-        title: 'Przychody (mies)',
+        title: 'Przychody (miesiąc)',
         value: formatCurrency(currentIncomeAmount),
         change: `${incomeChange >= 0 ? '+' : ''}${incomeChange}%`,
         positive: parseFloat(incomeChange) >= 0,
@@ -123,7 +144,8 @@ router.get('/stats', authenticateToken, async (req, res) => {
         positive: parseFloat(expensesChange) < 0, // Less expenses is positive
         iconKey: 'expenses',
         color: '#ff6b9d',
-        navigateTo: 'wydatki'
+        navigateTo: 'wydatki',
+        budgetPercentage: budgetPercentage
       }
     ];
 
@@ -167,14 +189,20 @@ router.get('/transactions', authenticateToken, async (req, res) => {
           }
         }
       },
-      orderBy: { date: 'desc' },
+      orderBy: [
+        { date: 'desc' },
+        { id: 'desc' }
+      ],
       take: limit
     });
 
     // Get recent incomes
     const incomes = await prisma.income.findMany({
       where: { userId: req.user.id },
-      orderBy: { date: 'desc' },
+      orderBy: [
+        { date: 'desc' },
+        { id: 'desc' }
+      ],
       take: limit
     });
 
@@ -182,6 +210,7 @@ router.get('/transactions', authenticateToken, async (req, res) => {
     const transactions = [
       ...expenses.map(e => ({
         id: e.id,
+        type: 'expense',
         title: e.name,
         category: e.category.name,
         amount: -e.amount, // Negative for expenses
@@ -190,6 +219,7 @@ router.get('/transactions', authenticateToken, async (req, res) => {
       })),
       ...incomes.map(i => ({
         id: i.id,
+        type: 'income',
         title: i.name,
         category: 'Przychód',
         amount: i.amount, // Positive for income

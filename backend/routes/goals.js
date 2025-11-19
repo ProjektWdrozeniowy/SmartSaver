@@ -6,6 +6,44 @@ const { authenticateToken } = require('../middleware/auth');
 const router = express.Router();
 const prisma = new PrismaClient();
 
+// Helper function to check if goal is achieved and create notification
+async function checkGoalAchievedAndNotify(userId, goalId, previousAmount, newAmount, targetAmount, goalName) {
+  try {
+    // Check if goal was just achieved (wasn't achieved before, but is now)
+    const wasAchieved = previousAmount >= targetAmount;
+    const isAchieved = newAmount >= targetAmount;
+
+    // Only create notification if goal was just achieved
+    if (!wasAchieved && isAchieved) {
+      // Check if notification already exists for this goal
+      const existingNotification = await prisma.notification.findFirst({
+        where: {
+          userId,
+          type: 'goal_achieved',
+          message: {
+            contains: goalName
+          }
+        }
+      });
+
+      if (!existingNotification) {
+        // Create achievement notification
+        await prisma.notification.create({
+          data: {
+            userId,
+            type: 'goal_achieved',
+            title: '🎉 Cel osiągnięty!',
+            message: `Gratulacje! Osiągnąłeś cel "${goalName}". Uzbierałeś ${newAmount.toFixed(2)} zł z ${targetAmount.toFixed(2)} zł.`
+          }
+        });
+      }
+    }
+  } catch (error) {
+    console.error('Error checking goal achievement:', error);
+    // Don't throw error - notification shouldn't break goal update
+  }
+}
+
 // Validation schemas
 const CreateGoalSchema = z.object({
   name: z.string().min(1).max(100),
@@ -116,6 +154,19 @@ router.put('/:id', authenticateToken, async (req, res) => {
       });
     }
 
+    // Calculate difference in currentAmount to adjust contributions
+    const amountDifference = currentAmount - goal.currentAmount;
+
+    // If currentAmount changed, create an adjustment contribution
+    if (amountDifference !== 0) {
+      await prisma.goalContribution.create({
+        data: {
+          goalId: goalId,
+          amount: amountDifference
+        }
+      });
+    }
+
     const updatedGoal = await prisma.goal.update({
       where: { id: goalId },
       data: {
@@ -126,6 +177,16 @@ router.put('/:id', authenticateToken, async (req, res) => {
         description: description || null
       }
     });
+
+    // Check if goal was achieved and create notification
+    await checkGoalAchievedAndNotify(
+      req.user.id,
+      goalId,
+      goal.currentAmount,
+      currentAmount,
+      targetAmount,
+      name
+    );
 
     res.json({
       message: 'Cel został zaktualizowany',
@@ -197,12 +258,23 @@ router.post('/:id/contribute', authenticateToken, async (req, res) => {
     });
 
     // Update goal's current amount
+    const newAmount = goal.currentAmount + amount;
     const updatedGoal = await prisma.goal.update({
       where: { id: goalId },
       data: {
-        currentAmount: goal.currentAmount + amount
+        currentAmount: newAmount
       }
     });
+
+    // Check if goal was achieved and create notification
+    await checkGoalAchievedAndNotify(
+      req.user.id,
+      goalId,
+      goal.currentAmount,
+      newAmount,
+      goal.targetAmount,
+      goal.name
+    );
 
     res.json({
       message: 'Wpłata została dodana',

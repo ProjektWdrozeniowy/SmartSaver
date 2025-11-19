@@ -17,6 +17,8 @@ import {
     DialogContentText,
     DialogActions,
     useTheme,
+    Slider,
+    InputAdornment,
 } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import LockIcon from '@mui/icons-material/Lock';
@@ -35,10 +37,12 @@ import {
     deleteAccount,
 } from '../../api/settings';
 import { useNavigate } from 'react-router-dom';
+import { useThemeMode } from '../../context/ThemeContext';
 
-const UstawieniaSection = () => {
+const UstawieniaSection = ({ scrollToSection, onScrollComplete }) => {
     const theme = useTheme();
     const navigate = useNavigate();
+    const { userMode, toggleTheme } = useThemeMode();
 
     // Stan dla informacji o profilu
     const [profileData, setProfileData] = useState({
@@ -57,10 +61,11 @@ const UstawieniaSection = () => {
     const [notifications, setNotifications] = useState({
         budgetAlerts: false,
         goalReminders: false,
+        monthlyBudgetLimit: null,
+        budgetAlertThreshold: 80,
+        goalReminderDeadlineDays: 7,
+        goalReminderInactivityDays: 14,
     });
-
-    // Stan dla motywu (na razie tylko w localStorage)
-    const [darkMode, setDarkMode] = useState(true);
 
     // Stan dla komunikatów
     const [snackbar, setSnackbar] = useState({
@@ -89,12 +94,32 @@ const UstawieniaSection = () => {
         loadNotificationSettings();
     }, []);
 
+    // Scroll to section when scrollToSection changes
+    useEffect(() => {
+        if (scrollToSection) {
+            const sectionId = `settings-${scrollToSection}`;
+            const element = document.getElementById(sectionId);
+            if (element) {
+                setTimeout(() => {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    if (onScrollComplete) {
+                        onScrollComplete();
+                    }
+                }, 100);
+            }
+        }
+    }, [scrollToSection, onScrollComplete]);
+
     const loadNotificationSettings = async () => {
         try {
             const settings = await getNotificationSettings();
             setNotifications({
                 budgetAlerts: settings.budgetAlerts || false,
                 goalReminders: settings.goalReminders || false,
+                monthlyBudgetLimit: settings.monthlyBudgetLimit || null,
+                budgetAlertThreshold: settings.budgetAlertThreshold || 80,
+                goalReminderDeadlineDays: settings.goalReminderDeadlineDays || 7,
+                goalReminderInactivityDays: settings.goalReminderInactivityDays || 14,
             });
         } catch (error) {
             console.error('Błąd ładowania ustawień powiadomień:', error);
@@ -235,14 +260,91 @@ const UstawieniaSection = () => {
         }
     };
 
+    // Obsługa zmiany limitu budżetu
+    const handleBudgetLimitChange = async (value) => {
+        const limit = value === '' ? null : parseFloat(value);
+        setNotifications({
+            ...notifications,
+            monthlyBudgetLimit: limit,
+        });
+    };
+
+    // Zapisz limit budżetu
+    const handleBudgetLimitSave = async () => {
+        try {
+            await updateNotificationSettings(notifications);
+            setSnackbar({
+                open: true,
+                message: 'Limit budżetu zaktualizowany',
+                severity: 'success',
+            });
+        } catch (error) {
+            setSnackbar({
+                open: true,
+                message: error.message || 'Błąd podczas aktualizacji limitu',
+                severity: 'error',
+            });
+        }
+    };
+
+    // Obsługa zmiany progu alertu
+    const handleThresholdChange = async (event, newValue) => {
+        setNotifications({
+            ...notifications,
+            budgetAlertThreshold: newValue,
+        });
+
+        try {
+            await updateNotificationSettings({
+                ...notifications,
+                budgetAlertThreshold: newValue,
+            });
+        } catch (error) {
+            console.error('Error updating threshold:', error);
+        }
+    };
+
+    // Obsługa zmiany dni przypomnienia o deadline
+    const handleDeadlineDaysChange = async (event, newValue) => {
+        setNotifications({
+            ...notifications,
+            goalReminderDeadlineDays: newValue,
+        });
+
+        try {
+            await updateNotificationSettings({
+                ...notifications,
+                goalReminderDeadlineDays: newValue,
+            });
+        } catch (error) {
+            console.error('Error updating deadline days:', error);
+        }
+    };
+
+    // Obsługa zmiany dni przypomnienia o braku aktywności
+    const handleInactivityDaysChange = async (event, newValue) => {
+        setNotifications({
+            ...notifications,
+            goalReminderInactivityDays: newValue,
+        });
+
+        try {
+            await updateNotificationSettings({
+                ...notifications,
+                goalReminderInactivityDays: newValue,
+            });
+        } catch (error) {
+            console.error('Error updating inactivity days:', error);
+        }
+    };
+
     // Obsługa zmiany motywu
     const handleThemeChange = () => {
-        setDarkMode(!darkMode);
-        // TODO: Implementacja zmiany motywu w całej aplikacji
+        toggleTheme();
         setSnackbar({
             open: true,
-            message: 'Funkcja zmiany motywu będzie dostępna wkrótce',
-            severity: 'info',
+            message: `Zmieniono na motyw ${userMode === 'dark' ? 'jasny' : 'ciemny'}`,
+            severity: 'success',
         });
     };
 
@@ -321,24 +423,35 @@ const UstawieniaSection = () => {
                 </Typography>
             </Box>
 
-            {/* Informacje o profilu */}
-            <Card
+            {/* Container for Profile and Password cards */}
+            <Box
+                id="settings-profile"
                 sx={{
-                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
-                    backdropFilter: 'blur(10px)',
-                    WebkitBackdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-                    p: 3,
+                    display: 'flex',
+                    flexDirection: { xs: 'column', lg: 'row' },
+                    gap: 3,
                     mb: 3,
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    '&:hover': {
-                        transform: 'none',
-                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-                        borderColor: 'rgba(255, 255, 255, 0.15)',
-                    },
+                    scrollMarginTop: '100px'
                 }}
             >
+                {/* Informacje o profilu */}
+                <Card
+                    sx={{
+                        flex: 1,
+                        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                        backdropFilter: 'blur(10px)',
+                        WebkitBackdropFilter: 'blur(10px)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                        p: 3,
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        '&:hover': {
+                            transform: 'none',
+                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                            borderColor: 'rgba(255, 255, 255, 0.15)',
+                        },
+                    }}
+                >
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                     <PersonIcon sx={{ fontSize: 24, mr: 1, color: 'primary.main' }} />
                     <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
@@ -407,24 +520,24 @@ const UstawieniaSection = () => {
                 </Box>
             </Card>
 
-            {/* Zmiana hasła */}
-            <Card
-                sx={{
-                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
-                    backdropFilter: 'blur(10px)',
-                    WebkitBackdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-                    p: 3,
-                    mb: 3,
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    '&:hover': {
-                        transform: 'none',
+                {/* Zmiana hasła */}
+                <Card
+                    sx={{
+                        flex: 1,
+                        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                        backdropFilter: 'blur(10px)',
+                        WebkitBackdropFilter: 'blur(10px)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
                         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-                        borderColor: 'rgba(255, 255, 255, 0.15)',
-                    },
-                }}
-            >
+                        p: 3,
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        '&:hover': {
+                            transform: 'none',
+                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                            borderColor: 'rgba(255, 255, 255, 0.15)',
+                        },
+                    }}
+                >
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                     <LockIcon sx={{ fontSize: 24, mr: 1, color: 'primary.main' }} />
                     <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
@@ -505,10 +618,12 @@ const UstawieniaSection = () => {
                         Zmień hasło
                     </Button>
                 </Box>
-            </Card>
+                </Card>
+            </Box>
 
             {/* Powiadomienia */}
             <Card
+                id="settings-notifications"
                 sx={{
                     background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
                     backdropFilter: 'blur(10px)',
@@ -517,6 +632,7 @@ const UstawieniaSection = () => {
                     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                     p: 3,
                     mb: 3,
+                    scrollMarginTop: '100px',
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     '&:hover': {
                         transform: 'none',
@@ -561,6 +677,77 @@ const UstawieniaSection = () => {
                         />
                     </Box>
 
+                    {/* Budget limit settings - visible when budgetAlerts is enabled */}
+                    {notifications.budgetAlerts && (
+                        <Box sx={{ pl: 2, pr: 2, pb: 2 }}>
+                            <Box sx={{ mb: 3 }}>
+                                <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1.5 }}>
+                                    Miesięczny limit budżetu
+                                </Typography>
+                                <Box sx={{ display: 'flex', gap: 1 }}>
+                                    <TextField
+                                        type="number"
+                                        value={notifications.monthlyBudgetLimit || ''}
+                                        onChange={(e) => handleBudgetLimitChange(e.target.value)}
+                                        placeholder="Wprowadź limit"
+                                        fullWidth
+                                        InputProps={{
+                                            endAdornment: <InputAdornment position="end">zł</InputAdornment>,
+                                        }}
+                                        inputProps={{
+                                            min: 0,
+                                            step: 100
+                                        }}
+                                        sx={{
+                                            '& input[type=number]': {
+                                                MozAppearance: 'textfield',
+                                            },
+                                            '& input[type=number]::-webkit-outer-spin-button': {
+                                                WebkitAppearance: 'none',
+                                                margin: 0,
+                                            },
+                                            '& input[type=number]::-webkit-inner-spin-button': {
+                                                WebkitAppearance: 'none',
+                                                margin: 0,
+                                            },
+                                        }}
+                                    />
+                                    <Button
+                                        variant="contained"
+                                        onClick={handleBudgetLimitSave}
+                                        disabled={!notifications.monthlyBudgetLimit}
+                                        sx={{ minWidth: 100 }}
+                                    >
+                                        Zapisz
+                                    </Button>
+                                </Box>
+                            </Box>
+
+                            {notifications.monthlyBudgetLimit && (
+                                <Box>
+                                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
+                                        Ostrzegaj przy: {notifications.budgetAlertThreshold}% budżetu
+                                    </Typography>
+                                    <Slider
+                                        value={notifications.budgetAlertThreshold}
+                                        onChange={handleThresholdChange}
+                                        min={70}
+                                        max={100}
+                                        step={10}
+                                        marks={[
+                                            { value: 70, label: '70%' },
+                                            { value: 80, label: '80%' },
+                                            { value: 90, label: '90%' },
+                                            { value: 100, label: '100%' },
+                                        ]}
+                                        valueLabelDisplay="auto"
+                                        valueLabelFormat={(value) => `${value}%`}
+                                    />
+                                </Box>
+                            )}
+                        </Box>
+                    )}
+
                     <Divider />
 
                     {/* Przypomnienia o celach */}
@@ -586,11 +773,59 @@ const UstawieniaSection = () => {
                             color="primary"
                         />
                     </Box>
+
+                    {/* Goal reminder settings - visible when goalReminders is enabled */}
+                    {notifications.goalReminders && (
+                        <Box sx={{ pl: 2, pr: 2, pb: 2 }}>
+                            <Box sx={{ mb: 3 }}>
+                                <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
+                                    Przypominaj przed zakończeniem celu: {notifications.goalReminderDeadlineDays} {notifications.goalReminderDeadlineDays === 1 ? 'dzień' : 'dni'}
+                                </Typography>
+                                <Slider
+                                    value={notifications.goalReminderDeadlineDays}
+                                    onChange={handleDeadlineDaysChange}
+                                    min={7}
+                                    max={60}
+                                    step={null}
+                                    marks={[
+                                        { value: 7, label: '7' },
+                                        { value: 14, label: '14' },
+                                        { value: 30, label: '30' },
+                                        { value: 60, label: '60' },
+                                    ]}
+                                    valueLabelDisplay="auto"
+                                    valueLabelFormat={(value) => `${value} dni`}
+                                />
+                            </Box>
+
+                            <Box>
+                                <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
+                                    Przypominaj o braku aktywności co: {notifications.goalReminderInactivityDays} {notifications.goalReminderInactivityDays === 1 ? 'dzień' : 'dni'}
+                                </Typography>
+                                <Slider
+                                    value={notifications.goalReminderInactivityDays}
+                                    onChange={handleInactivityDaysChange}
+                                    min={7}
+                                    max={60}
+                                    step={null}
+                                    marks={[
+                                        { value: 7, label: '7' },
+                                        { value: 14, label: '14' },
+                                        { value: 30, label: '30' },
+                                        { value: 60, label: '60' },
+                                    ]}
+                                    valueLabelDisplay="auto"
+                                    valueLabelFormat={(value) => `${value} dni`}
+                                />
+                            </Box>
+                        </Box>
+                    )}
                 </Box>
             </Card>
 
             {/* Wygląd */}
             <Card
+                id="settings-appearance"
                 sx={{
                     background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
                     backdropFilter: 'blur(10px)',
@@ -599,6 +834,7 @@ const UstawieniaSection = () => {
                     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                     p: 3,
                     mb: 3,
+                    scrollMarginTop: '100px',
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     '&:hover': {
                         transform: 'none',
@@ -630,11 +866,11 @@ const UstawieniaSection = () => {
                             Motyw ciemny
                         </Typography>
                         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                            Przełącz na motyw jasny
+                            {userMode === 'dark' ? 'Przełącz na motyw jasny' : 'Przełącz na motyw ciemny'}
                         </Typography>
                     </Box>
                     <Switch
-                        checked={darkMode}
+                        checked={userMode === 'dark'}
                         onChange={handleThemeChange}
                         color="primary"
                     />
@@ -643,6 +879,7 @@ const UstawieniaSection = () => {
 
             {/* Dane i prywatność */}
             <Card
+                id="settings-privacy"
                 sx={{
                     background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
                     backdropFilter: 'blur(10px)',
@@ -651,6 +888,7 @@ const UstawieniaSection = () => {
                     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                     p: 3,
                     mb: 3,
+                    scrollMarginTop: '100px',
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     '&:hover': {
                         transform: 'none',
@@ -777,6 +1015,20 @@ const UstawieniaSection = () => {
             <Dialog
                 open={deleteDialog.open}
                 onClose={() => setDeleteDialog({ open: false, password: '' })}
+                PaperProps={{
+                    sx: {
+                        background: userMode === 'dark'
+                            ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
+                        backdropFilter: 'blur(20px)',
+                        WebkitBackdropFilter: 'blur(20px)',
+                        border: '1px solid',
+                        borderColor: userMode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                        boxShadow: userMode === 'dark'
+                            ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                            : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
+                    }
+                }}
             >
                 <DialogTitle>Usuń konto</DialogTitle>
                 <DialogContent>

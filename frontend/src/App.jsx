@@ -1,6 +1,6 @@
 // src/App.jsx
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { Box } from '@mui/material';
 import LandingPage from './views/LandingPage';
 import SignInPage from './views/SignInPage';
@@ -17,7 +17,7 @@ import ScrollToTopOnRouteChange from './components/common/ScrollToTopOnRouteChan
 
 function App() {
     return (
-        <Router>
+        <>
             <ScrollToTopOnRouteChange />
             <Box
                 sx={{
@@ -51,7 +51,7 @@ function App() {
 
                 </Routes>
             </Box>
-        </Router>
+        </>
     );
 }
 

@@ -369,6 +369,8 @@ const analysisRouter = require('./routes/analysis');
 console.log('✓ Analysis router loaded');
 const userRouter = require('./routes/user');
 console.log('✓ User router loaded');
+const notificationsRouter = require('./routes/notifications');
+console.log('✓ Notifications router loaded');
 
 console.log('Registering routes...');
 app.use('/api/categories', categoriesRouter);
@@ -385,6 +387,8 @@ app.use('/api/analysis', analysisRouter);
 console.log('✓ Registered /api/analysis');
 app.use('/api/user', userRouter);
 console.log('✓ Registered /api/user');
+app.use('/api/notifications', notificationsRouter);
+console.log('✓ Registered /api/notifications');
 console.log('All routes registered successfully!');
 
 const PORT = process.env.PORT || 4000;
