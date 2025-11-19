@@ -63,6 +63,8 @@ const UstawieniaSection = ({ scrollToSection, onScrollComplete }) => {
         goalReminders: false,
         monthlyBudgetLimit: null,
         budgetAlertThreshold: 80,
+        goalReminderDeadlineDays: 7,
+        goalReminderInactivityDays: 14,
     });
 
     // Stan dla komunikatów
@@ -116,6 +118,8 @@ const UstawieniaSection = ({ scrollToSection, onScrollComplete }) => {
                 goalReminders: settings.goalReminders || false,
                 monthlyBudgetLimit: settings.monthlyBudgetLimit || null,
                 budgetAlertThreshold: settings.budgetAlertThreshold || 80,
+                goalReminderDeadlineDays: settings.goalReminderDeadlineDays || 7,
+                goalReminderInactivityDays: settings.goalReminderInactivityDays || 14,
             });
         } catch (error) {
             console.error('Błąd ładowania ustawień powiadomień:', error);
@@ -297,6 +301,40 @@ const UstawieniaSection = ({ scrollToSection, onScrollComplete }) => {
             });
         } catch (error) {
             console.error('Error updating threshold:', error);
+        }
+    };
+
+    // Obsługa zmiany dni przypomnienia o deadline
+    const handleDeadlineDaysChange = async (event, newValue) => {
+        setNotifications({
+            ...notifications,
+            goalReminderDeadlineDays: newValue,
+        });
+
+        try {
+            await updateNotificationSettings({
+                ...notifications,
+                goalReminderDeadlineDays: newValue,
+            });
+        } catch (error) {
+            console.error('Error updating deadline days:', error);
+        }
+    };
+
+    // Obsługa zmiany dni przypomnienia o braku aktywności
+    const handleInactivityDaysChange = async (event, newValue) => {
+        setNotifications({
+            ...notifications,
+            goalReminderInactivityDays: newValue,
+        });
+
+        try {
+            await updateNotificationSettings({
+                ...notifications,
+                goalReminderInactivityDays: newValue,
+            });
+        } catch (error) {
+            console.error('Error updating inactivity days:', error);
         }
     };
 
@@ -735,6 +773,53 @@ const UstawieniaSection = ({ scrollToSection, onScrollComplete }) => {
                             color="primary"
                         />
                     </Box>
+
+                    {/* Goal reminder settings - visible when goalReminders is enabled */}
+                    {notifications.goalReminders && (
+                        <Box sx={{ pl: 2, pr: 2, pb: 2 }}>
+                            <Box sx={{ mb: 3 }}>
+                                <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
+                                    Przypominaj przed zakończeniem celu: {notifications.goalReminderDeadlineDays} {notifications.goalReminderDeadlineDays === 1 ? 'dzień' : 'dni'}
+                                </Typography>
+                                <Slider
+                                    value={notifications.goalReminderDeadlineDays}
+                                    onChange={handleDeadlineDaysChange}
+                                    min={7}
+                                    max={60}
+                                    step={null}
+                                    marks={[
+                                        { value: 7, label: '7' },
+                                        { value: 14, label: '14' },
+                                        { value: 30, label: '30' },
+                                        { value: 60, label: '60' },
+                                    ]}
+                                    valueLabelDisplay="auto"
+                                    valueLabelFormat={(value) => `${value} dni`}
+                                />
+                            </Box>
+
+                            <Box>
+                                <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
+                                    Przypominaj o braku aktywności co: {notifications.goalReminderInactivityDays} {notifications.goalReminderInactivityDays === 1 ? 'dzień' : 'dni'}
+                                </Typography>
+                                <Slider
+                                    value={notifications.goalReminderInactivityDays}
+                                    onChange={handleInactivityDaysChange}
+                                    min={7}
+                                    max={60}
+                                    step={null}
+                                    marks={[
+                                        { value: 7, label: '7' },
+                                        { value: 14, label: '14' },
+                                        { value: 30, label: '30' },
+                                        { value: 60, label: '60' },
+                                    ]}
+                                    valueLabelDisplay="auto"
+                                    valueLabelFormat={(value) => `${value} dni`}
+                                />
+                            </Box>
+                        </Box>
+                    )}
                 </Box>
             </Card>
 

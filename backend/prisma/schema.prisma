@@ -71,17 +71,18 @@ model Income {
 }
 
 model Goal {
-  id            Int                @id @default(autoincrement())
-  userId        Int
-  name          String
-  targetAmount  Float
-  currentAmount Float              @default(0)
-  dueDate       DateTime
-  description   String?
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
-  contributions GoalContribution[]
-  user          Account            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                    Int                @id @default(autoincrement())
+  userId                Int
+  name                  String
+  targetAmount          Float
+  currentAmount         Float              @default(0)
+  dueDate               DateTime
+  description           String?
+  deadlineReminderSent  Boolean            @default(false)
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+  contributions         GoalContribution[]
+  user                  Account            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId], map: "goals_userId_fkey")
   @@map("goals")
@@ -99,15 +100,17 @@ model GoalContribution {
 }
 
 model UserSettings {
-  id                   Int      @id @default(autoincrement())
-  userId               Int      @unique
-  budgetAlerts         Boolean  @default(true)
-  goalReminders        Boolean  @default(false)
-  monthlyBudgetLimit   Float?
-  budgetAlertThreshold Int      @default(80)
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
-  user                 Account  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                          Int      @id @default(autoincrement())
+  userId                      Int      @unique
+  budgetAlerts                Boolean  @default(true)
+  goalReminders               Boolean  @default(false)
+  monthlyBudgetLimit          Float?
+  budgetAlertThreshold        Int      @default(80)
+  goalReminderDeadlineDays    Int      @default(7)
+  goalReminderInactivityDays  Int      @default(14)
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @updatedAt
+  user                        Account  @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_settings")
 }

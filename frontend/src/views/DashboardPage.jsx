@@ -1,5 +1,5 @@
 // src/views/DashboardPage.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Box,
     Drawer,
@@ -35,7 +35,7 @@ import SecurityIcon from '@mui/icons-material/Security';
 import Badge from '@mui/material/Badge';
 import { useNavigate } from 'react-router-dom';
 import { getUser, logout } from '../api/auth';
-import { getNotifications } from '../api/notifications';
+import { getNotifications, checkGoalReminders } from '../api/notifications';
 
 // Import dashboard sections
 import PulpitSection from '../components/dashboard/PulpitSection';
@@ -58,6 +58,7 @@ const DashboardPage = () => {
     const [avatarMenuAnchor, setAvatarMenuAnchor] = useState(null);
     const [settingsScrollTo, setSettingsScrollTo] = useState(null);
     const navigate = useNavigate();
+    const hasCheckedReminders = useRef(false);
 
     useEffect(() => {
         // Pobierz dane użytkownika z localStorage
@@ -68,6 +69,14 @@ const DashboardPage = () => {
 
         // Pobierz liczbę nieprzeczytanych powiadomień
         fetchUnreadCount();
+
+        // Sprawdź przypomnienia o celach tylko raz
+        if (!hasCheckedReminders.current) {
+            hasCheckedReminders.current = true;
+            checkGoalReminders().catch(error => {
+                console.error('Error checking goal reminders:', error);
+            });
+        }
     }, []);
 
     const fetchUnreadCount = async () => {
@@ -77,6 +86,17 @@ const DashboardPage = () => {
         } catch (error) {
             console.error('Error fetching unread count:', error);
         }
+    };
+
+    const handleGoalChange = async () => {
+        // Check for new goal reminders
+        try {
+            await checkGoalReminders();
+        } catch (error) {
+            console.error('Error checking goal reminders:', error);
+        }
+        // Refresh unread count
+        await fetchUnreadCount();
     };
 
     const handleDrawerToggle = () => {
@@ -168,7 +188,7 @@ const DashboardPage = () => {
             case 'budzet':
                 return <BudzetSection />;
             case 'cele':
-                return <CeleSection onGoalChange={fetchUnreadCount} />;
+                return <CeleSection onGoalChange={handleGoalChange} />;
             case 'analizy':
                 return <AnalizySection />;
             case 'powiadomienia':

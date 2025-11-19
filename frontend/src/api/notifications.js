@@ -121,3 +121,26 @@ export const deleteAllNotifications = async () => {
 
   return response.json();
 };
+
+// Check and create goal reminders
+export const checkGoalReminders = async () => {
+  const token = getToken();
+  if (!token) {
+    throw new Error('Brak tokenu autoryzacji');
+  }
+
+  const response = await fetch(`${BASE_URL}/api/notifications/check-goal-reminders`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Nie udało się sprawdzić przypomnień');
+  }
+
+  return response.json();
+};

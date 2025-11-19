@@ -22,7 +22,9 @@ const UpdateNotificationsSchema = z.object({
   budgetAlerts: z.boolean(),
   goalReminders: z.boolean(),
   monthlyBudgetLimit: z.number().positive().nullable().optional(),
-  budgetAlertThreshold: z.number().int().min(1).max(100).optional()
+  budgetAlertThreshold: z.number().int().min(1).max(100).optional(),
+  goalReminderDeadlineDays: z.number().int().optional(),
+  goalReminderInactivityDays: z.number().int().optional()
 });
 
 const DeleteAccountSchema = z.object({
@@ -146,7 +148,9 @@ router.get('/notifications', authenticateToken, async (req, res) => {
         budgetAlerts: true,
         goalReminders: true,
         monthlyBudgetLimit: true,
-        budgetAlertThreshold: true
+        budgetAlertThreshold: true,
+        goalReminderDeadlineDays: true,
+        goalReminderInactivityDays: true
       }
     });
 
@@ -157,13 +161,17 @@ router.get('/notifications', authenticateToken, async (req, res) => {
           userId: req.user.id,
           budgetAlerts: false,
           goalReminders: false,
-          budgetAlertThreshold: 80
+          budgetAlertThreshold: 80,
+          goalReminderDeadlineDays: 7,
+          goalReminderInactivityDays: 14
         },
         select: {
           budgetAlerts: true,
           goalReminders: true,
           monthlyBudgetLimit: true,
-          budgetAlertThreshold: true
+          budgetAlertThreshold: true,
+          goalReminderDeadlineDays: true,
+          goalReminderInactivityDays: true
         }
       });
     }
@@ -178,7 +186,7 @@ router.get('/notifications', authenticateToken, async (req, res) => {
 // PUT /api/user/notifications - Update notification settings
 router.put('/notifications', authenticateToken, async (req, res) => {
   try {
-    const { budgetAlerts, goalReminders, monthlyBudgetLimit, budgetAlertThreshold } = UpdateNotificationsSchema.parse(req.body);
+    const { budgetAlerts, goalReminders, monthlyBudgetLimit, budgetAlertThreshold, goalReminderDeadlineDays, goalReminderInactivityDays } = UpdateNotificationsSchema.parse(req.body);
 
     // Prepare update data
     const updateData = {
@@ -193,6 +201,12 @@ router.put('/notifications', authenticateToken, async (req, res) => {
     if (budgetAlertThreshold !== undefined) {
       updateData.budgetAlertThreshold = budgetAlertThreshold;
     }
+    if (goalReminderDeadlineDays !== undefined) {
+      updateData.goalReminderDeadlineDays = goalReminderDeadlineDays;
+    }
+    if (goalReminderInactivityDays !== undefined) {
+      updateData.goalReminderInactivityDays = goalReminderInactivityDays;
+    }
 
     // Upsert (update or create) settings
     const settings = await prisma.userSettings.upsert({
@@ -206,7 +220,9 @@ router.put('/notifications', authenticateToken, async (req, res) => {
         budgetAlerts: true,
         goalReminders: true,
         monthlyBudgetLimit: true,
-        budgetAlertThreshold: true
+        budgetAlertThreshold: true,
+        goalReminderDeadlineDays: true,
+        goalReminderInactivityDays: true
       }
     });
 
