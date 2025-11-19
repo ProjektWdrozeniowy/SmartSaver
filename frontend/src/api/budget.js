@@ -141,3 +141,28 @@ export async function getBudgetSummary(month = null) {
 
   return data;
 }
+
+/**
+ * Sprawdza i tworzy cykliczne przychody
+ * POST /api/budget/income/check-recurring
+ */
+export async function checkRecurringIncomes() {
+  const token = getToken();
+  if (!token) {
+    throw new Error('Brak tokenu autoryzacji');
+  }
+
+  const url = `${BASE_URL}/api/budget/income/check-recurring`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data?.message || `Błąd ${res.status}`);
+
+  return data;
+}

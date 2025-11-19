@@ -779,79 +779,140 @@ const WydatkiSection = ({ onExpenseChange }) => {
                             rows={3}
                         />
 
-                        {/* Recurring expense options */}
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    checked={expenseForm.isRecurring}
-                                    onChange={(e) => setExpenseForm({ ...expenseForm, isRecurring: e.target.checked })}
-                                />
-                            }
-                            label="Wydatek cykliczny"
-                        />
+                        {/* Recurring Expense Section */}
+                        <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={expenseForm.isRecurring}
+                                        onChange={(e) => setExpenseForm({ ...expenseForm, isRecurring: e.target.checked })}
+                                        sx={{
+                                            color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
+                                            '&.Mui-checked': {
+                                                color: '#66bb6a',
+                                            },
+                                        }}
+                                    />
+                                }
+                                label="Wydatek cykliczny"
+                            />
 
-                        {expenseForm.isRecurring && (
-                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pl: 4 }}>
-                                <Grid container spacing={2}>
-                                    <Grid item xs={6}>
-                                        <TextField
-                                            label="Powtarzaj co"
-                                            type="number"
-                                            value={expenseForm.recurringInterval}
-                                            onChange={(e) => setExpenseForm({ ...expenseForm, recurringInterval: e.target.value })}
-                                            fullWidth
-                                            inputProps={{ min: '1', step: '1' }}
-                                            sx={{
-                                                '& input[type=number]::-webkit-inner-spin-button, & input[type=number]::-webkit-outer-spin-button': {
-                                                    opacity: mode === 'dark' ? 0.7 : 1,
-                                                    filter: mode === 'dark' ? 'invert(1)' : 'none',
-                                                },
-                                            }}
-                                        />
+                            {expenseForm.isRecurring && (
+                                <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                    <Grid container spacing={2}>
+                                        <Grid item xs={6}>
+                                            <TextField
+                                                label="Powtarzaj co"
+                                                type="number"
+                                                value={expenseForm.recurringInterval}
+                                                onChange={(e) => setExpenseForm({ ...expenseForm, recurringInterval: parseInt(e.target.value) || 1 })}
+                                                fullWidth
+                                                inputProps={{ min: 1 }}
+                                                sx={{
+                                                    '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
+                                                        WebkitAppearance: 'auto',
+                                                        filter: mode === 'dark' ? 'invert(1)' : 'none',
+                                                    },
+                                                }}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <FormControl fullWidth>
+                                                <InputLabel>Jednostka</InputLabel>
+                                                <Select
+                                                    value={expenseForm.recurringUnit}
+                                                    label="Jednostka"
+                                                    onChange={(e) => setExpenseForm({ ...expenseForm, recurringUnit: e.target.value })}
+                                                >
+                                                    <MenuItem value="day">dzień</MenuItem>
+                                                    <MenuItem value="week">tydzień</MenuItem>
+                                                    <MenuItem value="month">miesiąc</MenuItem>
+                                                    <MenuItem value="year">rok</MenuItem>
+                                                </Select>
+                                            </FormControl>
+                                        </Grid>
                                     </Grid>
-                                    <Grid item xs={6}>
-                                        <FormControl fullWidth>
-                                            <InputLabel>Jednostka</InputLabel>
-                                            <Select
-                                                value={expenseForm.recurringUnit}
-                                                label="Jednostka"
-                                                onChange={(e) => setExpenseForm({ ...expenseForm, recurringUnit: e.target.value })}
-                                            >
-                                                <MenuItem value="day">dzień</MenuItem>
-                                                <MenuItem value="week">tydzień</MenuItem>
-                                                <MenuItem value="month">miesiąc</MenuItem>
-                                                <MenuItem value="year">rok</MenuItem>
-                                            </Select>
-                                        </FormControl>
-                                    </Grid>
-                                </Grid>
 
-                                <FormControlLabel
-                                    control={
-                                        <Switch
-                                            checked={!expenseForm.hasEndDate}
-                                            onChange={(e) => setExpenseForm({ ...expenseForm, hasEndDate: !e.target.checked })}
-                                        />
-                                    }
-                                    label="Do odwołania"
-                                />
+                                    <FormControlLabel
+                                        control={
+                                            <Switch
+                                                checked={!expenseForm.hasEndDate}
+                                                onChange={(e) => setExpenseForm({ ...expenseForm, hasEndDate: !e.target.checked })}
+                                                sx={{
+                                                    '& .MuiSwitch-switchBase.Mui-checked': {
+                                                        color: '#66bb6a',
+                                                    },
+                                                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                                        backgroundColor: '#66bb6a',
+                                                    },
+                                                }}
+                                            />
+                                        }
+                                        label="Do odwołania"
+                                    />
 
-                                {expenseForm.hasEndDate && (
-                                    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
-                                        <DatePicker
-                                            label="Data zakończenia"
-                                            value={expenseForm.recurringEndDate ? dayjs(expenseForm.recurringEndDate) : null}
-                                            onChange={(newValue) => setExpenseForm({ ...expenseForm, recurringEndDate: newValue ? newValue.format('YYYY-MM-DD') : '' })}
-                                            slotProps={{
-                                                textField: {
-                                                    fullWidth: true,
-                                                },
-                                            }}
-                                        />
-                                    </LocalizationProvider>
-                                )}
-                            </Box>
-                        )}
+                                    {expenseForm.hasEndDate && (
+                                        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
+                                            <DatePicker
+                                                label="Data zakończenia"
+                                                value={expenseForm.recurringEndDate ? dayjs(expenseForm.recurringEndDate) : null}
+                                                onChange={(newValue) => setExpenseForm({ ...expenseForm, recurringEndDate: newValue ? newValue.format('YYYY-MM-DD') : '' })}
+                                                minDate={dayjs(expenseForm.date).add(1, 'day')}
+                                                slotProps={{
+                                                    textField: {
+                                                        fullWidth: true,
+                                                    },
+                                                    popper: {
+                                                        sx: {
+                                                            '& .MuiPaper-root': {
+                                                                background: mode === 'dark'
+                                                                    ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                                                                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
+                                                                backdropFilter: 'blur(20px)',
+                                                                WebkitBackdropFilter: 'blur(20px)',
+                                                                border: '1px solid',
+                                                                borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                                                                boxShadow: mode === 'dark'
+                                                                    ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                                                                    : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
+                                                            },
+                                                            '& .MuiPickersCalendarHeader-root': {
+                                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
+                                                            },
+                                                            '& .MuiPickersCalendarHeader-label': {
+                                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
+                                                            },
+                                                            '& .MuiPickersDay-root': {
+                                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
+                                                                '&:hover': {
+                                                                    backgroundColor: 'rgba(168, 230, 207, 0.2)',
+                                                                },
+                                                                '&.Mui-selected': {
+                                                                    backgroundColor: '#66bb6a',
+                                                                    color: '#000000',
+                                                                    '&:hover': {
+                                                                        backgroundColor: '#84dcc6',
+                                                                    },
+                                                                },
+                                                            },
+                                                            '& .MuiPickersDay-today': {
+                                                                border: '1px solid #66bb6a',
+                                                            },
+                                                            '& .MuiDayCalendar-weekDayLabel': {
+                                                                color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
+                                                            },
+                                                            '& .MuiIconButton-root': {
+                                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
+                                                            },
+                                                        },
+                                                    },
+                                                }}
+                                            />
+                                        </LocalizationProvider>
+                                    )}
+                                </Box>
+                            )}
+                        </Box>
                     </Box>
                 </DialogContent>
                 <DialogActions>

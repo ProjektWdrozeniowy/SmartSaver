@@ -64,17 +64,25 @@ model Expense {
 }
 
 model Income {
-  id          Int      @id @default(autoincrement())
-  userId      Int
-  name        String
-  amount      Float
-  date        DateTime
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  user        Account  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                Int      @id @default(autoincrement())
+  userId            Int
+  name              String
+  amount            Float
+  date              DateTime
+  description       String?
+  isRecurring       Boolean  @default(false)
+  recurringInterval Int?
+  recurringUnit     String?
+  recurringEndDate  DateTime?
+  parentIncomeId    Int?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              Account  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parentIncome      Income?  @relation("RecurringIncomes", fields: [parentIncomeId], references: [id], onDelete: Cascade)
+  childIncomes      Income[] @relation("RecurringIncomes")
 
   @@index([userId], map: "incomes_userId_fkey")
+  @@index([parentIncomeId], map: "incomes_parentIncomeId_fkey")
   @@map("incomes")
 }
 

@@ -27,6 +27,10 @@ import {
     Alert,
     Snackbar,
     LinearProgress,
+    Checkbox,
+    FormControlLabel,
+    Switch,
+    Grid,
 } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -76,6 +80,11 @@ const BudzetSection = () => {
         amount: '',
         date: new Date().toISOString().split('T')[0],
         description: '',
+        isRecurring: false,
+        recurringInterval: 1,
+        recurringUnit: 'month',
+        recurringEndDate: '',
+        hasEndDate: false,
     });
 
     // Fetch data on mount and when month changes
@@ -158,6 +167,11 @@ const BudzetSection = () => {
             amount: '',
             date: new Date().toISOString().split('T')[0],
             description: '',
+            isRecurring: false,
+            recurringInterval: 1,
+            recurringUnit: 'month',
+            recurringEndDate: '',
+            hasEndDate: false,
         });
         setOpenIncomeDialog(true);
     };
@@ -165,11 +179,18 @@ const BudzetSection = () => {
     // Handle edit income
     const handleEditIncome = (income) => {
         setEditingIncome(income);
+        // If income has parentIncomeId, it's part of a recurring series
+        const isPartOfRecurringSeries = income.isRecurring || !!income.parentIncomeId;
         setIncomeForm({
             name: income.name,
             amount: income.amount,
             date: income.date.split('T')[0], // Convert ISO string to YYYY-MM-DD format
             description: income.description || '',
+            isRecurring: isPartOfRecurringSeries,
+            recurringInterval: income.recurringInterval || 1,
+            recurringUnit: income.recurringUnit || 'month',
+            recurringEndDate: income.recurringEndDate ? income.recurringEndDate.split('T')[0] : '',
+            hasEndDate: !!income.recurringEndDate,
         });
         setOpenIncomeDialog(true);
     };
@@ -183,6 +204,10 @@ const BudzetSection = () => {
                 amount: parseFloat(incomeForm.amount),
                 date: incomeForm.date,
                 description: incomeForm.description,
+                isRecurring: incomeForm.isRecurring,
+                recurringInterval: incomeForm.isRecurring ? incomeForm.recurringInterval : null,
+                recurringUnit: incomeForm.isRecurring ? incomeForm.recurringUnit : null,
+                recurringEndDate: incomeForm.isRecurring && incomeForm.hasEndDate ? incomeForm.recurringEndDate : null,
             };
 
             if (editingIncome) {
@@ -711,7 +736,24 @@ const BudzetSection = () => {
                 <DialogTitle>
                     {editingIncome ? 'Edytuj przychód' : 'Dodaj przychód'}
                 </DialogTitle>
-                <DialogContent>
+                <DialogContent
+                    sx={{
+                        '&::-webkit-scrollbar': {
+                            width: '8px',
+                        },
+                        '&::-webkit-scrollbar-track': {
+                            background: mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
+                            borderRadius: '4px',
+                        },
+                        '&::-webkit-scrollbar-thumb': {
+                            background: mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
+                            borderRadius: '4px',
+                            '&:hover': {
+                                background: mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+                            },
+                        },
+                    }}
+                >
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2 }}>
                         <TextField
                             label="Nazwa przychodu"
@@ -808,6 +850,141 @@ const BudzetSection = () => {
                             rows={3}
                             placeholder="Dodatkowe informacje o przychodzie"
                         />
+
+                        {/* Recurring Income Section */}
+                        <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={incomeForm.isRecurring}
+                                        onChange={(e) => setIncomeForm({ ...incomeForm, isRecurring: e.target.checked })}
+                                        sx={{
+                                            color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
+                                            '&.Mui-checked': {
+                                                color: '#66bb6a',
+                                            },
+                                        }}
+                                    />
+                                }
+                                label="Przychód cykliczny"
+                            />
+
+                            {incomeForm.isRecurring && (
+                                <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                    <Grid container spacing={2}>
+                                        <Grid item xs={6}>
+                                            <TextField
+                                                label="Powtarzaj co"
+                                                type="number"
+                                                value={incomeForm.recurringInterval}
+                                                onChange={(e) => setIncomeForm({ ...incomeForm, recurringInterval: parseInt(e.target.value) || 1 })}
+                                                fullWidth
+                                                inputProps={{ min: 1 }}
+                                                sx={{
+                                                    '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
+                                                        WebkitAppearance: 'auto',
+                                                        filter: mode === 'dark' ? 'invert(1)' : 'none',
+                                                    },
+                                                }}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <FormControl fullWidth>
+                                                <InputLabel>Jednostka</InputLabel>
+                                                <Select
+                                                    value={incomeForm.recurringUnit}
+                                                    label="Jednostka"
+                                                    onChange={(e) => setIncomeForm({ ...incomeForm, recurringUnit: e.target.value })}
+                                                >
+                                                    <MenuItem value="day">dzień</MenuItem>
+                                                    <MenuItem value="week">tydzień</MenuItem>
+                                                    <MenuItem value="month">miesiąc</MenuItem>
+                                                    <MenuItem value="year">rok</MenuItem>
+                                                </Select>
+                                            </FormControl>
+                                        </Grid>
+                                    </Grid>
+
+                                    <FormControlLabel
+                                        control={
+                                            <Switch
+                                                checked={!incomeForm.hasEndDate}
+                                                onChange={(e) => setIncomeForm({ ...incomeForm, hasEndDate: !e.target.checked })}
+                                                sx={{
+                                                    '& .MuiSwitch-switchBase.Mui-checked': {
+                                                        color: '#66bb6a',
+                                                    },
+                                                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                                        backgroundColor: '#66bb6a',
+                                                    },
+                                                }}
+                                            />
+                                        }
+                                        label="Do odwołania"
+                                    />
+
+                                    {incomeForm.hasEndDate && (
+                                        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
+                                            <DatePicker
+                                                label="Data zakończenia"
+                                                value={incomeForm.recurringEndDate ? dayjs(incomeForm.recurringEndDate) : null}
+                                                onChange={(newValue) => setIncomeForm({ ...incomeForm, recurringEndDate: newValue ? newValue.format('YYYY-MM-DD') : '' })}
+                                                minDate={dayjs(incomeForm.date).add(1, 'day')}
+                                                slotProps={{
+                                                    textField: {
+                                                        fullWidth: true,
+                                                    },
+                                                    popper: {
+                                                        sx: {
+                                                            '& .MuiPaper-root': {
+                                                                background: mode === 'dark'
+                                                                    ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                                                                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
+                                                                backdropFilter: 'blur(20px)',
+                                                                WebkitBackdropFilter: 'blur(20px)',
+                                                                border: '1px solid',
+                                                                borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                                                                boxShadow: mode === 'dark'
+                                                                    ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                                                                    : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
+                                                            },
+                                                            '& .MuiPickersCalendarHeader-root': {
+                                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
+                                                            },
+                                                            '& .MuiPickersCalendarHeader-label': {
+                                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
+                                                            },
+                                                            '& .MuiPickersDay-root': {
+                                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
+                                                                '&:hover': {
+                                                                    backgroundColor: 'rgba(168, 230, 207, 0.2)',
+                                                                },
+                                                                '&.Mui-selected': {
+                                                                    backgroundColor: '#66bb6a',
+                                                                    color: '#000000',
+                                                                    '&:hover': {
+                                                                        backgroundColor: '#84dcc6',
+                                                                    },
+                                                                },
+                                                            },
+                                                            '& .MuiPickersDay-today': {
+                                                                border: '1px solid #66bb6a',
+                                                            },
+                                                            '& .MuiDayCalendar-weekDayLabel': {
+                                                                color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
+                                                            },
+                                                            '& .MuiIconButton-root': {
+                                                                color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
+                                                            },
+                                                        },
+                                                    },
+                                                }}
+                                            />
+                                        </LocalizationProvider>
+                                    )}
+                                </Box>
+                            )}
+                        </Box>
                     </Box>
                 </DialogContent>
                 <DialogActions>
