@@ -217,9 +217,18 @@ router.get('/summary', authenticateToken, async (req, res) => {
       _sum: { amount: true }
     });
 
+    // Get total goal contributions (all time)
+    const totalGoalContributionsResult = await prisma.goalContribution.aggregate({
+      where: {
+        goal: { userId: req.user.id }
+      },
+      _sum: { amount: true }
+    });
+
     const totalIncome = incomesResult._sum.amount || 0;
     const totalExpenses = expensesResult._sum.amount || 0;
-    const balance = (totalIncomesResult._sum.amount || 0) - (totalExpensesResult._sum.amount || 0);
+    const totalGoalContributions = totalGoalContributionsResult._sum.amount || 0;
+    const balance = (totalIncomesResult._sum.amount || 0) - (totalExpensesResult._sum.amount || 0) - totalGoalContributions;
 
     res.json({
       totalIncome,

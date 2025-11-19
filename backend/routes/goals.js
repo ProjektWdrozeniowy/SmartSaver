@@ -154,6 +154,19 @@ router.put('/:id', authenticateToken, async (req, res) => {
       });
     }
 
+    // Calculate difference in currentAmount to adjust contributions
+    const amountDifference = currentAmount - goal.currentAmount;
+
+    // If currentAmount changed, create an adjustment contribution
+    if (amountDifference !== 0) {
+      await prisma.goalContribution.create({
+        data: {
+          goalId: goalId,
+          amount: amountDifference
+        }
+      });
+    }
+
     const updatedGoal = await prisma.goal.update({
       where: { id: goalId },
       data: {

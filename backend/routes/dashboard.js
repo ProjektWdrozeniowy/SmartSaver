@@ -69,7 +69,7 @@ router.get('/stats', authenticateToken, async (req, res) => {
         },
         _sum: { amount: true }
       }),
-      // Total balance (all time income - expenses)
+      // Total balance (all time income - expenses - goal contributions)
       prisma.$transaction([
         prisma.income.aggregate({
           where: { userId: req.user.id },
@@ -77,6 +77,12 @@ router.get('/stats', authenticateToken, async (req, res) => {
         }),
         prisma.expense.aggregate({
           where: { userId: req.user.id },
+          _sum: { amount: true }
+        }),
+        prisma.goalContribution.aggregate({
+          where: {
+            goal: { userId: req.user.id }
+          },
           _sum: { amount: true }
         })
       ]),
@@ -99,7 +105,7 @@ router.get('/stats', authenticateToken, async (req, res) => {
     const currentExpensesAmount = currentExpenses._sum.amount || 0;
     const previousIncomeAmount = previousIncome._sum.amount || 0;
     const previousExpensesAmount = previousExpenses._sum.amount || 0;
-    const balance = (totalBalance[0]._sum.amount || 0) - (totalBalance[1]._sum.amount || 0);
+    const balance = (totalBalance[0]._sum.amount || 0) - (totalBalance[1]._sum.amount || 0) - (totalBalance[2]._sum.amount || 0);
 
     // Calculate changes
     const incomeChange = calculateChange(currentIncomeAmount, previousIncomeAmount);
