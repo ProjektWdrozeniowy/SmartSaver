@@ -933,7 +933,7 @@ const WydatkiSection = ({ onExpenseChange }) => {
                 open={snackbar.open}
                 autoHideDuration={4000}
                 onClose={handleCloseSnackbar}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             >
                 <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
                     {snackbar.message}

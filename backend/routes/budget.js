@@ -48,7 +48,10 @@ router.get('/income', authenticateToken, async (req, res) => {
         date: true,
         description: true
       },
-      orderBy: { date: 'desc' }
+      orderBy: [
+        { date: 'desc' },
+        { id: 'desc' }
+      ]
     });
 
     res.json({ incomes });

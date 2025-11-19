@@ -204,6 +204,7 @@ router.get('/transactions', authenticateToken, async (req, res) => {
     const transactions = [
       ...expenses.map(e => ({
         id: e.id,
+        type: 'expense',
         title: e.name,
         category: e.category.name,
         amount: -e.amount, // Negative for expenses
@@ -212,6 +213,7 @@ router.get('/transactions', authenticateToken, async (req, res) => {
       })),
       ...incomes.map(i => ({
         id: i.id,
+        type: 'income',
         title: i.name,
         category: 'Przychód',
         amount: i.amount, // Positive for income
