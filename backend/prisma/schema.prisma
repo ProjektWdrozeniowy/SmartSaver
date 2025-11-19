@@ -38,20 +38,28 @@ model Category {
 }
 
 model Expense {
-  id          Int      @id @default(autoincrement())
-  userId      Int
-  categoryId  Int
-  name        String
-  amount      Float
-  date        DateTime
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  category    Category @relation(fields: [categoryId], references: [id])
-  user        Account  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                Int       @id @default(autoincrement())
+  userId            Int
+  categoryId        Int
+  name              String
+  amount            Float
+  date              DateTime
+  description       String?
+  isRecurring       Boolean   @default(false)
+  recurringInterval Int?
+  recurringUnit     String?
+  recurringEndDate  DateTime?
+  parentExpenseId   Int?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  category          Category  @relation(fields: [categoryId], references: [id])
+  user              Account   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parentExpense     Expense?  @relation("RecurringExpenses", fields: [parentExpenseId], references: [id], onDelete: Cascade)
+  childExpenses     Expense[] @relation("RecurringExpenses")
 
   @@index([categoryId], map: "expenses_categoryId_fkey")
   @@index([userId], map: "expenses_userId_fkey")
+  @@index([parentExpenseId], map: "expenses_parentExpenseId_fkey")
   @@map("expenses")
 }
 

@@ -113,3 +113,28 @@ export async function deleteExpense(id) {
 
   return data;
 }
+
+/**
+ * Sprawdza i tworzy cykliczne wydatki
+ * POST /api/expenses/check-recurring
+ */
+export async function checkRecurringExpenses() {
+  const token = getToken();
+  if (!token) {
+    throw new Error('Brak tokenu autoryzacji');
+  }
+
+  const url = `${BASE_URL}/api/expenses/check-recurring`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data?.message || `Błąd ${res.status}`);
+
+  return data;
+}

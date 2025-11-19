@@ -36,6 +36,7 @@ import Badge from '@mui/material/Badge';
 import { useNavigate } from 'react-router-dom';
 import { getUser, logout } from '../api/auth';
 import { getNotifications, checkGoalReminders } from '../api/notifications';
+import { checkRecurringExpenses } from '../api/expenses';
 
 // Import dashboard sections
 import PulpitSection from '../components/dashboard/PulpitSection';
@@ -70,11 +71,14 @@ const DashboardPage = () => {
         // Pobierz liczbę nieprzeczytanych powiadomień
         fetchUnreadCount();
 
-        // Sprawdź przypomnienia o celach tylko raz
+        // Sprawdź przypomnienia o celach i cykliczne wydatki tylko raz
         if (!hasCheckedReminders.current) {
             hasCheckedReminders.current = true;
             checkGoalReminders().catch(error => {
                 console.error('Error checking goal reminders:', error);
+            });
+            checkRecurringExpenses().catch(error => {
+                console.error('Error checking recurring expenses:', error);
             });
         }
     }, []);

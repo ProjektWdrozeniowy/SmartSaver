@@ -27,6 +27,10 @@ import {
     CircularProgress,
     Alert,
     Snackbar,
+    Checkbox,
+    Switch,
+    FormControlLabel,
+    Grid,
 } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -78,6 +82,11 @@ const WydatkiSection = ({ onExpenseChange }) => {
         date: new Date().toISOString().split('T')[0],
         description: '',
         amount: '',
+        isRecurring: false,
+        recurringInterval: 1,
+        recurringUnit: 'month',
+        recurringEndDate: '',
+        hasEndDate: false,
     });
 
     // Form state for new category
@@ -160,6 +169,11 @@ const WydatkiSection = ({ onExpenseChange }) => {
             date: new Date().toISOString().split('T')[0],
             description: '',
             amount: '',
+            isRecurring: false,
+            recurringInterval: 1,
+            recurringUnit: 'month',
+            recurringEndDate: '',
+            hasEndDate: false,
         });
         setOpenExpenseDialog(true);
     };
@@ -173,6 +187,11 @@ const WydatkiSection = ({ onExpenseChange }) => {
             date: expense.date.split('T')[0], // Convert ISO string to YYYY-MM-DD format
             description: expense.description || '',
             amount: expense.amount,
+            isRecurring: expense.isRecurring || false,
+            recurringInterval: expense.recurringInterval || 1,
+            recurringUnit: expense.recurringUnit || 'month',
+            recurringEndDate: expense.recurringEndDate ? expense.recurringEndDate.split('T')[0] : '',
+            hasEndDate: expense.recurringEndDate ? true : false,
         });
         setOpenExpenseDialog(true);
     };
@@ -187,6 +206,10 @@ const WydatkiSection = ({ onExpenseChange }) => {
                 date: expenseForm.date,
                 amount: parseFloat(expenseForm.amount),
                 description: expenseForm.description,
+                isRecurring: expenseForm.isRecurring,
+                recurringInterval: expenseForm.isRecurring ? parseInt(expenseForm.recurringInterval) : null,
+                recurringUnit: expenseForm.isRecurring ? expenseForm.recurringUnit : null,
+                recurringEndDate: expenseForm.isRecurring && expenseForm.hasEndDate ? expenseForm.recurringEndDate : null,
             };
 
             if (editingExpense) {
@@ -614,7 +637,24 @@ const WydatkiSection = ({ onExpenseChange }) => {
                 <DialogTitle>
                     {editingExpense ? 'Edytuj wydatek' : 'Dodaj wydatek'}
                 </DialogTitle>
-                <DialogContent>
+                <DialogContent
+                    sx={{
+                        '&::-webkit-scrollbar': {
+                            width: '8px',
+                        },
+                        '&::-webkit-scrollbar-track': {
+                            background: mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
+                            borderRadius: '10px',
+                        },
+                        '&::-webkit-scrollbar-thumb': {
+                            background: mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
+                            borderRadius: '10px',
+                            '&:hover': {
+                                background: mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+                            },
+                        },
+                    }}
+                >
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2 }}>
                         <TextField
                             label="Nazwa wydatku"
@@ -738,6 +778,80 @@ const WydatkiSection = ({ onExpenseChange }) => {
                             multiline
                             rows={3}
                         />
+
+                        {/* Recurring expense options */}
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={expenseForm.isRecurring}
+                                    onChange={(e) => setExpenseForm({ ...expenseForm, isRecurring: e.target.checked })}
+                                />
+                            }
+                            label="Wydatek cykliczny"
+                        />
+
+                        {expenseForm.isRecurring && (
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pl: 4 }}>
+                                <Grid container spacing={2}>
+                                    <Grid item xs={6}>
+                                        <TextField
+                                            label="Powtarzaj co"
+                                            type="number"
+                                            value={expenseForm.recurringInterval}
+                                            onChange={(e) => setExpenseForm({ ...expenseForm, recurringInterval: e.target.value })}
+                                            fullWidth
+                                            inputProps={{ min: '1', step: '1' }}
+                                            sx={{
+                                                '& input[type=number]::-webkit-inner-spin-button, & input[type=number]::-webkit-outer-spin-button': {
+                                                    opacity: mode === 'dark' ? 0.7 : 1,
+                                                    filter: mode === 'dark' ? 'invert(1)' : 'none',
+                                                },
+                                            }}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <FormControl fullWidth>
+                                            <InputLabel>Jednostka</InputLabel>
+                                            <Select
+                                                value={expenseForm.recurringUnit}
+                                                label="Jednostka"
+                                                onChange={(e) => setExpenseForm({ ...expenseForm, recurringUnit: e.target.value })}
+                                            >
+                                                <MenuItem value="day">dzień</MenuItem>
+                                                <MenuItem value="week">tydzień</MenuItem>
+                                                <MenuItem value="month">miesiąc</MenuItem>
+                                                <MenuItem value="year">rok</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                    </Grid>
+                                </Grid>
+
+                                <FormControlLabel
+                                    control={
+                                        <Switch
+                                            checked={!expenseForm.hasEndDate}
+                                            onChange={(e) => setExpenseForm({ ...expenseForm, hasEndDate: !e.target.checked })}
+                                        />
+                                    }
+                                    label="Do odwołania"
+                                />
+
+                                {expenseForm.hasEndDate && (
+                                    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
+                                        <DatePicker
+                                            label="Data zakończenia"
+                                            value={expenseForm.recurringEndDate ? dayjs(expenseForm.recurringEndDate) : null}
+                                            onChange={(newValue) => setExpenseForm({ ...expenseForm, recurringEndDate: newValue ? newValue.format('YYYY-MM-DD') : '' })}
+                                            slotProps={{
+                                                textField: {
+                                                    fullWidth: true,
+                                                },
+                                            }}
+                                        />
+                                    </LocalizationProvider>
+                                )}
+                            </Box>
+                        )}
                     </Box>
                 </DialogContent>
                 <DialogActions>
