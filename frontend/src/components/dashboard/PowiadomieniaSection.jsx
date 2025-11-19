@@ -313,12 +313,16 @@ const PowiadomieniaSection = ({ onNotificationChange }) => {
                                         backgroundColor: notification.isRead
                                             ? 'transparent'
                                             : mode === 'dark'
-                                                ? 'rgba(255, 255, 255, 0.03)'
-                                                : 'rgba(0, 0, 0, 0.02)',
+                                                ? 'rgba(244, 67, 54, 0.08)'
+                                                : 'rgba(244, 67, 54, 0.06)',
                                         '&:hover': {
-                                            backgroundColor: mode === 'dark'
-                                                ? 'rgba(255, 255, 255, 0.05)'
-                                                : 'rgba(0, 0, 0, 0.03)',
+                                            backgroundColor: notification.isRead
+                                                ? mode === 'dark'
+                                                    ? 'rgba(255, 255, 255, 0.05)'
+                                                    : 'rgba(0, 0, 0, 0.03)'
+                                                : mode === 'dark'
+                                                    ? 'rgba(244, 67, 54, 0.12)'
+                                                    : 'rgba(244, 67, 54, 0.09)',
                                         },
                                         transition: 'background-color 0.2s',
                                     }}
