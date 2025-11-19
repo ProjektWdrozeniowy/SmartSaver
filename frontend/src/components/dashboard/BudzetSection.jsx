@@ -31,6 +31,8 @@ import {
     FormControlLabel,
     Switch,
     Grid,
+    useMediaQuery,
+    useTheme,
 } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -50,6 +52,8 @@ import { useThemeMode } from '../../context/ThemeContext';
 
 const BudzetSection = () => {
     const { mode } = useThemeMode();
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     // Data states
     const [incomes, setIncomes] = useState([]);
@@ -649,67 +653,161 @@ const BudzetSection = () => {
                     },
                 }}
             >
-                <TableContainer>
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell sx={{ fontWeight: 600, color: 'text.primary' }}>Nazwa</TableCell>
-                                <TableCell sx={{ fontWeight: 600, color: 'text.primary' }}>Data</TableCell>
-                                <TableCell sx={{ fontWeight: 600, color: 'text.primary' }}>Opis</TableCell>
-                                <TableCell align="right" sx={{ fontWeight: 600, color: 'text.primary' }}>Kwota</TableCell>
-                                <TableCell align="center" sx={{ fontWeight: 600, color: 'text.primary' }}>Akcje</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {loading ? (
+                {isMobile ? (
+                    // Mobile Card Layout
+                    <Box sx={{ p: 2 }}>
+                        {loading ? (
+                            <Box sx={{ textAlign: 'center', py: 4 }}>
+                                <CircularProgress />
+                            </Box>
+                        ) : incomes.length === 0 ? (
+                            <Box sx={{ textAlign: 'center', py: 4 }}>
+                                <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                                    Brak przychodów do wyświetlenia
+                                </Typography>
+                            </Box>
+                        ) : (
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                {incomes.map((income) => (
+                                    <Card
+                                        key={income.id}
+                                        sx={{
+                                            background: mode === 'dark'
+                                                ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))'
+                                                : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(245, 245, 245, 0.9))',
+                                            backdropFilter: 'blur(10px)',
+                                            WebkitBackdropFilter: 'blur(10px)',
+                                            border: '1px solid',
+                                            borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                                            boxShadow: mode === 'dark'
+                                                ? '0 2px 8px rgba(0, 0, 0, 0.3)'
+                                                : '0 2px 8px rgba(0, 0, 0, 0.08)',
+                                            transition: 'all 0.2s',
+                                            '&:hover': {
+                                                transform: 'translateY(-2px)',
+                                                boxShadow: mode === 'dark'
+                                                    ? '0 4px 12px rgba(0, 0, 0, 0.4)'
+                                                    : '0 4px 12px rgba(0, 0, 0, 0.12)',
+                                            },
+                                        }}
+                                    >
+                                        <CardContent>
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                                                <Box sx={{ flex: 1 }}>
+                                                    <Typography variant="h6" sx={{ color: 'text.primary', fontWeight: 600, mb: 0.5 }}>
+                                                        {income.name}
+                                                    </Typography>
+                                                    <Typography variant="h5" sx={{ color: '#66bb6a', fontWeight: 700, mb: 1 }}>
+                                                        {income.amount.toFixed(2).replace('.', ',')} zł
+                                                    </Typography>
+                                                </Box>
+                                                <Box sx={{ display: 'flex', gap: 0.5 }}>
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={() => handleEditIncome(income)}
+                                                        sx={{ color: 'primary.main' }}
+                                                    >
+                                                        <EditIcon fontSize="small" />
+                                                    </IconButton>
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={() => handleDeleteIncome(income)}
+                                                        sx={{ color: 'error.main' }}
+                                                    >
+                                                        <DeleteIcon fontSize="small" />
+                                                    </IconButton>
+                                                </Box>
+                                            </Box>
+                                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                    <Typography variant="body2" sx={{ color: 'text.secondary', minWidth: '60px' }}>
+                                                        📅 Data:
+                                                    </Typography>
+                                                    <Typography variant="body2" sx={{ color: 'text.primary' }}>
+                                                        {new Date(income.date).toLocaleDateString('pl-PL')}
+                                                    </Typography>
+                                                </Box>
+                                                {income.description && (
+                                                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mt: 0.5 }}>
+                                                        <Typography variant="body2" sx={{ color: 'text.secondary', minWidth: '60px' }}>
+                                                            📝 Opis:
+                                                        </Typography>
+                                                        <Typography variant="body2" sx={{ color: 'text.secondary', flex: 1 }}>
+                                                            {income.description}
+                                                        </Typography>
+                                                    </Box>
+                                                )}
+                                            </Box>
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                            </Box>
+                        )}
+                    </Box>
+                ) : (
+                    // Desktop Table Layout
+                    <TableContainer>
+                        <Table>
+                            <TableHead>
                                 <TableRow>
-                                    <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
-                                        <CircularProgress />
-                                    </TableCell>
+                                    <TableCell sx={{ fontWeight: 600, color: 'text.primary' }}>Nazwa</TableCell>
+                                    <TableCell sx={{ fontWeight: 600, color: 'text.primary' }}>Data</TableCell>
+                                    <TableCell sx={{ fontWeight: 600, color: 'text.primary' }}>Opis</TableCell>
+                                    <TableCell align="right" sx={{ fontWeight: 600, color: 'text.primary' }}>Kwota</TableCell>
+                                    <TableCell align="center" sx={{ fontWeight: 600, color: 'text.primary' }}>Akcje</TableCell>
                                 </TableRow>
-                            ) : incomes.length === 0 ? (
-                                <TableRow>
-                                    <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
-                                        <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                                            Brak przychodów do wyświetlenia
-                                        </Typography>
-                                    </TableCell>
-                                </TableRow>
-                            ) : (
-                                incomes.map((income) => (
-                                    <TableRow key={income.id} hover>
-                                        <TableCell sx={{ color: 'text.primary', fontWeight: 500 }}>{income.name}</TableCell>
-                                        <TableCell sx={{ color: 'text.secondary' }}>
-                                            {new Date(income.date).toLocaleDateString('pl-PL')}
-                                        </TableCell>
-                                        <TableCell sx={{ color: 'text.secondary', maxWidth: 250 }}>
-                                            {income.description || '-'}
-                                        </TableCell>
-                                        <TableCell align="right" sx={{ color: '#66bb6a', fontWeight: 700, fontSize: '1.1rem' }}>
-                                            {income.amount.toFixed(2).replace('.', ',')} zł
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            <IconButton
-                                                size="small"
-                                                onClick={() => handleEditIncome(income)}
-                                                sx={{ color: 'primary.main' }}
-                                            >
-                                                <EditIcon fontSize="small" />
-                                            </IconButton>
-                                            <IconButton
-                                                size="small"
-                                                onClick={() => handleDeleteIncome(income)}
-                                                sx={{ color: 'error.main' }}
-                                            >
-                                                <DeleteIcon fontSize="small" />
-                                            </IconButton>
+                            </TableHead>
+                            <TableBody>
+                                {loading ? (
+                                    <TableRow>
+                                        <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
+                                            <CircularProgress />
                                         </TableCell>
                                     </TableRow>
-                                ))
-                            )}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                                ) : incomes.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
+                                            <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                                                Brak przychodów do wyświetlenia
+                                            </Typography>
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    incomes.map((income) => (
+                                        <TableRow key={income.id} hover>
+                                            <TableCell sx={{ color: 'text.primary', fontWeight: 500 }}>{income.name}</TableCell>
+                                            <TableCell sx={{ color: 'text.secondary' }}>
+                                                {new Date(income.date).toLocaleDateString('pl-PL')}
+                                            </TableCell>
+                                            <TableCell sx={{ color: 'text.secondary', maxWidth: 250 }}>
+                                                {income.description || '-'}
+                                            </TableCell>
+                                            <TableCell align="right" sx={{ color: '#66bb6a', fontWeight: 700, fontSize: '1.1rem' }}>
+                                                {income.amount.toFixed(2).replace('.', ',')} zł
+                                            </TableCell>
+                                            <TableCell align="center">
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={() => handleEditIncome(income)}
+                                                    sx={{ color: 'primary.main' }}
+                                                >
+                                                    <EditIcon fontSize="small" />
+                                                </IconButton>
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={() => handleDeleteIncome(income)}
+                                                    sx={{ color: 'error.main' }}
+                                                >
+                                                    <DeleteIcon fontSize="small" />
+                                                </IconButton>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                )}
             </Card>
 
             {/* Dialog - Add/Edit Income */}

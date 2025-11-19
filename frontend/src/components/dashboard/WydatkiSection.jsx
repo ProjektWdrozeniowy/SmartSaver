@@ -31,6 +31,8 @@ import {
     Switch,
     FormControlLabel,
     Grid,
+    useMediaQuery,
+    useTheme,
 } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -48,6 +50,8 @@ import { useThemeMode } from '../../context/ThemeContext';
 
 const WydatkiSection = ({ onExpenseChange }) => {
     const { mode } = useThemeMode();
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     // Available icons for categories
     const availableIcons = [
@@ -536,81 +540,193 @@ const WydatkiSection = ({ onExpenseChange }) => {
                     },
                 }}
             >
-                <TableContainer>
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell sx={{ fontWeight: 600, color: 'text.primary' }}>Nazwa</TableCell>
-                                <TableCell sx={{ fontWeight: 600, color: 'text.primary' }}>Kategoria</TableCell>
-                                <TableCell sx={{ fontWeight: 600, color: 'text.primary' }}>Data</TableCell>
-                                <TableCell sx={{ fontWeight: 600, color: 'text.primary' }}>Opis</TableCell>
-                                <TableCell align="right" sx={{ fontWeight: 600, color: 'text.primary' }}>Kwota</TableCell>
-                                <TableCell align="center" sx={{ fontWeight: 600, color: 'text.primary' }}>Akcje</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {filteredExpenses.length === 0 ? (
-                                <TableRow>
-                                    <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
-                                        <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                                            Brak wydatków do wyświetlenia
-                                        </Typography>
-                                    </TableCell>
-                                </TableRow>
-                            ) : (
-                                filteredExpenses.map((expense) => {
+                {isMobile ? (
+                    // Mobile Card Layout
+                    <Box sx={{ p: 2 }}>
+                        {filteredExpenses.length === 0 ? (
+                            <Box sx={{ textAlign: 'center', py: 4 }}>
+                                <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                                    Brak wydatków do wyświetlenia
+                                </Typography>
+                            </Box>
+                        ) : (
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                {filteredExpenses.map((expense) => {
                                     const category = getCategoryById(expense.categoryId);
                                     return (
-                                        <TableRow key={expense.id} hover>
-                                            <TableCell sx={{ color: 'text.primary' }}>{expense.name}</TableCell>
-                                            <TableCell>
-                                                <Chip
-                                                    icon={
-                                                        <Box sx={{ fontSize: '16px', display: 'flex', alignItems: 'center' }}>
-                                                            {category?.icon}
+                                        <Card
+                                            key={expense.id}
+                                            sx={{
+                                                background: mode === 'dark'
+                                                    ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))'
+                                                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(245, 245, 245, 0.9))',
+                                                backdropFilter: 'blur(10px)',
+                                                WebkitBackdropFilter: 'blur(10px)',
+                                                border: '1px solid',
+                                                borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                                                boxShadow: mode === 'dark'
+                                                    ? '0 2px 8px rgba(0, 0, 0, 0.3)'
+                                                    : '0 2px 8px rgba(0, 0, 0, 0.08)',
+                                                transition: 'all 0.2s',
+                                                '&:hover': {
+                                                    transform: 'translateY(-2px)',
+                                                    boxShadow: mode === 'dark'
+                                                        ? '0 4px 12px rgba(0, 0, 0, 0.4)'
+                                                        : '0 4px 12px rgba(0, 0, 0, 0.12)',
+                                                },
+                                            }}
+                                        >
+                                            <CardContent>
+                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                                                    <Box sx={{ flex: 1 }}>
+                                                        <Typography variant="h6" sx={{ color: 'text.primary', fontWeight: 600, mb: 0.5 }}>
+                                                            {expense.name}
+                                                        </Typography>
+                                                        <Typography variant="h5" sx={{ color: 'text.primary', fontWeight: 700, mb: 1 }}>
+                                                            {expense.amount.toFixed(2).replace('.', ',')} zł
+                                                        </Typography>
+                                                    </Box>
+                                                    <Box sx={{ display: 'flex', gap: 0.5 }}>
+                                                        <IconButton
+                                                            size="small"
+                                                            onClick={() => handleEditExpense(expense)}
+                                                            sx={{ color: 'primary.main' }}
+                                                        >
+                                                            <EditIcon fontSize="small" />
+                                                        </IconButton>
+                                                        <IconButton
+                                                            size="small"
+                                                            onClick={() => handleDeleteExpense(expense)}
+                                                            sx={{ color: 'error.main' }}
+                                                        >
+                                                            <DeleteIcon fontSize="small" />
+                                                        </IconButton>
+                                                    </Box>
+                                                </Box>
+                                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                        <Typography variant="body2" sx={{ color: 'text.secondary', minWidth: '60px' }}>
+                                                            📅 Data:
+                                                        </Typography>
+                                                        <Typography variant="body2" sx={{ color: 'text.primary' }}>
+                                                            {new Date(expense.date).toLocaleDateString('pl-PL')}
+                                                        </Typography>
+                                                    </Box>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                        <Typography variant="body2" sx={{ color: 'text.secondary', minWidth: '60px' }}>
+                                                            🏷️ Kategoria:
+                                                        </Typography>
+                                                        <Chip
+                                                            icon={
+                                                                <Box sx={{ fontSize: '14px', display: 'flex', alignItems: 'center' }}>
+                                                                    {category?.icon}
+                                                                </Box>
+                                                            }
+                                                            label={category?.name}
+                                                            size="small"
+                                                            sx={{
+                                                                backgroundColor: `${category?.color}20`,
+                                                                color: category?.color,
+                                                                fontWeight: 500,
+                                                            }}
+                                                        />
+                                                    </Box>
+                                                    {expense.description && (
+                                                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mt: 0.5 }}>
+                                                            <Typography variant="body2" sx={{ color: 'text.secondary', minWidth: '60px' }}>
+                                                                📝 Opis:
+                                                            </Typography>
+                                                            <Typography variant="body2" sx={{ color: 'text.secondary', flex: 1 }}>
+                                                                {expense.description}
+                                                            </Typography>
                                                         </Box>
-                                                    }
-                                                    label={category?.name}
-                                                    size="small"
-                                                    sx={{
-                                                        backgroundColor: `${category?.color}20`,
-                                                        color: category?.color,
-                                                        fontWeight: 500,
-                                                    }}
-                                                />
-                                            </TableCell>
-                                            <TableCell sx={{ color: 'text.secondary' }}>
-                                                {new Date(expense.date).toLocaleDateString('pl-PL')}
-                                            </TableCell>
-                                            <TableCell sx={{ color: 'text.secondary', maxWidth: 200 }}>
-                                                {expense.description || '-'}
-                                            </TableCell>
-                                            <TableCell align="right" sx={{ color: 'text.primary', fontWeight: 600 }}>
-                                                {expense.amount.toFixed(2).replace('.', ',')} zł
-                                            </TableCell>
-                                            <TableCell align="center">
-                                                <IconButton
-                                                    size="small"
-                                                    onClick={() => handleEditExpense(expense)}
-                                                    sx={{ color: 'primary.main' }}
-                                                >
-                                                    <EditIcon fontSize="small" />
-                                                </IconButton>
-                                                <IconButton
-                                                    size="small"
-                                                    onClick={() => handleDeleteExpense(expense)}
-                                                    sx={{ color: 'error.main' }}
-                                                >
-                                                    <DeleteIcon fontSize="small" />
-                                                </IconButton>
-                                            </TableCell>
-                                        </TableRow>
+                                                    )}
+                                                </Box>
+                                            </CardContent>
+                                        </Card>
                                     );
-                                })
-                            )}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                                })}
+                            </Box>
+                        )}
+                    </Box>
+                ) : (
+                    // Desktop Table Layout
+                    <TableContainer>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell sx={{ fontWeight: 600, color: 'text.primary' }}>Nazwa</TableCell>
+                                    <TableCell sx={{ fontWeight: 600, color: 'text.primary' }}>Kategoria</TableCell>
+                                    <TableCell sx={{ fontWeight: 600, color: 'text.primary' }}>Data</TableCell>
+                                    <TableCell sx={{ fontWeight: 600, color: 'text.primary' }}>Opis</TableCell>
+                                    <TableCell align="right" sx={{ fontWeight: 600, color: 'text.primary' }}>Kwota</TableCell>
+                                    <TableCell align="center" sx={{ fontWeight: 600, color: 'text.primary' }}>Akcje</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {filteredExpenses.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
+                                            <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                                                Brak wydatków do wyświetlenia
+                                            </Typography>
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    filteredExpenses.map((expense) => {
+                                        const category = getCategoryById(expense.categoryId);
+                                        return (
+                                            <TableRow key={expense.id} hover>
+                                                <TableCell sx={{ color: 'text.primary' }}>{expense.name}</TableCell>
+                                                <TableCell>
+                                                    <Chip
+                                                        icon={
+                                                            <Box sx={{ fontSize: '16px', display: 'flex', alignItems: 'center' }}>
+                                                                {category?.icon}
+                                                            </Box>
+                                                        }
+                                                        label={category?.name}
+                                                        size="small"
+                                                        sx={{
+                                                            backgroundColor: `${category?.color}20`,
+                                                            color: category?.color,
+                                                            fontWeight: 500,
+                                                        }}
+                                                    />
+                                                </TableCell>
+                                                <TableCell sx={{ color: 'text.secondary' }}>
+                                                    {new Date(expense.date).toLocaleDateString('pl-PL')}
+                                                </TableCell>
+                                                <TableCell sx={{ color: 'text.secondary', maxWidth: 200 }}>
+                                                    {expense.description || '-'}
+                                                </TableCell>
+                                                <TableCell align="right" sx={{ color: 'text.primary', fontWeight: 600 }}>
+                                                    {expense.amount.toFixed(2).replace('.', ',')} zł
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={() => handleEditExpense(expense)}
+                                                        sx={{ color: 'primary.main' }}
+                                                    >
+                                                        <EditIcon fontSize="small" />
+                                                    </IconButton>
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={() => handleDeleteExpense(expense)}
+                                                        sx={{ color: 'error.main' }}
+                                                    >
+                                                        <DeleteIcon fontSize="small" />
+                                                    </IconButton>
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })
+                                )}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                )}
             </Card>
 
             {/* Dialog - Add/Edit Expense */}
