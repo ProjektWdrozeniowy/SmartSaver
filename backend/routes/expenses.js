@@ -113,8 +113,8 @@ const CreateExpenseSchema = z.object({
   amount: z.number().positive(),
   description: z.string().optional(),
   isRecurring: z.boolean().optional(),
-  recurringInterval: z.number().int().positive().optional(),
-  recurringUnit: z.enum(['day', 'week', 'month', 'year']).optional(),
+  recurringInterval: z.number().int().positive().optional().nullable(),
+  recurringUnit: z.enum(['day', 'week', 'month', 'year']).optional().nullable(),
   recurringEndDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().nullable()
 });
 
@@ -125,8 +125,8 @@ const UpdateExpenseSchema = z.object({
   amount: z.number().positive(),
   description: z.string().optional(),
   isRecurring: z.boolean().optional(),
-  recurringInterval: z.number().int().positive().optional(),
-  recurringUnit: z.enum(['day', 'week', 'month', 'year']).optional(),
+  recurringInterval: z.number().int().positive().optional().nullable(),
+  recurringUnit: z.enum(['day', 'week', 'month', 'year']).optional().nullable(),
   recurringEndDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().nullable()
 });
 

@@ -13,8 +13,8 @@ const CreateIncomeSchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   description: z.string().nullable().optional(),
   isRecurring: z.boolean().optional(),
-  recurringInterval: z.number().int().positive().optional(),
-  recurringUnit: z.enum(['day', 'week', 'month', 'year']).optional(),
+  recurringInterval: z.number().int().positive().optional().nullable(),
+  recurringUnit: z.enum(['day', 'week', 'month', 'year']).optional().nullable(),
   recurringEndDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().nullable()
 });
 
@@ -24,8 +24,8 @@ const UpdateIncomeSchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   description: z.string().nullable().optional(),
   isRecurring: z.boolean().optional(),
-  recurringInterval: z.number().int().positive().optional(),
-  recurringUnit: z.enum(['day', 'week', 'month', 'year']).optional(),
+  recurringInterval: z.number().int().positive().optional().nullable(),
+  recurringUnit: z.enum(['day', 'week', 'month', 'year']).optional().nullable(),
   recurringEndDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().nullable()
 });
 
