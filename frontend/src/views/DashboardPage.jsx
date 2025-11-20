@@ -120,6 +120,19 @@ const DashboardPage = () => {
         if (menuId !== 'powiadomienia') {
             fetchUnreadCount();
         }
+        // Close mobile drawer when menu item is clicked
+        if (isMobile) {
+            setMobileOpen(false);
+        }
+        // Scroll to top of page when changing sections
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // Navigation handler for internal links (e.g., from dashboard cards)
+    const handleNavigate = (menuId) => {
+        setSelectedMenu(menuId);
+        // Scroll to top of page when navigating
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const handleLogout = () => {
@@ -143,6 +156,8 @@ const DashboardPage = () => {
         } else {
             setSelectedMenu('ustawienia');
             setSettingsScrollTo(action);
+            // Scroll to top of page when changing to settings
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     };
 
@@ -193,7 +208,7 @@ const DashboardPage = () => {
     const renderContent = () => {
         switch (selectedMenu) {
             case 'pulpit':
-                return <PulpitSection user={user} onNavigate={setSelectedMenu} />;
+                return <PulpitSection user={user} onNavigate={handleNavigate} />;
             case 'wydatki':
                 return <WydatkiSection onExpenseChange={fetchUnreadCount} />;
             case 'budzet':
@@ -207,7 +222,7 @@ const DashboardPage = () => {
             case 'ustawienia':
                 return <UstawieniaSection scrollToSection={settingsScrollTo} onScrollComplete={() => setSettingsScrollTo(null)} />;
             default:
-                return <PulpitSection user={user} onNavigate={setSelectedMenu} />;
+                return <PulpitSection user={user} onNavigate={handleNavigate} />;
         }
     };
 

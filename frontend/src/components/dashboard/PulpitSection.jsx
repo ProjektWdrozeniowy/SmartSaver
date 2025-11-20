@@ -387,8 +387,8 @@ const PulpitSection = ({ user, onNavigate }) => {
                                     </Typography>
                                 </Box>
                             ) : (
-                                <Box sx={{ width: '100%', height: chartHeight }}>
-                                    <ResponsiveContainer width="100%" height="100%">
+                                <Box sx={{ width: '100%', height: chartHeight, minHeight: chartHeight }}>
+                                    <ResponsiveContainer width="100%" height={chartHeight}>
                                         <PieChart>
                                             <Pie
                                                 data={expensesByCategory}
