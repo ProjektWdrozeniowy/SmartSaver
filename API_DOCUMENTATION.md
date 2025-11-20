@@ -3,14 +3,16 @@
 ## 📋 Spis treści
 1. [Ogólne informacje](#ogólne-informacje)
 2. [Autoryzacja](#autoryzacja)
-3. [Dashboard Endpoints](#dashboard-endpoints)
-4. [Expenses Endpoints](#expenses-endpoints)
-5. [Categories Endpoints](#categories-endpoints)
-6. [Goals Endpoints](#goals-endpoints)
-7. [Analysis Endpoints](#analysis-endpoints)
-8. [Budget Endpoints](#budget-endpoints)
-9. [Settings/User Endpoints](#settingsuser-endpoints)
-10. [Struktury danych](#struktury-danych)
+3. [Authentication Endpoints](#authentication-endpoints)
+4. [Dashboard Endpoints](#dashboard-endpoints)
+5. [Expenses Endpoints](#expenses-endpoints)
+6. [Categories Endpoints](#categories-endpoints)
+7. [Goals Endpoints](#goals-endpoints)
+8. [Analysis Endpoints](#analysis-endpoints)
+9. [Budget Endpoints](#budget-endpoints)
+10. [Notifications Endpoints](#notifications-endpoints)
+11. [Settings/User Endpoints](#settingsuser-endpoints)
+12. [Struktury danych](#struktury-danych)
 
 ---
 
@@ -32,6 +34,7 @@ Content-Type: application/json
 - `201` - Created
 - `400` - Bad Request
 - `401` - Unauthorized
+- `403` - Forbidden
 - `404` - Not Found
 - `500` - Internal Server Error
 
@@ -39,13 +42,119 @@ Content-Type: application/json
 
 ## Autoryzacja
 
-Wszystkie endpointy (poza `/api/login` i `/api/register`) wymagają tokenu JWT w headerze:
+Wszystkie endpointy (poza `/api/login`, `/api/register`, `/api/forgot-password` i `/api/reset-password`) wymagają tokenu JWT w headerze:
 
 ```http
 Authorization: Bearer <token>
 ```
 
 Token jest zwracany po zalogowaniu/rejestracji i przechowywany w `localStorage` po stronie frontendu.
+
+---
+
+## Authentication Endpoints
+
+### 1. POST /api/register
+Rejestruje nowego użytkownika.
+
+**Request Body:**
+```json
+{
+  "username": "Jan Kowalski",
+  "email": "jan@example.com",
+  "password": "haslo123"
+}
+```
+
+**Validation:**
+- `username` - wymagane, string (min 3 znaki)
+- `email` - wymagane, string (format email, unikalny)
+- `password` - wymagane, string (min 6 znaków)
+
+**Response Body (201 Created):**
+```json
+{
+  "message": "Użytkownik został zarejestrowany",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": 1,
+    "username": "Jan Kowalski",
+    "email": "jan@example.com"
+  }
+}
+```
+
+---
+
+### 2. POST /api/login
+Loguje użytkownika.
+
+**Request Body:**
+```json
+{
+  "email": "jan@example.com",
+  "password": "haslo123"
+}
+```
+
+**Response Body (200 OK):**
+```json
+{
+  "message": "Zalogowano pomyślnie",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": 1,
+    "username": "Jan Kowalski",
+    "email": "jan@example.com"
+  }
+}
+```
+
+**Error Response (401 Unauthorized):**
+```json
+{
+  "message": "Nieprawidłowe dane logowania"
+}
+```
+
+---
+
+### 3. POST /api/forgot-password
+Inicjuje proces resetowania hasła.
+
+**Request Body:**
+```json
+{
+  "email": "jan@example.com"
+}
+```
+
+**Response Body (200 OK):**
+```json
+{
+  "message": "Link do resetowania hasła został wysłany na adres email"
+}
+```
+
+---
+
+### 4. POST /api/reset-password
+Resetuje hasło użytkownika.
+
+**Request Body:**
+```json
+{
+  "token": "reset-token-from-email",
+  "newPassword": "nowe_haslo123"
+}
+```
+
+**Response Body (200 OK):**
+```json
+{
+  "message": "Hasło zostało zmienione"
+}
+```
 
 ---
 
@@ -69,16 +178,16 @@ Authorization: Bearer <token>
       "change": "+2.5%",
       "positive": true,
       "iconKey": "balance",
-      "color": "#00f0ff",
+      "color": "#00b8d4",
       "navigateTo": "budzet"
     },
     {
-      "title": "Przychody (mies)",
+      "title": "Przychody (miesiąc)",
       "value": "5,730 zł",
       "change": "+12%",
       "positive": true,
       "iconKey": "income",
-      "color": "#a8e6cf",
+      "color": "#66bb6a",
       "navigateTo": "budzet"
     },
     {
@@ -87,25 +196,17 @@ Authorization: Bearer <token>
       "change": "-15%",
       "positive": true,
       "iconKey": "expenses",
-      "color": "#ff6b9d",
-      "navigateTo": "wydatki"
+      "color": "#ef5350",
+      "navigateTo": "wydatki",
+      "budgetPercentage": "65.2"
     },
     {
-      "title": "Twoje oszczędności",
-      "value": "8,500 zł",
-      "change": "+8%",
-      "positive": true,
-      "iconKey": "savings",
-      "color": "#ffd93d",
-      "navigateTo": "budzet"
-    },
-    {
-      "title": "Twój cel (Wakacje)",
+      "title": "Twój cel",
       "value": "68%",
       "change": "+5%",
       "positive": true,
       "iconKey": "goal",
-      "color": "#c77dff",
+      "color": "#ab47bc",
       "navigateTo": "cele"
     }
   ]
@@ -113,7 +214,8 @@ Authorization: Bearer <token>
 ```
 
 **Uwagi:**
-- `iconKey` musi być jednym z: `balance`, `income`, `expenses`, `savings`, `goal`
+- `iconKey` musi być jednym z: `balance`, `income`, `expenses`, `goal`
+- `budgetPercentage` - opcjonalne, pokazuje procent wykorzystanego budżetu dla wydatków
 - Frontend mapuje te klucze na odpowiednie ikony Material-UI
 
 ---
@@ -144,7 +246,8 @@ GET /api/dashboard/transactions?limit=5
       "category": "Jedzenie",
       "amount": -125.50,
       "date": "2025-10-23",
-      "icon": "🛒"
+      "icon": "🛒",
+      "type": "expense"
     },
     {
       "id": 2,
@@ -152,7 +255,8 @@ GET /api/dashboard/transactions?limit=5
       "category": "Przychód",
       "amount": 5730.00,
       "date": "2025-10-20",
-      "icon": "💰"
+      "icon": "💰",
+      "type": "income"
     }
   ]
 }
@@ -160,6 +264,7 @@ GET /api/dashboard/transactions?limit=5
 
 **Uwagi:**
 - `amount` ujemne = wydatek, dodatnie = przychód
+- `type` - typ transakcji: `expense` lub `income`
 - `date` w formacie YYYY-MM-DD
 - `icon` to emoji (string)
 
@@ -228,15 +333,9 @@ GET /api/expenses?month=2025-10
       "categoryId": 1,
       "date": "2025-10-23",
       "description": "Zakupy w Biedronce",
-      "amount": 125.50
-    },
-    {
-      "id": 2,
-      "name": "Netflix",
-      "categoryId": 3,
-      "date": "2025-10-19",
-      "description": "Subskrypcja miesięczna",
-      "amount": 49.99
+      "amount": 125.50,
+      "isRecurring": false,
+      "recurringFrequency": null
     }
   ]
 }
@@ -260,7 +359,9 @@ Content-Type: application/json
   "categoryId": 1,
   "date": "2025-10-23",
   "amount": 125.50,
-  "description": "Zakupy w Biedronce"
+  "description": "Zakupy w Biedronce",
+  "isRecurring": false,
+  "recurringFrequency": null
 }
 ```
 
@@ -270,6 +371,8 @@ Content-Type: application/json
 - `date` - wymagane, string (format YYYY-MM-DD)
 - `amount` - wymagane, number (> 0)
 - `description` - opcjonalne, string
+- `isRecurring` - opcjonalne, boolean (default: false)
+- `recurringFrequency` - opcjonalne, string: `daily`, `weekly`, `monthly`, `yearly`
 
 **Response Body (201 Created):**
 ```json
@@ -283,6 +386,8 @@ Content-Type: application/json
     "amount": 125.50,
     "description": "Zakupy w Biedronce",
     "userId": 1,
+    "isRecurring": false,
+    "recurringFrequency": null,
     "createdAt": "2025-10-23T10:30:00.000Z"
   }
 }
@@ -306,7 +411,8 @@ Content-Type: application/json
   "categoryId": 1,
   "date": "2025-10-23",
   "amount": 150.00,
-  "description": "Zakupy w Biedronce i Lidlu"
+  "description": "Zakupy w Biedronce i Lidlu",
+  "isRecurring": false
 }
 ```
 
@@ -327,13 +433,6 @@ Content-Type: application/json
 }
 ```
 
-**Error Response (404 Not Found):**
-```json
-{
-  "message": "Wydatek nie został znaleziony"
-}
-```
-
 ---
 
 ### 4. DELETE /api/expenses/:id
@@ -351,12 +450,28 @@ Authorization: Bearer <token>
 }
 ```
 
-**Error Response (404 Not Found):**
+---
+
+### 5. POST /api/expenses/check-recurring
+Sprawdza i tworzy cykliczne wydatki (wywoływane automatycznie przez frontend).
+
+**Request Headers:**
+```http
+Authorization: Bearer <token>
+```
+
+**Response Body (200 OK):**
 ```json
 {
-  "message": "Wydatek nie został znaleziony"
+  "message": "Sprawdzono cykliczne wydatki",
+  "created": 2
 }
 ```
+
+**Uwagi:**
+- Endpoint automatycznie sprawdza wszystkie cykliczne wydatki użytkownika
+- Tworzy nowe wpisy dla wydatków, które powinny się powtórzyć
+- `created` - liczba utworzonych nowych wydatków
 
 ---
 
@@ -423,17 +538,10 @@ Content-Type: application/json
 }
 ```
 
-**Error Response (400 Bad Request):**
-```json
-{
-  "message": "Kategoria o tej nazwie już istnieje"
-}
-```
-
 ---
 
 ### 3. DELETE /api/categories/:id
-Usuwa kategorię (opcjonalne - można to zaimplementować później).
+Usuwa kategorię.
 
 **Request Headers:**
 ```http
@@ -448,8 +556,8 @@ Authorization: Bearer <token>
 ```
 
 **Uwagi:**
-- Przed usunięciem kategorii, należy sprawdzić czy nie ma wydatków z tą kategorią
-- Można albo zabronić usuwania, albo przenieść wydatki do kategorii domyślnej
+- Przed usunięciem sprawdza czy kategoria ma przypisane wydatki
+- Jeśli kategoria ma wydatki, zwraca błąd 400
 
 ---
 
@@ -475,28 +583,14 @@ Authorization: Bearer <token>
       "dueDate": "2026-06-30",
       "description": "Wyjazd do Grecji",
       "userId": 1,
+      "reminderEnabled": true,
+      "reminderFrequency": "weekly",
       "createdAt": "2025-10-01T10:00:00.000Z",
       "updatedAt": "2025-10-23T14:30:00.000Z"
-    },
-    {
-      "id": 2,
-      "name": "Nowy laptop",
-      "targetAmount": 4000.00,
-      "currentAmount": 2100.00,
-      "dueDate": "2025-12-31",
-      "description": "MacBook Pro",
-      "userId": 1,
-      "createdAt": "2025-09-15T12:00:00.000Z",
-      "updatedAt": "2025-10-20T10:15:00.000Z"
     }
   ]
 }
 ```
-
-**Uwagi:**
-- Lista powinna zawierać wszystkie cele użytkownika (aktywne i ukończone)
-- `dueDate` w formacie YYYY-MM-DD
-- Kwoty jako liczby zmiennoprzecinkowe
 
 ---
 
@@ -516,7 +610,9 @@ Content-Type: application/json
   "targetAmount": 10000.00,
   "currentAmount": 0.00,
   "dueDate": "2026-12-31",
-  "description": "6-miesięczny fundusz awaryjny"
+  "description": "6-miesięczny fundusz awaryjny",
+  "reminderEnabled": true,
+  "reminderFrequency": "weekly"
 }
 ```
 
@@ -526,6 +622,8 @@ Content-Type: application/json
 - `currentAmount` - wymagane, number (>= 0, domyślnie 0)
 - `dueDate` - wymagane, string (format YYYY-MM-DD, musi być w przyszłości)
 - `description` - opcjonalne, string (max 500 znaków)
+- `reminderEnabled` - opcjonalne, boolean (default: false)
+- `reminderFrequency` - opcjonalne, string: `weekly`, `monthly`
 
 **Response Body (201 Created):**
 ```json
@@ -538,17 +636,12 @@ Content-Type: application/json
     "currentAmount": 0.00,
     "dueDate": "2026-12-31",
     "description": "6-miesięczny fundusz awaryjny",
+    "reminderEnabled": true,
+    "reminderFrequency": "weekly",
     "userId": 1,
     "createdAt": "2025-10-24T15:00:00.000Z",
     "updatedAt": "2025-10-24T15:00:00.000Z"
   }
-}
-```
-
-**Error Response (400 Bad Request):**
-```json
-{
-  "message": "Nieprawidłowe dane: targetAmount musi być większe od 0"
 }
 ```
 
@@ -570,14 +663,11 @@ Content-Type: application/json
   "targetAmount": 6000.00,
   "currentAmount": 3500.00,
   "dueDate": "2026-07-15",
-  "description": "Wyjazd do Grecji - 2 tygodnie"
+  "description": "Wyjazd do Grecji - 2 tygodnie",
+  "reminderEnabled": true,
+  "reminderFrequency": "monthly"
 }
 ```
-
-**Validation:**
-- Wszystkie pola są wymagane (jak w POST)
-- `currentAmount` nie może być większe niż `targetAmount`
-- Użytkownik musi być właścicielem celu
 
 **Response Body (200 OK):**
 ```json
@@ -590,23 +680,11 @@ Content-Type: application/json
     "currentAmount": 3500.00,
     "dueDate": "2026-07-15",
     "description": "Wyjazd do Grecji - 2 tygodnie",
+    "reminderEnabled": true,
+    "reminderFrequency": "monthly",
     "userId": 1,
     "updatedAt": "2025-10-24T16:00:00.000Z"
   }
-}
-```
-
-**Error Response (404 Not Found):**
-```json
-{
-  "message": "Cel nie został znaleziony"
-}
-```
-
-**Error Response (403 Forbidden):**
-```json
-{
-  "message": "Brak uprawnień do edycji tego celu"
 }
 ```
 
@@ -624,20 +702,6 @@ Authorization: Bearer <token>
 ```json
 {
   "message": "Cel został usunięty"
-}
-```
-
-**Error Response (404 Not Found):**
-```json
-{
-  "message": "Cel nie został znaleziony"
-}
-```
-
-**Error Response (403 Forbidden):**
-```json
-{
-  "message": "Brak uprawnień do usunięcia tego celu"
 }
 ```
 
@@ -661,8 +725,6 @@ Content-Type: application/json
 
 **Validation:**
 - `amount` - wymagane, number (> 0)
-- Użytkownik musi być właścicielem celu
-- Po wpłacie `currentAmount` nie może przekroczyć `targetAmount` (opcjonalnie można pozwolić)
 
 **Response Body (200 OK):**
 ```json
@@ -681,31 +743,12 @@ Content-Type: application/json
 }
 ```
 
-**Uwagi:**
-- Ten endpoint zwiększa wartość `currentAmount` o podaną kwotę
-- Możesz opcjonalnie prowadzić historię wpłat w osobnej tabeli (zalecane)
-- Frontend wysyła tylko kwotę wpłaty, backend dodaje ją do `currentAmount`
-
-**Error Response (400 Bad Request):**
-```json
-{
-  "message": "Kwota wpłaty musi być większa od 0"
-}
-```
-
-**Error Response (404 Not Found):**
-```json
-{
-  "message": "Cel nie został znaleziony"
-}
-```
-
 ---
 
 ## Analysis Endpoints
 
 ### 1. GET /api/analysis/statistics
-Pobiera statystyki analizy dla wybranego okresu (średnie wydatki, przychody, oszczędności, stopa oszczędności).
+Pobiera statystyki analizy dla wybranego okresu.
 
 **Query Parameters:**
 - `period` (optional) - Okres analizy: `last3months`, `last6months`, `last12months`, `thisyear` (default: `last6months`)
@@ -734,13 +777,6 @@ GET /api/analysis/statistics?period=last6months
 }
 ```
 
-**Uwagi:**
-- `averageExpenses` - średnia wydatków w wybranym okresie
-- `averageIncome` - średnia przychodów w wybranym okresie
-- `averageSavings` - średnia oszczędności w wybranym okresie
-- `savingsRate` - stopa oszczędności w % (savings/income * 100)
-- `*Change` - zmiana procentowa w stosunku do poprzedniego okresu (może być ujemna lub dodatnia)
-
 ---
 
 ### 2. GET /api/analysis/savings-growth
@@ -752,11 +788,6 @@ Pobiera dane dla wykresu wzrostu oszczędności w czasie.
 **Request Headers:**
 ```http
 Authorization: Bearer <token>
-```
-
-**Request Example:**
-```http
-GET /api/analysis/savings-growth?period=last6months
 ```
 
 **Response Body:**
@@ -773,28 +804,17 @@ GET /api/analysis/savings-growth?period=last6months
 }
 ```
 
-**Uwagi:**
-- `month` - skrócona nazwa miesiąca (3 znaki: Sty, Lut, Mar, etc.)
-- `savings` - skumulowana wartość oszczędności do danego miesiąca
-- Dane powinny być posortowane chronologicznie
-- Liczba elementów zależy od wybranego okresu (3, 6, 12 miesięcy)
-
 ---
 
 ### 3. GET /api/analysis/income-vs-expenses
-Pobiera dane dla wykresu porównania przychodów, wydatków i oszczędności w czasie.
+Pobiera dane dla wykresu porównania przychodów, wydatków i oszczędności.
 
 **Query Parameters:**
-- `period` (optional) - Okres analizy: `last3months`, `last6months`, `last12months`, `thisyear` (default: `last6months`)
+- `period` (optional) - Okres analizy (default: `last6months`)
 
 **Request Headers:**
 ```http
 Authorization: Bearer <token>
-```
-
-**Request Example:**
-```http
-GET /api/analysis/income-vs-expenses?period=last6months
 ```
 
 **Response Body:**
@@ -803,26 +823,15 @@ GET /api/analysis/income-vs-expenses?period=last6months
   "data": [
     { "month": "Sty", "income": 5200.00, "expenses": 3100.00, "savings": 1500.00 },
     { "month": "Lut", "income": 5300.00, "expenses": 3600.00, "savings": 1300.00 },
-    { "month": "Mar", "income": 5100.00, "expenses": 2900.00, "savings": 1600.00 },
-    { "month": "Kwi", "income": 5800.00, "expenses": 3500.00, "savings": 1200.00 },
-    { "month": "Maj", "income": 5600.00, "expenses": 3200.00, "savings": 1300.00 },
-    { "month": "Cze", "income": 5900.00, "expenses": 3000.00, "savings": 2000.00 }
+    { "month": "Mar", "income": 5100.00, "expenses": 2900.00, "savings": 1600.00 }
   ]
 }
 ```
 
-**Uwagi:**
-- `month` - skrócona nazwa miesiąca (3 znaki)
-- `income` - suma przychodów w danym miesiącu
-- `expenses` - suma wydatków w danym miesiącu
-- `savings` - różnica między przychodami a wydatkami (income - expenses)
-- Dane powinny być posortowane chronologicznie
-- Wszystkie wartości jako liczby zmiennoprzecinkowe
-
 ---
 
 ### 4. GET /api/analysis/weekly-expenses
-Pobiera dane dla wykresu wydatków tygodniowych (dni tygodnia).
+Pobiera dane dla wykresu wydatków tygodniowych.
 
 **Query Parameters:**
 - `weeks` (optional) - Liczba ostatnich tygodni do analizy (default: 8)
@@ -830,11 +839,6 @@ Pobiera dane dla wykresu wydatków tygodniowych (dni tygodnia).
 **Request Headers:**
 ```http
 Authorization: Bearer <token>
-```
-
-**Request Example:**
-```http
-GET /api/analysis/weekly-expenses?weeks=8
 ```
 
 **Response Body:**
@@ -853,26 +857,6 @@ GET /api/analysis/weekly-expenses?weeks=8
 }
 ```
 
-**Uwagi:**
-- `week` - nazwa dnia tygodnia (Pon, Wt, Śr, Czw, Pt, Sob, Ndz)
-- `amount` - średnia wydatków dla danego dnia tygodnia z ostatnich X tygodni
-- `dailyAverage` - średnia dzienna wydatków ze wszystkich dni
-- Obliczenie: dla każdego dnia tygodnia zsumować wydatki z ostatnich X wystąpień tego dnia i podzielić przez X
-- Przykład: jeśli `weeks=8`, to dla poniedziałków zsumować wydatki z ostatnich 8 poniedziałków i podzielić przez 8
-
----
-
-### 5. GET /api/dashboard/expenses-by-category (ponownie wykorzystany)
-Wykres wydatków według kategorii w sekcji Analizy wykorzystuje ten sam endpoint co na dashboardzie.
-
-**Endpoint szczegółowo opisany w:** [Dashboard Endpoints](#3-get-apidashboardexpenses-by-category)
-
-**Uwagi dla sekcji Analizy:**
-- Używa tego samego endpointu bez parametru `month`
-- Zwraca wydatki według kategorii dla bieżącego miesiąca
-- Frontend korzysta z `getExpensesByCategory()` z `api/dashboard.js`
-- Wykres w sekcji Analizy ma identyczny format (donut chart) jak na pulpicie
-
 ---
 
 ## Budget Endpoints
@@ -888,11 +872,6 @@ Pobiera listę przychodów użytkownika.
 Authorization: Bearer <token>
 ```
 
-**Request Example:**
-```http
-GET /api/budget/income?month=2025-10
-```
-
 **Response Body:**
 ```json
 {
@@ -902,23 +881,13 @@ GET /api/budget/income?month=2025-10
       "name": "Wynagrodzenie",
       "amount": 5730.00,
       "date": "2025-10-25",
-      "description": "Pensja za październik"
-    },
-    {
-      "id": 2,
-      "name": "Premia",
-      "amount": 1000.00,
-      "date": "2025-10-30",
-      "description": "Premia kwartalna"
+      "description": "Pensja za październik",
+      "isRecurring": true,
+      "recurringFrequency": "monthly"
     }
   ]
 }
 ```
-
-**Uwagi:**
-- Lista przychodów powinna być posortowana według daty malejąco (najnowsze na początku)
-- `amount` jako liczba zmiennoprzecinkowa
-- `description` jest opcjonalne (może być null lub pusty string)
 
 ---
 
@@ -937,7 +906,9 @@ Content-Type: application/json
   "name": "Wynagrodzenie",
   "amount": 5730.00,
   "date": "2025-10-25",
-  "description": "Pensja za październik"
+  "description": "Pensja za październik",
+  "isRecurring": true,
+  "recurringFrequency": "monthly"
 }
 ```
 
@@ -946,6 +917,8 @@ Content-Type: application/json
 - `amount` - wymagane, number (> 0)
 - `date` - wymagane, string (format YYYY-MM-DD)
 - `description` - opcjonalne, string (max 500 znaków)
+- `isRecurring` - opcjonalne, boolean (default: false)
+- `recurringFrequency` - opcjonalne, string: `daily`, `weekly`, `monthly`, `yearly`
 
 **Response Body (201 Created):**
 ```json
@@ -957,16 +930,11 @@ Content-Type: application/json
     "amount": 5730.00,
     "date": "2025-10-25",
     "description": "Pensja za październik",
+    "isRecurring": true,
+    "recurringFrequency": "monthly",
     "userId": 1,
     "createdAt": "2025-10-25T10:00:00.000Z"
   }
-}
-```
-
-**Error Response (400 Bad Request):**
-```json
-{
-  "message": "Nieprawidłowe dane: amount musi być większe od 0"
 }
 ```
 
@@ -1007,13 +975,6 @@ Content-Type: application/json
 }
 ```
 
-**Error Response (404 Not Found):**
-```json
-{
-  "message": "Przychód nie został znaleziony"
-}
-```
-
 ---
 
 ### 4. DELETE /api/budget/income/:id
@@ -1031,17 +992,10 @@ Authorization: Bearer <token>
 }
 ```
 
-**Error Response (404 Not Found):**
-```json
-{
-  "message": "Przychód nie został znaleziony"
-}
-```
-
 ---
 
 ### 5. GET /api/budget/summary
-Pobiera podsumowanie budżetu (saldo, przychody, wydatki, oszczędności).
+Pobiera podsumowanie budżetu.
 
 **Query Parameters:**
 - `month` (optional) - Miesiąc w formacie YYYY-MM (domyślnie bieżący miesiąc)
@@ -1049,11 +1003,6 @@ Pobiera podsumowanie budżetu (saldo, przychody, wydatki, oszczędności).
 **Request Headers:**
 ```http
 Authorization: Bearer <token>
-```
-
-**Request Example:**
-```http
-GET /api/budget/summary?month=2025-10
 ```
 
 **Response Body:**
@@ -1066,192 +1015,166 @@ GET /api/budget/summary?month=2025-10
 }
 ```
 
+---
+
+### 6. POST /api/budget/income/check-recurring
+Sprawdza i tworzy cykliczne przychody.
+
+**Request Headers:**
+```http
+Authorization: Bearer <token>
+```
+
+**Response Body (200 OK):**
+```json
+{
+  "message": "Sprawdzono cykliczne przychody",
+  "created": 1
+}
+```
+
+---
+
+## Notifications Endpoints
+
+### 1. GET /api/notifications
+Pobiera listę powiadomień użytkownika.
+
+**Query Parameters:**
+- `filter` (optional) - Filtr: `all`, `unread`, lub typ powiadomienia (default: `all`)
+
+**Request Headers:**
+```http
+Authorization: Bearer <token>
+```
+
+**Request Example:**
+```http
+GET /api/notifications?filter=unread
+```
+
+**Response Body:**
+```json
+{
+  "notifications": [
+    {
+      "id": 1,
+      "type": "goal_reminder",
+      "title": "Przypomnienie o celu",
+      "message": "Zbliżasz się do osiągnięcia celu: Wakacje 2026",
+      "isRead": false,
+      "createdAt": "2025-10-24T10:00:00.000Z"
+    },
+    {
+      "id": 2,
+      "type": "budget_alert",
+      "title": "Przekroczenie budżetu",
+      "message": "Przekroczyłeś 80% budżetu na kategorię: Transport",
+      "isRead": false,
+      "createdAt": "2025-10-23T15:30:00.000Z"
+    }
+  ],
+  "unreadCount": 2
+}
+```
+
 **Uwagi:**
-- `totalIncome` - suma wszystkich przychodów w wybranym miesiącu
-- `totalExpenses` - suma wszystkich wydatków w wybranym miesiącu
-- `balance` - całkowite saldo użytkownika (suma wszystkich przychodów - suma wszystkich wydatków od początku)
-- `savings` - oszczędności w danym miesiącu (totalIncome - totalExpenses dla wybranego miesiąca)
-- Wszystkie wartości jako liczby zmiennoprzecinkowe
-- Jeśli nie podano miesiąca, zwraca dane dla bieżącego miesiąca
+- Typy powiadomień: `goal_reminder`, `budget_alert`, `goal_achieved`, `goal_deadline`
+- `unreadCount` - liczba nieprzeczytanych powiadomień
 
 ---
 
-## Struktury danych
+### 2. PUT /api/notifications/:id/read
+Oznacza powiadomienie jako przeczytane.
 
-### User
-```json
-{
-  "id": 1,
-  "username": "jan.kowalski",
-  "email": "jan@example.com",
-  "createdAt": "2025-01-15T10:00:00.000Z"
-}
+**Request Headers:**
+```http
+Authorization: Bearer <token>
 ```
 
-### Expense
+**Response Body (200 OK):**
 ```json
 {
-  "id": 1,
-  "name": "Zakupy spożywcze",
-  "categoryId": 1,
-  "date": "2025-10-23",
-  "amount": 125.50,
-  "description": "Zakupy w Biedronce",
-  "userId": 1,
-  "createdAt": "2025-10-23T10:30:00.000Z",
-  "updatedAt": "2025-10-23T10:30:00.000Z"
-}
-```
-
-### Category
-```json
-{
-  "id": 1,
-  "name": "Jedzenie",
-  "color": "#ff6b9d",
-  "icon": "🍕",
-  "userId": 1,
-  "createdAt": "2025-01-15T10:00:00.000Z"
-}
-```
-
-### Goal
-```json
-{
-  "id": 1,
-  "name": "Wakacje 2026",
-  "targetAmount": 5000.00,
-  "currentAmount": 3500.00,
-  "dueDate": "2026-06-30",
-  "description": "Wyjazd do Grecji",
-  "userId": 1,
-  "createdAt": "2025-10-01T10:00:00.000Z",
-  "updatedAt": "2025-10-23T14:30:00.000Z"
-}
-```
-
-### Income
-```json
-{
-  "id": 1,
-  "name": "Wynagrodzenie",
-  "amount": 5730.00,
-  "date": "2025-10-25",
-  "description": "Pensja za październik",
-  "userId": 1,
-  "createdAt": "2025-10-25T10:00:00.000Z",
-  "updatedAt": "2025-10-25T10:00:00.000Z"
+  "message": "Powiadomienie zostało oznaczone jako przeczytane",
+  "notification": {
+    "id": 1,
+    "type": "goal_reminder",
+    "title": "Przypomnienie o celu",
+    "message": "Zbliżasz się do osiągnięcia celu: Wakacje 2026",
+    "isRead": true,
+    "createdAt": "2025-10-24T10:00:00.000Z"
+  }
 }
 ```
 
 ---
 
-## 🔐 Uwagi bezpieczeństwa
+### 3. PUT /api/notifications/read-all
+Oznacza wszystkie powiadomienia jako przeczytane.
 
-1. **Weryfikacja tokenu JWT** - każdy endpoint musi weryfikować czy token jest ważny
-2. **Weryfikacja userId** - upewnić się że użytkownik ma dostęp tylko do swoich danych
-3. **Walidacja danych wejściowych** - sprawdzać typy danych, długość stringów, etc.
-4. **SQL Injection** - używać prepared statements/ORM
-5. **Rate limiting** - opcjonalnie dodać ograniczenie liczby requestów
+**Request Headers:**
+```http
+Authorization: Bearer <token>
+```
+
+**Response Body (200 OK):**
+```json
+{
+  "message": "Wszystkie powiadomienia zostały oznaczone jako przeczytane"
+}
+```
 
 ---
 
-## 💡 Dodatkowe wskazówki
+### 4. DELETE /api/notifications/:id
+Usuwa pojedyncze powiadomienie.
 
-### Baza danych - przykładowe tabele
-
-**users**
-```sql
-CREATE TABLE users (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  username TEXT NOT NULL,
-  email TEXT UNIQUE NOT NULL,
-  password TEXT NOT NULL,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
+**Request Headers:**
+```http
+Authorization: Bearer <token>
 ```
 
-**categories**
-```sql
-CREATE TABLE categories (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  user_id INTEGER NOT NULL,
-  name TEXT NOT NULL,
-  color TEXT NOT NULL,
-  icon TEXT NOT NULL,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id),
-  UNIQUE(user_id, name)
-);
+**Response Body (200 OK):**
+```json
+{
+  "message": "Powiadomienie zostało usunięte"
+}
 ```
 
-**expenses**
-```sql
-CREATE TABLE expenses (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  user_id INTEGER NOT NULL,
-  category_id INTEGER NOT NULL,
-  name TEXT NOT NULL,
-  amount REAL NOT NULL,
-  date DATE NOT NULL,
-  description TEXT,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id),
-  FOREIGN KEY (category_id) REFERENCES categories(id)
-);
+---
+
+### 5. DELETE /api/notifications
+Usuwa wszystkie powiadomienia użytkownika.
+
+**Request Headers:**
+```http
+Authorization: Bearer <token>
 ```
 
-**goals**
-```sql
-CREATE TABLE goals (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  user_id INTEGER NOT NULL,
-  name TEXT NOT NULL,
-  target_amount REAL NOT NULL,
-  current_amount REAL NOT NULL DEFAULT 0,
-  due_date DATE NOT NULL,
-  description TEXT,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id)
-);
+**Response Body (200 OK):**
+```json
+{
+  "message": "Wszystkie powiadomienia zostały usunięte"
+}
 ```
 
-**goal_contributions** (opcjonalna tabela dla historii wpłat)
-```sql
-CREATE TABLE goal_contributions (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  goal_id INTEGER NOT NULL,
-  amount REAL NOT NULL,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (goal_id) REFERENCES goals(id)
-);
+---
+
+### 6. POST /api/notifications/check-goal-reminders
+Sprawdza cele i tworzy powiadomienia przypominające (wywoływane automatycznie).
+
+**Request Headers:**
+```http
+Authorization: Bearer <token>
 ```
 
-**incomes**
-```sql
-CREATE TABLE incomes (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  user_id INTEGER NOT NULL,
-  name TEXT NOT NULL,
-  amount REAL NOT NULL,
-  date DATE NOT NULL,
-  description TEXT,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id)
-);
+**Response Body (200 OK):**
+```json
+{
+  "message": "Sprawdzono przypomnienia o celach",
+  "created": 2
+}
 ```
-
-### Domyślne kategorie
-
-Przy rejestracji użytkownika, można automatycznie utworzyć podstawowe kategorie:
-- Jedzenie (#ff6b9d, 🍕)
-- Transport (#00f0ff, 🚗)
-- Rozrywka (#a8e6cf, 🎬)
-- Rachunki (#ffd93d, ⚡)
-- Zakupy (#c77dff, 🛒)
 
 ---
 
@@ -1294,10 +1217,6 @@ Content-Type: application/json
 }
 ```
 
-**Validation:**
-- `username` - wymagane, string (max 100 znaków)
-- `email` - wymagane, string (format email, unikalny)
-
 **Response Body (200 OK):**
 ```json
 {
@@ -1308,13 +1227,6 @@ Content-Type: application/json
     "email": "jan.kowalski@example.com",
     "updatedAt": "2025-10-27T14:30:00.000Z"
   }
-}
-```
-
-**Error Response (400 Bad Request):**
-```json
-{
-  "message": "Email jest już używany przez inne konto"
 }
 ```
 
@@ -1337,21 +1249,10 @@ Content-Type: application/json
 }
 ```
 
-**Validation:**
-- `currentPassword` - wymagane, string
-- `newPassword` - wymagane, string (min 6 znaków)
-
 **Response Body (200 OK):**
 ```json
 {
   "message": "Hasło zostało zmienione"
-}
-```
-
-**Error Response (400 Bad Request):**
-```json
-{
-  "message": "Aktualne hasło jest nieprawidłowe"
 }
 ```
 
@@ -1369,13 +1270,9 @@ Authorization: Bearer <token>
 ```json
 {
   "budgetAlerts": true,
-  "goalReminders": false
+  "goalReminders": true
 }
 ```
-
-**Uwagi:**
-- `budgetAlerts` - powiadomienia o przekroczeniu budżetu
-- `goalReminders` - powiadomienia o postępach w celach
 
 ---
 
@@ -1433,10 +1330,6 @@ Authorization: Bearer <token>
 }
 ```
 
-**Uwagi:**
-- Zwraca kompletny eksport wszystkich danych użytkownika
-- Format JSON umożliwia łatwe archiwizowanie i przenoszenie danych
-
 ---
 
 ### 7. DELETE /api/user/delete
@@ -1455,9 +1348,6 @@ Content-Type: application/json
 }
 ```
 
-**Validation:**
-- `password` - wymagane, string (hasło użytkownika dla potwierdzenia)
-
 **Response Body (200 OK):**
 ```json
 {
@@ -1465,20 +1355,114 @@ Content-Type: application/json
 }
 ```
 
-**Error Response (400 Bad Request):**
-```json
-{
-  "message": "Nieprawidłowe hasło"
-}
-```
-
 **Uwagi:**
-- Usuwa użytkownika i wszystkie powiązane dane (wydatki, przychody, kategorie, cele)
 - Operacja jest nieodwracalna
 - Wymaga potwierdzenia hasłem
 
 ---
 
+## Struktury danych
+
+### User
+```json
+{
+  "id": 1,
+  "username": "jan.kowalski",
+  "email": "jan@example.com",
+  "createdAt": "2025-01-15T10:00:00.000Z"
+}
+```
+
+### Expense
+```json
+{
+  "id": 1,
+  "name": "Zakupy spożywcze",
+  "categoryId": 1,
+  "date": "2025-10-23",
+  "amount": 125.50,
+  "description": "Zakupy w Biedronce",
+  "isRecurring": false,
+  "recurringFrequency": null,
+  "userId": 1,
+  "createdAt": "2025-10-23T10:30:00.000Z",
+  "updatedAt": "2025-10-23T10:30:00.000Z"
+}
+```
+
+### Category
+```json
+{
+  "id": 1,
+  "name": "Jedzenie",
+  "color": "#ff6b9d",
+  "icon": "🍕",
+  "userId": 1,
+  "createdAt": "2025-01-15T10:00:00.000Z"
+}
+```
+
+### Goal
+```json
+{
+  "id": 1,
+  "name": "Wakacje 2026",
+  "targetAmount": 5000.00,
+  "currentAmount": 3500.00,
+  "dueDate": "2026-06-30",
+  "description": "Wyjazd do Grecji",
+  "reminderEnabled": true,
+  "reminderFrequency": "weekly",
+  "userId": 1,
+  "createdAt": "2025-10-01T10:00:00.000Z",
+  "updatedAt": "2025-10-23T14:30:00.000Z"
+}
+```
+
+### Income
+```json
+{
+  "id": 1,
+  "name": "Wynagrodzenie",
+  "amount": 5730.00,
+  "date": "2025-10-25",
+  "description": "Pensja za październik",
+  "isRecurring": true,
+  "recurringFrequency": "monthly",
+  "userId": 1,
+  "createdAt": "2025-10-25T10:00:00.000Z",
+  "updatedAt": "2025-10-25T10:00:00.000Z"
+}
+```
+
+### Notification
+```json
+{
+  "id": 1,
+  "type": "goal_reminder",
+  "title": "Przypomnienie o celu",
+  "message": "Zbliżasz się do osiągnięcia celu: Wakacje 2026",
+  "isRead": false,
+  "userId": 1,
+  "createdAt": "2025-10-24T10:00:00.000Z"
+}
+```
+
+---
+
+## 🔐 Uwagi bezpieczeństwa
+
+1. **Weryfikacja tokenu JWT** - każdy endpoint musi weryfikować czy token jest ważny
+2. **Weryfikacja userId** - upewnić się że użytkownik ma dostęp tylko do swoich danych
+3. **Walidacja danych wejściowych** - sprawdzać typy danych, długość stringów, etc.
+4. **SQL Injection** - używać Prisma ORM z parametryzowanymi zapytaniami
+5. **Rate limiting** - zaimplementowane ograniczenie liczby requestów
+6. **Haszowanie haseł** - używanie Argon2 do bezpiecznego przechowywania haseł
+
+---
+
 ## 📞 Kontakt
 
-W razie pytań dotyczących implementacji API, skontaktuj się z zespołem frontendowym.
+W razie pytań dotyczących implementacji API, skontaktuj się z zespołem rozwojowym.
+
+**Ostatnia aktualizacja:** Listopad 2025
