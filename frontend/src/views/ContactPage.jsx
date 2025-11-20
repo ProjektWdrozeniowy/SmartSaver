@@ -502,7 +502,6 @@ const ContactPage = () => {
                                 <Button
                                     variant="outlined"
                                     fullWidth
-                                    startIcon={<HelpOutlineIcon />}
                                     onClick={() => setFaqOpen(true)}
                                     sx={{
                                         py: 1.5,

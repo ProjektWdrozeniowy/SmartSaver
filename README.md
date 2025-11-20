@@ -309,13 +309,35 @@ Pełna dokumentacja API znajduje się w pliku [API_DOCUMENTATION.md](./API_DOCUM
 
 ## 🔐 Bezpieczeństwo
 
-- **Haszowanie haseł:** Argon2 (bezpieczniejsze niż bcrypt)
-- **Autentykacja:** JWT tokens z ważnością 7 dni
-- **CORS:** Konfiguracja dla bezpiecznej komunikacji frontend-backend
-- **Rate limiting:** Ochrona przed atakami brute-force
-- **Helmet:** Dodatkowe zabezpieczenia HTTP headers
-- **Walidacja:** Zod schemas dla wszystkich input'ów
-- **SQL Injection:** Ochrona poprzez Prisma ORM
+### Zaimplementowane zabezpieczenia:
+
+- **Haszowanie haseł:** Argon2 (bezpieczniejsze niż bcrypt) z indywidualnym salt dla każdego użytkownika
+- **Autentykacja:** JWT tokens z ważnością 7 dni, przechowywane w localStorage
+- **Silna walidacja haseł:**
+  - Minimum 12 znaków
+  - Wymagana mała litera (a-z)
+  - Wymagana wielka litera (A-Z)
+  - Wymagana cyfra (0-9)
+  - Wymagany znak specjalny (!@#$%^&*...)
+  - Walidacja zarówno na frontend (UI z wizualnymi wskaźnikami) jak i backend (Zod schema)
+- **Rate limiting:**
+  - Ochrona przed atakami brute-force na endpointy autoryzacji
+  - 20 prób logowania/rejestracji na 15 minut na IP
+  - `skipSuccessfulRequests: true` - liczymy tylko nieudane próby
+- **Helmet:** Dodatkowe zabezpieczenia HTTP headers (Content-Security-Policy, X-Frame-Options, etc.)
+- **CORS:** Konfiguracja dla bezpiecznej komunikacji frontend-backend z credentials support
+- **Walidacja wejścia:** Zod schemas dla wszystkich input'ów z dokładnymi komunikatami błędów
+- **SQL Injection:** Ochrona poprzez Prisma ORM (prepared statements)
+- **Ochrona przed information disclosure:**
+  - Ogólne komunikaty błędów przy logowaniu ("Nieprawidłowy email lub hasło")
+  - Brak ujawniania czy email istnieje w systemie
+  - Brak logowania wrażliwych danych (hasła, tokeny)
+- **Dostępność (Accessibility):** Poprawna obsługa aria-hidden w modalach dla screen readers
+
+### Potencjalne przyszłe ulepszenia:
+
+- [ ] Migracja z localStorage do httpOnly cookies dla tokenów JWT (lepsza ochrona przed XSS)
+- [ ] Content Security Policy (CSP) headers na produkcji
 
 ## 🌐 Deployment
 
