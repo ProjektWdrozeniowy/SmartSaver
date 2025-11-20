@@ -12,6 +12,8 @@ import {
     CircularProgress,
     Snackbar,
     Alert,
+    useTheme,
+    useMediaQuery,
 } from '@mui/material';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
@@ -21,6 +23,11 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recha
 import { getDashboardStats, getRecentTransactions, getExpensesByCategory } from '../../api/dashboard';
 
 const PulpitSection = ({ user, onNavigate }) => {
+    // Theme and responsive breakpoints
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
+
     // State for data
     const [stats, setStats] = useState([]);
     const [expensesByCategory, setExpensesByCategory] = useState([]);
@@ -38,6 +45,11 @@ const PulpitSection = ({ user, onNavigate }) => {
     const handleCloseSnackbar = () => {
         setSnackbar({ ...snackbar, open: false });
     };
+
+    // Chart dimensions based on screen size
+    const chartHeight = isMobile ? 300 : isTablet ? 400 : 450;
+    const innerRadius = isMobile ? 50 : isTablet ? 70 : 95;
+    const outerRadius = isMobile ? 90 : isTablet ? 120 : 160;
 
     // Icons mapping for stats
     const iconMap = {
@@ -331,7 +343,7 @@ const PulpitSection = ({ user, onNavigate }) => {
                 </Box>
 
                 {/* Expenses by Category Chart */}
-                <Box sx={{ flex: '0 0 65%', minWidth: 0 }}>
+                <Box sx={{ flex: { xs: '1 1 100%', md: '0 0 65%' }, minWidth: 0 }}>
                     <Card
                         onClick={() => onNavigate('analizy')}
                         sx={{
@@ -358,7 +370,7 @@ const PulpitSection = ({ user, onNavigate }) => {
                             {expensesByCategory.length === 0 ? (
                                 <Box sx={{
                                     width: '100%',
-                                    height: 450,
+                                    height: chartHeight,
                                     display: 'flex',
                                     flexDirection: 'column',
                                     alignItems: 'center',
@@ -375,19 +387,19 @@ const PulpitSection = ({ user, onNavigate }) => {
                                     </Typography>
                                 </Box>
                             ) : (
-                                <Box sx={{ width: '100%', height: 450 }}>
+                                <Box sx={{ width: '100%', height: chartHeight }}>
                                     <ResponsiveContainer width="100%" height="100%">
                                         <PieChart>
                                             <Pie
                                                 data={expensesByCategory}
                                                 cx="50%"
-                                                cy="48%"
-                                                innerRadius={95}
-                                                outerRadius={160}
+                                                cy={isMobile ? '45%' : '48%'}
+                                                innerRadius={innerRadius}
+                                                outerRadius={outerRadius}
                                                 fill="#8884d8"
                                                 paddingAngle={5}
                                                 dataKey="value"
-                                                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                                                label={isMobile ? false : ({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                                             >
                                                 {expensesByCategory.map((entry, index) => (
                                                     <Cell key={`cell-${index}`} fill={entry.color} />

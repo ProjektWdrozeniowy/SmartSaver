@@ -11,6 +11,8 @@ import {
     CircularProgress,
     Alert,
     Snackbar,
+    useTheme,
+    useMediaQuery,
 } from '@mui/material';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
@@ -46,6 +48,11 @@ import { useThemeMode } from '../../context/ThemeContext';
 const AnalizySection = () => {
     const { mode } = useThemeMode();
 
+    // Theme and responsive breakpoints
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
+
     // Data states
     const [statistics, setStatistics] = useState({
         averageExpenses: 0,
@@ -67,6 +74,11 @@ const AnalizySection = () => {
     const [selectedPeriod, setSelectedPeriod] = useState('last6months');
     const [loading, setLoading] = useState(true);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+
+    // Chart dimensions based on screen size
+    const pieChartHeight = isMobile ? 300 : isTablet ? 350 : 350;
+    const pieInnerRadius = isMobile ? 40 : isTablet ? 50 : 55;
+    const pieOuterRadius = isMobile ? 80 : isTablet ? 90 : 95;
 
     // Fetch all data on mount and period change
     useEffect(() => {
@@ -665,7 +677,7 @@ const AnalizySection = () => {
                             {expensesByCategoryData.length === 0 ? (
                                 <Box sx={{
                                     width: '100%',
-                                    height: 350,
+                                    height: pieChartHeight,
                                     display: 'flex',
                                     flexDirection: 'column',
                                     alignItems: 'center',
@@ -682,19 +694,19 @@ const AnalizySection = () => {
                                     </Typography>
                                 </Box>
                             ) : (
-                                <Box sx={{ width: '100%', height: 350 }}>
+                                <Box sx={{ width: '100%', height: pieChartHeight }}>
                                     <ResponsiveContainer width="100%" height="100%">
                                         <PieChart>
                                             <Pie
                                                 data={expensesByCategoryData}
                                                 cx="50%"
-                                                cy="45%"
-                                                innerRadius={55}
-                                                outerRadius={95}
+                                                cy={isMobile ? '42%' : '45%'}
+                                                innerRadius={pieInnerRadius}
+                                                outerRadius={pieOuterRadius}
                                                 fill="#8884d8"
                                                 paddingAngle={5}
                                                 dataKey="value"
-                                                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                                                label={isMobile ? false : ({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                                             >
                                                 {expensesByCategoryData.map((entry, index) => (
                                                     <Cell key={`cell-${index}`} fill={entry.color} />
