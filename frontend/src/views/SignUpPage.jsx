@@ -118,6 +118,11 @@ const SignUpPage = () => {
 const handleSubmit = async (e) => {
   e.preventDefault();
 
+  // Usuń focus z przycisku aby uniknąć problemów z aria-hidden
+  if (document.activeElement instanceof HTMLElement) {
+    document.activeElement.blur();
+  }
+
   if (validateForm()) {
     try {
       const { username, email, password } = formData;
