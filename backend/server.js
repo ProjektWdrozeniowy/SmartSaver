@@ -1,6 +1,8 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const argon2 = require('argon2');
 const jwt = require('jsonwebtoken');
 const { z } = require('zod');
@@ -27,6 +29,39 @@ function generateToken(user) {
   );
 }
 
+// ===== SECURITY MIDDLEWARE =====
+
+// 1. Helmet - Secure HTTP headers
+app.use(helmet({
+  contentSecurityPolicy: false, // Wyłączone dla compatibility z frontend
+  crossOriginEmbedderPolicy: false
+}));
+
+// 2. Rate Limiting - Ochrona przed brute-force
+// Rate limiting TYLKO dla auth endpoints (login, register, password reset)
+// NIE stosujemy globalnego rate limitera, aby nie blokować normalnego użytkowania
+// dashboardu, który wykonuje wiele requestów przy załadowaniu strony
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minut
+  max: 20, // 20 prób na 15 minut (zwiększone dla środowiska deweloperskiego)
+  message: {
+    ok: false,
+    message: 'Zbyt wiele prób logowania/rejestracji. Spróbuj ponownie za 15 minut.'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true, // Nie licz udanych requestów (tylko błędne)
+  handler: (req, res) => {
+    console.log(`[AUTH RATE LIMIT] Przekroczono limit dla IP: ${req.ip} na ${req.path}`);
+    res.status(429).json({
+      ok: false,
+      message: 'Zbyt wiele prób logowania/rejestracji. Spróbuj ponownie za 15 minut.'
+    });
+  }
+});
+
+// ===== END SECURITY MIDDLEWARE =====
+
 // Elastyczna konfiguracja CORS dla development
 app.use(cors({
   origin: (origin, callback) => {
@@ -45,24 +80,35 @@ app.use(express.json());
 // Mail routes
 app.use('/api/mail', mailRoutes);
 
+// ===== VALIDATION SCHEMAS =====
+
+// Strong password validation
+const PasswordSchema = z.string()
+  .min(12, 'Hasło musi mieć minimum 12 znaków')
+  .max(128, 'Hasło może mieć maksymalnie 128 znaków')
+  .regex(/[a-z]/, 'Hasło musi zawierać małą literę')
+  .regex(/[A-Z]/, 'Hasło musi zawierać wielką literę')
+  .regex(/[0-9]/, 'Hasło musi zawierać cyfrę')
+  .regex(/[^A-Za-z0-9]/, 'Hasło musi zawierać znak specjalny (!@#$%^&*...)');
+
 const RegisterSchema = z.object({
-  username: z.string().min(3).max(32),
-  email: z.string().email(),
-  password: z.string().min(8)
+  username: z.string().min(3, 'Nazwa użytkownika musi mieć minimum 3 znaki').max(32, 'Nazwa użytkownika może mieć maksymalnie 32 znaki'),
+  email: z.string().email('Nieprawidłowy format email').max(100, 'Email może mieć maksymalnie 100 znaków'),
+  password: PasswordSchema
 });
 
 const LoginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8)
+  email: z.string().email('Nieprawidłowy format email'),
+  password: z.string().min(1, 'Hasło jest wymagane') // przy logowaniu nie sprawdzamy siły
 });
 
 const ForgotPasswordSchema = z.object({
-  email: z.string().email()
+  email: z.string().email('Nieprawidłowy format email')
 });
 
 const ResetPasswordSchema = z.object({
-  token: z.string().min(1),
-  newPassword: z.string().min(8)
+  token: z.string().min(1, 'Token jest wymagany'),
+  newPassword: PasswordSchema
 });
 
 // 👇 tu dodajesz
@@ -76,9 +122,13 @@ app.get('/', (_req, res) => {
 
 app.get('/healthz', (_req, res) => res.json({ ok: true }));
 
-app.post('/api/register', async (req, res) => {
+app.post('/api/register', authLimiter, async (req, res) => {
   try {
-    console.log('Received registration request:', req.body);
+    console.log('Received registration request:', {
+      username: req.body.username,
+      email: req.body.email
+      // password not logged for security
+    });
     const { username, email, password } = RegisterSchema.parse(req.body);
 
     // Sprawdź czy email już istnieje (username może się powtarzać)
@@ -133,7 +183,7 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-app.post('/api/login', async (req, res) => {
+app.post('/api/login', authLimiter, async (req, res) => {
   try {
     console.log('Received login request:', { email: req.body.email });
     const { email, password } = LoginSchema.parse(req.body);
@@ -162,10 +212,12 @@ app.post('/api/login', async (req, res) => {
     });
   } catch (err) {
     console.error('Login error:', err);
+    // Dla bezpieczeństwa, przy logowaniu zawsze zwracamy ogólny komunikat
+    // aby nie ujawniać informacji o tym, czy email istnieje czy hasło jest nieprawidłowe
     if (err.name === 'ZodError') {
-      return res.status(400).json({ ok: false, message: 'Nieprawidłowe dane: ' + err.errors.map(e => e.message).join(', ') });
+      return res.status(401).json({ ok: false, message: 'Nieprawidłowy email lub hasło' });
     }
-    res.status(400).json({ ok: false, message: err.message });
+    res.status(401).json({ ok: false, message: 'Nieprawidłowy email lub hasło' });
   }
 });
 
@@ -193,7 +245,7 @@ app.get('/api/me', authenticateToken, async (req, res) => {
 });
 
 // Forgot password endpoint
-app.post('/api/forgot-password', async (req, res) => {
+app.post('/api/forgot-password', authLimiter, async (req, res) => {
   try {
     console.log('Received forgot password request:', { email: req.body.email });
     const { email } = ForgotPasswordSchema.parse(req.body);
@@ -287,7 +339,7 @@ app.post('/api/forgot-password', async (req, res) => {
 });
 
 // Reset password endpoint
-app.post('/api/reset-password', async (req, res) => {
+app.post('/api/reset-password', authLimiter, async (req, res) => {
   try {
     console.log('Received reset password request');
     const { token, newPassword } = ResetPasswordSchema.parse(req.body);

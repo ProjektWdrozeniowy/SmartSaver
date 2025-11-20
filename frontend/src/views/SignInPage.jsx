@@ -49,18 +49,15 @@ const SignInPage = () => {
     const validateForm = () => {
         const newErrors = {};
 
-        // Walidacja email
+        // Walidacja email - sprawdzamy tylko czy pole nie jest puste
         if (!formData.email) {
             newErrors.email = 'Email jest wymagany';
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = 'Nieprawidłowy format email';
         }
 
-        // Walidacja hasła
+        // Walidacja hasła - sprawdzamy tylko czy pole nie jest puste
+        // NIE sprawdzamy długości ani innych wymagań, aby nie ujawniać informacji o wymaganiach
         if (!formData.password) {
             newErrors.password = 'Hasło jest wymagane';
-        } else if (formData.password.length < 8) {
-            newErrors.password = 'Hasło musi mieć minimum 8 znaków';
         }
 
         setErrors(newErrors);

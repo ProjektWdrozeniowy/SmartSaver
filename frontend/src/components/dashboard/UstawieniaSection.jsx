@@ -1,5 +1,5 @@
 // src/components/dashboard/UstawieniaSection.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
     Box,
     Typography,
@@ -19,6 +19,10 @@ import {
     useTheme,
     Slider,
     InputAdornment,
+    List,
+    ListItem,
+    ListItemIcon,
+    ListItemText,
 } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import LockIcon from '@mui/icons-material/Lock';
@@ -27,6 +31,8 @@ import PaletteIcon from '@mui/icons-material/Palette';
 import SecurityIcon from '@mui/icons-material/Security';
 import DownloadIcon from '@mui/icons-material/Download';
 import DeleteIcon from '@mui/icons-material/Delete';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
 import { getUser, saveUser } from '../../api/auth';
 import {
     updateUserProfile,
@@ -56,6 +62,22 @@ const UstawieniaSection = ({ scrollToSection, onScrollComplete }) => {
         newPassword: '',
         confirmPassword: '',
     });
+
+    // Walidacja wymagań hasła w czasie rzeczywistym
+    const passwordRequirements = useMemo(() => {
+        const password = passwordData.newPassword;
+        return {
+            minLength: password.length >= 12,
+            hasLowercase: /[a-z]/.test(password),
+            hasUppercase: /[A-Z]/.test(password),
+            hasDigit: /[0-9]/.test(password),
+            hasSpecialChar: /[^A-Za-z0-9]/.test(password),
+        };
+    }, [passwordData.newPassword]);
+
+    const allPasswordRequirementsMet = useMemo(() => {
+        return Object.values(passwordRequirements).every(Boolean);
+    }, [passwordRequirements]);
 
     // Stan dla powiadomień
     const [notifications, setNotifications] = useState({
@@ -181,19 +203,19 @@ const UstawieniaSection = ({ scrollToSection, onScrollComplete }) => {
             return;
         }
 
-        if (passwordData.newPassword !== passwordData.confirmPassword) {
+        if (!allPasswordRequirementsMet) {
             setSnackbar({
                 open: true,
-                message: 'Nowe hasła nie są identyczne',
+                message: 'Nowe hasło nie spełnia wszystkich wymagań',
                 severity: 'error',
             });
             return;
         }
 
-        if (passwordData.newPassword.length < 6) {
+        if (passwordData.newPassword !== passwordData.confirmPassword) {
             setSnackbar({
                 open: true,
-                message: 'Nowe hasło musi mieć co najmniej 6 znaków',
+                message: 'Nowe hasła nie są identyczne',
                 severity: 'error',
             });
             return;
@@ -578,6 +600,113 @@ const UstawieniaSection = ({ scrollToSection, onScrollComplete }) => {
                             variant="outlined"
                             size="small"
                         />
+
+                        {/* Password Requirements Indicator */}
+                        {passwordData.newPassword && (
+                            <Box
+                                sx={{
+                                    mt: 1.5,
+                                    p: 1.5,
+                                    backgroundColor: 'rgba(255, 255, 255, 0.02)',
+                                    borderRadius: 1,
+                                    border: '1px solid',
+                                    borderColor: 'rgba(255, 255, 255, 0.05)',
+                                }}
+                            >
+                                <Typography
+                                    sx={{
+                                        fontSize: '0.75rem',
+                                        fontWeight: 600,
+                                        mb: 0.75,
+                                        color: 'text.secondary',
+                                    }}
+                                >
+                                    Wymagania dotyczące hasła:
+                                </Typography>
+                                <List dense sx={{ py: 0 }}>
+                                    <ListItem sx={{ py: 0.2, px: 0 }}>
+                                        <ListItemIcon sx={{ minWidth: 28 }}>
+                                            {passwordRequirements.minLength ? (
+                                                <CheckCircleIcon sx={{ fontSize: 16, color: 'success.main' }} />
+                                            ) : (
+                                                <CancelIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
+                                            )}
+                                        </ListItemIcon>
+                                        <ListItemText
+                                            primary="Minimum 12 znaków"
+                                            primaryTypographyProps={{
+                                                fontSize: '0.75rem',
+                                                color: passwordRequirements.minLength ? 'success.main' : 'text.secondary',
+                                            }}
+                                        />
+                                    </ListItem>
+                                    <ListItem sx={{ py: 0.2, px: 0 }}>
+                                        <ListItemIcon sx={{ minWidth: 28 }}>
+                                            {passwordRequirements.hasLowercase ? (
+                                                <CheckCircleIcon sx={{ fontSize: 16, color: 'success.main' }} />
+                                            ) : (
+                                                <CancelIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
+                                            )}
+                                        </ListItemIcon>
+                                        <ListItemText
+                                            primary="Przynajmniej jedna mała litera (a-z)"
+                                            primaryTypographyProps={{
+                                                fontSize: '0.75rem',
+                                                color: passwordRequirements.hasLowercase ? 'success.main' : 'text.secondary',
+                                            }}
+                                        />
+                                    </ListItem>
+                                    <ListItem sx={{ py: 0.2, px: 0 }}>
+                                        <ListItemIcon sx={{ minWidth: 28 }}>
+                                            {passwordRequirements.hasUppercase ? (
+                                                <CheckCircleIcon sx={{ fontSize: 16, color: 'success.main' }} />
+                                            ) : (
+                                                <CancelIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
+                                            )}
+                                        </ListItemIcon>
+                                        <ListItemText
+                                            primary="Przynajmniej jedna wielka litera (A-Z)"
+                                            primaryTypographyProps={{
+                                                fontSize: '0.75rem',
+                                                color: passwordRequirements.hasUppercase ? 'success.main' : 'text.secondary',
+                                            }}
+                                        />
+                                    </ListItem>
+                                    <ListItem sx={{ py: 0.2, px: 0 }}>
+                                        <ListItemIcon sx={{ minWidth: 28 }}>
+                                            {passwordRequirements.hasDigit ? (
+                                                <CheckCircleIcon sx={{ fontSize: 16, color: 'success.main' }} />
+                                            ) : (
+                                                <CancelIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
+                                            )}
+                                        </ListItemIcon>
+                                        <ListItemText
+                                            primary="Przynajmniej jedna cyfra (0-9)"
+                                            primaryTypographyProps={{
+                                                fontSize: '0.75rem',
+                                                color: passwordRequirements.hasDigit ? 'success.main' : 'text.secondary',
+                                            }}
+                                        />
+                                    </ListItem>
+                                    <ListItem sx={{ py: 0.2, px: 0 }}>
+                                        <ListItemIcon sx={{ minWidth: 28 }}>
+                                            {passwordRequirements.hasSpecialChar ? (
+                                                <CheckCircleIcon sx={{ fontSize: 16, color: 'success.main' }} />
+                                            ) : (
+                                                <CancelIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
+                                            )}
+                                        </ListItemIcon>
+                                        <ListItemText
+                                            primary="Przynajmniej jeden znak specjalny (!@#$%^&*...)"
+                                            primaryTypographyProps={{
+                                                fontSize: '0.75rem',
+                                                color: passwordRequirements.hasSpecialChar ? 'success.main' : 'text.secondary',
+                                            }}
+                                        />
+                                    </ListItem>
+                                </List>
+                            </Box>
+                        )}
                     </Box>
 
                     <Box>
