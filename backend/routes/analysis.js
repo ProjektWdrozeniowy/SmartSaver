@@ -72,7 +72,10 @@ router.get('/statistics', authenticateToken, async (req, res) => {
       prisma.expense.aggregate({
         where: {
           userId: req.user.id,
-          date: { gte: startDate, lt: endDate }
+          date: { gte: startDate, lt: endDate },
+          category: {
+            isSystem: false
+          }
         },
         _sum: { amount: true }
       })
@@ -90,7 +93,10 @@ router.get('/statistics', authenticateToken, async (req, res) => {
       prisma.expense.aggregate({
         where: {
           userId: req.user.id,
-          date: { gte: prevStartDate, lt: startDate }
+          date: { gte: prevStartDate, lt: startDate },
+          category: {
+            isSystem: false
+          }
         },
         _sum: { amount: true }
       })
@@ -165,7 +171,10 @@ router.get('/savings-growth', authenticateToken, async (req, res) => {
         prisma.expense.aggregate({
           where: {
             userId: req.user.id,
-            date: { gte: monthStart, lt: monthEnd }
+            date: { gte: monthStart, lt: monthEnd },
+            category: {
+              isSystem: false
+            }
           },
           _sum: { amount: true }
         })
@@ -214,7 +223,10 @@ router.get('/income-vs-expenses', authenticateToken, async (req, res) => {
         prisma.expense.aggregate({
           where: {
             userId: req.user.id,
-            date: { gte: monthStart, lt: monthEnd }
+            date: { gte: monthStart, lt: monthEnd },
+            category: {
+              isSystem: false
+            }
           },
           _sum: { amount: true }
         })
@@ -249,11 +261,14 @@ router.get('/weekly-expenses', authenticateToken, async (req, res) => {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - (weeks * 7));
 
-    // Get all expenses in the period
+    // Get all expenses in the period (excluding system categories)
     const expenses = await prisma.expense.findMany({
       where: {
         userId: req.user.id,
-        date: { gte: startDate, lte: endDate }
+        date: { gte: startDate, lte: endDate },
+        category: {
+          isSystem: false
+        }
       },
       select: {
         amount: true,

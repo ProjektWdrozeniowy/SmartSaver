@@ -161,8 +161,15 @@ const WydatkiSection = ({ onExpenseChange }) => {
         return filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
     }, [filteredExpenses]);
 
-    // Get category by id
-    const getCategoryById = (id) => categories.find(cat => cat.id === id);
+    // Get category by id (prefer category from expense object, fallback to categories list)
+    const getCategoryById = (expense) => {
+        // If expense has category object, use it (includes system categories)
+        if (expense.category) {
+            return expense.category;
+        }
+        // Fallback to finding in categories list
+        return categories.find(cat => cat.id === expense.categoryId);
+    };
 
     // Handle add expense
     const handleAddExpense = () => {
@@ -552,7 +559,7 @@ const WydatkiSection = ({ onExpenseChange }) => {
                         ) : (
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                                 {filteredExpenses.map((expense) => {
-                                    const category = getCategoryById(expense.categoryId);
+                                    const category = getCategoryById(expense);
                                     return (
                                         <Card
                                             key={expense.id}
@@ -674,7 +681,7 @@ const WydatkiSection = ({ onExpenseChange }) => {
                                     </TableRow>
                                 ) : (
                                     filteredExpenses.map((expense) => {
-                                        const category = getCategoryById(expense.categoryId);
+                                        const category = getCategoryById(expense);
                                         return (
                                             <TableRow key={expense.id} hover>
                                                 <TableCell sx={{ color: 'text.primary' }}>{expense.name}</TableCell>
