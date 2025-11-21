@@ -18,6 +18,14 @@ import {
     Snackbar,
     LinearProgress,
     Chip,
+    Checkbox,
+    FormControlLabel,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    Switch,
+    Grid,
 } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -32,7 +40,7 @@ import TrackChangesIcon from '@mui/icons-material/TrackChanges';
 import SavingsIcon from '@mui/icons-material/Savings';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import { getGoals, createGoal, updateGoal, deleteGoal, contributeToGoal } from '../../api/goals';
+import { getGoals, createGoal, updateGoal, deleteGoal, contributeToGoal, updateRecurringContribution } from '../../api/goals';
 import { useThemeMode } from '../../context/ThemeContext';
 
 const CeleSection = ({ onGoalChange }) => {
@@ -61,6 +69,12 @@ const CeleSection = ({ onGoalChange }) => {
         currentAmount: '',
         dueDate: '',
         description: '',
+        hasRecurringContribution: false,
+        recurringAmount: '',
+        recurringInterval: 1,
+        recurringUnit: 'month',
+        recurringEndDate: '',
+        hasRecurringEndDate: false,
     });
 
     // Form state for contribution
@@ -141,6 +155,12 @@ const CeleSection = ({ onGoalChange }) => {
             currentAmount: '0',
             dueDate: '',
             description: '',
+            hasRecurringContribution: false,
+            recurringAmount: '',
+            recurringInterval: 1,
+            recurringUnit: 'month',
+            recurringEndDate: '',
+            hasRecurringEndDate: false,
         });
         setOpenGoalDialog(true);
     };
@@ -148,12 +168,23 @@ const CeleSection = ({ onGoalChange }) => {
     // Handle edit goal
     const handleEditGoal = (goal) => {
         setEditingGoal(goal);
+
+        // Check if goal has recurring contribution
+        const hasRecurring = goal.recurringContribution !== null && goal.recurringContribution !== undefined;
+        const recurring = goal.recurringContribution || {};
+
         setGoalForm({
             name: goal.name,
             targetAmount: goal.targetAmount,
             currentAmount: goal.currentAmount,
             dueDate: goal.dueDate.split('T')[0], // Convert ISO string to YYYY-MM-DD format
             description: goal.description || '',
+            hasRecurringContribution: hasRecurring,
+            recurringAmount: hasRecurring ? recurring.amount.toString() : '',
+            recurringInterval: hasRecurring ? recurring.recurringInterval : 1,
+            recurringUnit: hasRecurring ? recurring.recurringUnit : 'month',
+            recurringEndDate: hasRecurring && recurring.recurringEndDate ? recurring.recurringEndDate.split('T')[0] : '',
+            hasRecurringEndDate: hasRecurring && recurring.recurringEndDate !== null,
         });
         setOpenGoalDialog(true);
     };
@@ -171,15 +202,69 @@ const CeleSection = ({ onGoalChange }) => {
             };
 
             if (editingGoal) {
-                // Update existing
+                // Update existing goal
                 await updateGoal(editingGoal.id, goalData);
-                showSnackbar('Cel został zaktualizowany', 'success');
+
+                // Handle recurring contribution changes
+                const hadRecurring = editingGoal.recurringContribution !== null;
+                const hasRecurring = goalForm.hasRecurringContribution && goalForm.recurringAmount && parseFloat(goalForm.recurringAmount) > 0;
+
+                if (hadRecurring && !hasRecurring) {
+                    // Delete recurring contribution
+                    try {
+                        await updateRecurringContribution(editingGoal.id, { action: 'delete' });
+                        showSnackbar('Cel zaktualizowany, cykliczna wpłata usunięta', 'success');
+                    } catch (contribErr) {
+                        console.error('Error deleting recurring contribution:', contribErr);
+                        showSnackbar('Cel zaktualizowany, ale wystąpił błąd podczas usuwania cyklicznej wpłaty', 'warning');
+                    }
+                } else if (hasRecurring) {
+                    // Update or create recurring contribution
+                    const contributionData = {
+                        action: 'update',
+                        amount: parseFloat(goalForm.recurringAmount),
+                        recurringInterval: goalForm.recurringInterval,
+                        recurringUnit: goalForm.recurringUnit,
+                        recurringEndDate: goalForm.hasRecurringEndDate ? goalForm.recurringEndDate : null,
+                    };
+
+                    try {
+                        await updateRecurringContribution(editingGoal.id, contributionData);
+                        showSnackbar(hadRecurring ? 'Cel i cykliczna wpłata zaktualizowane' : 'Cel zaktualizowany, cykliczna wpłata dodana', 'success');
+                    } catch (contribErr) {
+                        console.error('Error updating recurring contribution:', contribErr);
+                        showSnackbar('Cel zaktualizowany, ale wystąpił błąd podczas zapisywania cyklicznej wpłaty', 'warning');
+                    }
+                } else {
+                    showSnackbar('Cel został zaktualizowany', 'success');
+                }
+
                 // Refresh notification count as goal might have been achieved
                 if (onGoalChange) onGoalChange();
             } else {
-                // Add new
-                await createGoal(goalData);
-                showSnackbar('Cel został dodany', 'success');
+                // Add new goal
+                const response = await createGoal(goalData);
+
+                // If recurring contribution is enabled, create it
+                if (goalForm.hasRecurringContribution && goalForm.recurringAmount && parseFloat(goalForm.recurringAmount) > 0) {
+                    const contributionData = {
+                        amount: parseFloat(goalForm.recurringAmount),
+                        isRecurring: true,
+                        recurringInterval: goalForm.recurringInterval,
+                        recurringUnit: goalForm.recurringUnit,
+                        recurringEndDate: goalForm.hasRecurringEndDate ? goalForm.recurringEndDate : null,
+                    };
+
+                    try {
+                        await contributeToGoal(response.goal.id, contributionData);
+                        showSnackbar('Cel oraz cykliczna wpłata zostały dodane', 'success');
+                    } catch (contribErr) {
+                        console.error('Error creating recurring contribution:', contribErr);
+                        showSnackbar('Cel został dodany, ale wystąpił błąd podczas tworzenia cyklicznej wpłaty', 'warning');
+                    }
+                } else {
+                    showSnackbar('Cel został dodany', 'success');
+                }
             }
 
             setOpenGoalDialog(false);
@@ -225,7 +310,16 @@ const CeleSection = ({ onGoalChange }) => {
     const handleContribute = async () => {
         try {
             setSaving(true);
-            await contributeToGoal(selectedGoal.id, parseFloat(contributeAmount));
+
+            const contributionData = {
+                amount: parseFloat(contributeAmount),
+                isRecurring: false,
+                recurringInterval: null,
+                recurringUnit: null,
+                recurringEndDate: null,
+            };
+
+            await contributeToGoal(selectedGoal.id, contributionData);
             showSnackbar('Wpłata została dodana', 'success');
             setOpenContributeDialog(false);
             fetchGoals(); // Refresh list
@@ -259,6 +353,7 @@ const CeleSection = ({ onGoalChange }) => {
                         boxShadow: '0 4px 12px rgba(199, 125, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
                         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                         textShadow: '0 0 10px rgba(199, 125, 255, 0.5)',
+                        minWidth: '200px',
                         '&:hover': {
                             background: 'linear-gradient(135deg, rgba(199, 125, 255, 0.3), rgba(199, 125, 255, 0.2))',
                             boxShadow: '0 0 12px 3px rgba(199, 125, 255, 0.2)',
@@ -266,7 +361,7 @@ const CeleSection = ({ onGoalChange }) => {
                         },
                     }}
                 >
-                    Nowy cel
+                    Dodaj cel
                 </Button>
             </Box>
 
@@ -884,6 +979,162 @@ const CeleSection = ({ onGoalChange }) => {
                             rows={3}
                             placeholder="Dodaj opis swojego celu"
                         />
+
+                        {/* Recurring Contribution Section */}
+                        <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            checked={goalForm.hasRecurringContribution}
+                                            onChange={(e) => setGoalForm({ ...goalForm, hasRecurringContribution: e.target.checked })}
+                                            sx={{
+                                                color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
+                                                '&.Mui-checked': {
+                                                    color: '#ab47bc',
+                                                },
+                                            }}
+                                        />
+                                    }
+                                    label="Ustaw cykliczną wpłatę"
+                                />
+
+                                {goalForm.hasRecurringContribution && (
+                                    <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                        <TextField
+                                            label="Kwota wpłaty"
+                                            type="number"
+                                            value={goalForm.recurringAmount}
+                                            onChange={(e) => setGoalForm({ ...goalForm, recurringAmount: e.target.value })}
+                                            fullWidth
+                                            required
+                                            inputProps={{ step: '0.01', min: '0.01' }}
+                                            InputProps={{
+                                                endAdornment: <InputAdornment position="end">zł</InputAdornment>,
+                                            }}
+                                            sx={{
+                                                '& input[type=number]': {
+                                                    MozAppearance: 'textfield',
+                                                },
+                                                '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
+                                                    WebkitAppearance: 'none',
+                                                    margin: 0,
+                                                },
+                                            }}
+                                        />
+
+                                        <Grid container spacing={2}>
+                                            <Grid item xs={6}>
+                                                <TextField
+                                                    label="Powtarzaj co"
+                                                    type="number"
+                                                    value={goalForm.recurringInterval}
+                                                    onChange={(e) => setGoalForm({ ...goalForm, recurringInterval: parseInt(e.target.value) || 1 })}
+                                                    fullWidth
+                                                    inputProps={{ min: 1 }}
+                                                    sx={{
+                                                        '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
+                                                            WebkitAppearance: 'auto',
+                                                            filter: mode === 'dark' ? 'invert(1)' : 'none',
+                                                        },
+                                                    }}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={6}>
+                                                <FormControl fullWidth>
+                                                    <InputLabel>Jednostka</InputLabel>
+                                                    <Select
+                                                        value={goalForm.recurringUnit}
+                                                        label="Jednostka"
+                                                        onChange={(e) => setGoalForm({ ...goalForm, recurringUnit: e.target.value })}
+                                                    >
+                                                        <MenuItem value="day">dzień</MenuItem>
+                                                        <MenuItem value="week">tydzień</MenuItem>
+                                                        <MenuItem value="month">miesiąc</MenuItem>
+                                                        <MenuItem value="year">rok</MenuItem>
+                                                    </Select>
+                                                </FormControl>
+                                            </Grid>
+                                        </Grid>
+
+                                        <FormControlLabel
+                                            control={
+                                                <Switch
+                                                    checked={!goalForm.hasRecurringEndDate}
+                                                    onChange={(e) => setGoalForm({ ...goalForm, hasRecurringEndDate: !e.target.checked })}
+                                                    sx={{
+                                                        '& .MuiSwitch-switchBase.Mui-checked': {
+                                                            color: '#ab47bc',
+                                                        },
+                                                        '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                                            backgroundColor: '#ab47bc',
+                                                        },
+                                                    }}
+                                                />
+                                            }
+                                            label="Do odwołania"
+                                        />
+
+                                        {goalForm.hasRecurringEndDate && (
+                                            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
+                                                <DatePicker
+                                                    label="Data zakończenia wpłat"
+                                                    value={goalForm.recurringEndDate ? dayjs(goalForm.recurringEndDate) : null}
+                                                    onChange={(newValue) => setGoalForm({ ...goalForm, recurringEndDate: newValue ? newValue.format('YYYY-MM-DD') : '' })}
+                                                    minDate={dayjs().add(1, 'day')}
+                                                    slotProps={{
+                                                        textField: {
+                                                            fullWidth: true,
+                                                        },
+                                                        popper: {
+                                                            sx: {
+                                                                '& .MuiPaper-root': {
+                                                                    background: mode === 'dark'
+                                                                        ? 'linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(18, 18, 18, 0.95))'
+                                                                        : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(245, 245, 245, 0.95))',
+                                                                    backdropFilter: 'blur(20px)',
+                                                                    WebkitBackdropFilter: 'blur(20px)',
+                                                                    border: '1px solid',
+                                                                    borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+                                                                    boxShadow: mode === 'dark'
+                                                                        ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                                                                        : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
+                                                                },
+                                                                '& .MuiPickersCalendarHeader-root': {
+                                                                    color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
+                                                                },
+                                                                '& .MuiPickersCalendarHeader-label': {
+                                                                    color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
+                                                                },
+                                                                '& .MuiPickersDay-root': {
+                                                                    color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
+                                                                    '&:hover': {
+                                                                        backgroundColor: 'rgba(199, 125, 255, 0.2)',
+                                                                    },
+                                                                    '&.Mui-selected': {
+                                                                        backgroundColor: '#ab47bc',
+                                                                        '&:hover': {
+                                                                            backgroundColor: '#9d4edd',
+                                                                        },
+                                                                    },
+                                                                },
+                                                                '& .MuiPickersDay-today': {
+                                                                    border: '1px solid #ab47bc',
+                                                                },
+                                                                '& .MuiDayCalendar-weekDayLabel': {
+                                                                    color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
+                                                                },
+                                                                '& .MuiIconButton-root': {
+                                                                    color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
+                                                                },
+                                                            },
+                                                        },
+                                                    }}
+                                                />
+                                            </LocalizationProvider>
+                                        )}
+                                    </Box>
+                                )}
+                        </Box>
                     </Box>
                 </DialogContent>
                 <DialogActions>

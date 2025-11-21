@@ -16,13 +16,26 @@ const CreateCategorySchema = z.object({
 // GET /api/categories - Get all categories for the authenticated user
 router.get('/', authenticateToken, async (req, res) => {
   try {
+    const { includeSystem } = req.query;
+    const shouldIncludeSystem = includeSystem === 'true';
+
+    const where = {
+      userId: req.user.id
+    };
+
+    // By default, exclude system categories (for forms)
+    if (!shouldIncludeSystem) {
+      where.isSystem = false;
+    }
+
     const categories = await prisma.category.findMany({
-      where: { userId: req.user.id },
+      where,
       select: {
         id: true,
         name: true,
         color: true,
-        icon: true
+        icon: true,
+        isSystem: true
       },
       orderBy: { createdAt: 'asc' }
     });
@@ -90,6 +103,11 @@ router.delete('/:id', authenticateToken, async (req, res) => {
 
     if (!category) {
       return res.status(404).json({ message: 'Kategoria nie została znaleziona' });
+    }
+
+    // Prevent deletion of system categories
+    if (category.isSystem) {
+      return res.status(400).json({ message: 'Nie można usunąć kategorii systemowej' });
     }
 
     // Check if there are expenses using this category

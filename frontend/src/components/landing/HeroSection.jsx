@@ -154,6 +154,8 @@ const HeroSection = () => {
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
+                        position: 'relative',
+                        zIndex: 2,
                     }}
                 >
                     <Box
@@ -165,6 +167,8 @@ const HeroSection = () => {
                             width: '100%',
                             height: 'auto',
                             opacity: 0.85,
+                            position: 'relative',
+                            zIndex: 2,
                         }}
                     />
                 </Box>

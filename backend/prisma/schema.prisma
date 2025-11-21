@@ -29,6 +29,7 @@ model Category {
   name      String
   color     String
   icon      String
+  isSystem  Boolean   @default(false)
   createdAt DateTime  @default(now())
   user      Account   @relation(fields: [userId], references: [id], onDelete: Cascade)
   expenses  Expense[]
@@ -105,13 +106,21 @@ model Goal {
 }
 
 model GoalContribution {
-  id        Int      @id @default(autoincrement())
-  goalId    Int
-  amount    Float
-  createdAt DateTime @default(now())
-  goal      Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  id                    Int                  @id @default(autoincrement())
+  goalId                Int
+  amount                Float
+  createdAt             DateTime             @default(now())
+  isRecurring           Boolean              @default(false)
+  recurringInterval     Int?
+  recurringUnit         String?
+  recurringEndDate      DateTime?
+  parentContributionId  Int?
+  goal                  Goal                 @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  parentContribution    GoalContribution?    @relation("RecurringContributions", fields: [parentContributionId], references: [id], onDelete: Cascade)
+  childContributions    GoalContribution[]   @relation("RecurringContributions")
 
   @@index([goalId], map: "goal_contributions_goalId_fkey")
+  @@index([parentContributionId], map: "goal_contributions_parentContributionId_fkey")
   @@map("goal_contributions")
 }
 

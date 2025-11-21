@@ -45,11 +45,14 @@ router.get('/stats', authenticateToken, async (req, res) => {
         },
         _sum: { amount: true }
       }),
-      // Current month expenses
+      // Current month expenses (excluding system categories)
       prisma.expense.aggregate({
         where: {
           userId: req.user.id,
-          date: { gte: currentMonth, lt: nextMonth }
+          date: { gte: currentMonth, lt: nextMonth },
+          category: {
+            isSystem: false
+          }
         },
         _sum: { amount: true }
       }),
@@ -61,11 +64,14 @@ router.get('/stats', authenticateToken, async (req, res) => {
         },
         _sum: { amount: true }
       }),
-      // Previous month expenses
+      // Previous month expenses (excluding system categories)
       prisma.expense.aggregate({
         where: {
           userId: req.user.id,
-          date: { gte: previousMonth, lt: currentMonth }
+          date: { gte: previousMonth, lt: currentMonth },
+          category: {
+            isSystem: false
+          }
         },
         _sum: { amount: true }
       }),
@@ -253,7 +259,7 @@ router.get('/expenses-by-category', authenticateToken, async (req, res) => {
     const endDate = new Date(startDate);
     endDate.setMonth(endDate.getMonth() + 1);
 
-    // Get expenses grouped by category
+    // Get expenses grouped by category (excluding system categories)
     const expensesByCategory = await prisma.expense.groupBy({
       by: ['categoryId'],
       where: {
@@ -261,6 +267,9 @@ router.get('/expenses-by-category', authenticateToken, async (req, res) => {
         date: {
           gte: startDate,
           lt: endDate
+        },
+        category: {
+          isSystem: false
         }
       },
       _sum: {

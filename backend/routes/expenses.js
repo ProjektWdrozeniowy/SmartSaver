@@ -29,13 +29,16 @@ async function checkBudgetAndNotify(userId, expenseDate) {
     const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
     const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59);
 
-    // Get total expenses for this month
+    // Get total expenses for this month (excluding system categories)
     const expenses = await prisma.expense.findMany({
       where: {
         userId,
         date: {
           gte: startOfMonth,
           lte: endOfMonth
+        },
+        category: {
+          isSystem: false
         }
       },
       select: {
@@ -161,7 +164,16 @@ router.get('/', authenticateToken, async (req, res) => {
         recurringInterval: true,
         recurringUnit: true,
         recurringEndDate: true,
-        parentExpenseId: true
+        parentExpenseId: true,
+        category: {
+          select: {
+            id: true,
+            name: true,
+            icon: true,
+            color: true,
+            isSystem: true
+          }
+        }
       },
       orderBy: [
         { date: 'desc' },

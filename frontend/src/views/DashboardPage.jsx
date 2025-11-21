@@ -38,6 +38,7 @@ import { getUser, logout } from '../api/auth';
 import { getNotifications, checkGoalReminders } from '../api/notifications';
 import { checkRecurringExpenses } from '../api/expenses';
 import { checkRecurringIncomes } from '../api/budget';
+import { checkRecurringContributions } from '../api/goals';
 
 // Import dashboard sections
 import PulpitSection from '../components/dashboard/PulpitSection';
@@ -75,7 +76,7 @@ const DashboardPage = () => {
         // Pobierz liczbę nieprzeczytanych powiadomień
         fetchUnreadCount();
 
-        // Sprawdź przypomnienia o celach, cykliczne wydatki i cykliczne przychody tylko raz
+        // Sprawdź przypomnienia o celach, cykliczne wydatki, cykliczne przychody i cykliczne wpłaty tylko raz
         if (!hasCheckedReminders.current) {
             hasCheckedReminders.current = true;
             checkGoalReminders().catch(error => {
@@ -86,6 +87,9 @@ const DashboardPage = () => {
             });
             checkRecurringIncomes().catch(error => {
                 console.error('Error checking recurring incomes:', error);
+            });
+            checkRecurringContributions().catch(error => {
+                console.error('Error checking recurring contributions:', error);
             });
         }
     }, []);

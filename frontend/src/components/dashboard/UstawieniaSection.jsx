@@ -913,10 +913,11 @@ const UstawieniaSection = ({ scrollToSection, onScrollComplete }) => {
                                 <Slider
                                     value={notifications.goalReminderDeadlineDays}
                                     onChange={handleDeadlineDaysChange}
-                                    min={7}
+                                    min={1}
                                     max={60}
                                     step={null}
                                     marks={[
+                                        { value: 1, label: '1' },
                                         { value: 7, label: '7' },
                                         { value: 14, label: '14' },
                                         { value: 30, label: '30' },
@@ -934,10 +935,11 @@ const UstawieniaSection = ({ scrollToSection, onScrollComplete }) => {
                                 <Slider
                                     value={notifications.goalReminderInactivityDays}
                                     onChange={handleInactivityDaysChange}
-                                    min={7}
+                                    min={1}
                                     max={60}
                                     step={null}
                                     marks={[
+                                        { value: 1, label: '1' },
                                         { value: 7, label: '7' },
                                         { value: 14, label: '14' },
                                         { value: 30, label: '30' },

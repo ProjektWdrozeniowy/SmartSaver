@@ -62,7 +62,11 @@ const UpdateGoalSchema = z.object({
 });
 
 const ContributeSchema = z.object({
-  amount: z.number().positive()
+  amount: z.number().positive(),
+  isRecurring: z.boolean().optional(),
+  recurringInterval: z.number().int().positive().optional().nullable(),
+  recurringUnit: z.enum(['day', 'week', 'month', 'year']).optional().nullable(),
+  recurringEndDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().nullable()
 });
 
 // GET /api/goals - Get all goals for the authenticated user
@@ -78,12 +82,36 @@ router.get('/', authenticateToken, async (req, res) => {
         dueDate: true,
         description: true,
         createdAt: true,
-        updatedAt: true
+        updatedAt: true,
+        contributions: {
+          where: {
+            isRecurring: true,
+            parentContributionId: null // Only parent recurring contributions
+          },
+          select: {
+            id: true,
+            amount: true,
+            isRecurring: true,
+            recurringInterval: true,
+            recurringUnit: true,
+            recurringEndDate: true,
+            createdAt: true
+          },
+          orderBy: { createdAt: 'desc' },
+          take: 1 // Get only the most recent recurring contribution
+        }
       },
       orderBy: { dueDate: 'asc' }
     });
 
-    res.json({ goals });
+    // Transform contributions array to single object or null
+    const goalsWithRecurring = goals.map(goal => ({
+      ...goal,
+      recurringContribution: goal.contributions.length > 0 ? goal.contributions[0] : null,
+      contributions: undefined // Remove the array
+    }));
+
+    res.json({ goals: goalsWithRecurring });
   } catch (error) {
     console.error('Get goals error:', error);
     res.status(500).json({ message: 'Błąd serwera' });
@@ -231,11 +259,238 @@ router.delete('/:id', authenticateToken, async (req, res) => {
   }
 });
 
+// POST /api/goals/check-recurring-contributions - Check and create recurring contributions
+router.post('/check-recurring-contributions', authenticateToken, async (req, res) => {
+  try {
+    const now = new Date();
+    let createdCount = 0;
+
+    // Get the system 'Cel' category
+    const goalCategory = await prisma.category.findFirst({
+      where: {
+        userId: req.user.id,
+        name: 'Cel',
+        isSystem: true
+      }
+    });
+
+    if (!goalCategory) {
+      return res.status(500).json({ message: 'Błąd: Brak kategorii systemowej "Cel"' });
+    }
+
+    // Get all recurring contributions for the user (parent contributions only)
+    const recurringContributions = await prisma.goalContribution.findMany({
+      where: {
+        goal: {
+          userId: req.user.id
+        },
+        isRecurring: true,
+        parentContributionId: null // Only parent contributions
+      },
+      include: {
+        goal: true
+      }
+    });
+
+    for (const parentContribution of recurringContributions) {
+      // Check if recurring has ended
+      if (parentContribution.recurringEndDate && new Date(parentContribution.recurringEndDate) < now) {
+        continue; // Skip expired recurring contributions
+      }
+
+      // Get the last generated contribution for this recurring contribution
+      const lastChild = await prisma.goalContribution.findFirst({
+        where: {
+          parentContributionId: parentContribution.id
+        },
+        orderBy: { createdAt: 'desc' }
+      });
+
+      // Determine the last date (either last child or parent date)
+      const lastDate = lastChild ? new Date(lastChild.createdAt) : new Date(parentContribution.createdAt);
+
+      // Calculate next date based on recurring settings
+      const nextDate = new Date(lastDate);
+      switch (parentContribution.recurringUnit) {
+        case 'day':
+          nextDate.setDate(nextDate.getDate() + parentContribution.recurringInterval);
+          break;
+        case 'week':
+          nextDate.setDate(nextDate.getDate() + (parentContribution.recurringInterval * 7));
+          break;
+        case 'month':
+          nextDate.setMonth(nextDate.getMonth() + parentContribution.recurringInterval);
+          break;
+        case 'year':
+          nextDate.setFullYear(nextDate.getFullYear() + parentContribution.recurringInterval);
+          break;
+      }
+
+      // Check if next date is today or in the past (and not in the future)
+      if (nextDate <= now) {
+        // Check if contribution hasn't ended yet
+        if (!parentContribution.recurringEndDate || nextDate <= new Date(parentContribution.recurringEndDate)) {
+          // Check if contribution for this date doesn't already exist
+          const existingContribution = await prisma.goalContribution.findFirst({
+            where: {
+              parentContributionId: parentContribution.id,
+              createdAt: {
+                gte: new Date(nextDate.setHours(0, 0, 0, 0)),
+                lt: new Date(nextDate.setHours(23, 59, 59, 999))
+              }
+            }
+          });
+
+          if (!existingContribution) {
+            // Create new recurring contribution
+            await prisma.goalContribution.create({
+              data: {
+                goalId: parentContribution.goalId,
+                amount: parentContribution.amount,
+                createdAt: nextDate,
+                isRecurring: false, // Child contributions are not marked as recurring
+                parentContributionId: parentContribution.id
+              }
+            });
+
+            // Create expense record for this automatic contribution
+            const goal = parentContribution.goal;
+            await prisma.expense.create({
+              data: {
+                userId: req.user.id,
+                categoryId: goalCategory.id,
+                name: `Wpłata na cel: ${goal.name}`,
+                amount: parentContribution.amount,
+                date: nextDate,
+                description: 'Automatyczna wpłata cykliczna na cel oszczędnościowy',
+                isRecurring: false
+              }
+            });
+
+            // Update goal's current amount
+            const newAmount = goal.currentAmount + parentContribution.amount;
+            await prisma.goal.update({
+              where: { id: goal.id },
+              data: {
+                currentAmount: newAmount
+              }
+            });
+
+            // Check if goal was achieved and create notification
+            await checkGoalAchievedAndNotify(
+              goal.userId,
+              goal.id,
+              goal.currentAmount,
+              newAmount,
+              goal.targetAmount,
+              goal.name
+            );
+
+            createdCount++;
+          }
+        }
+      }
+    }
+
+    res.json({
+      message: 'Sprawdzono cykliczne wpłaty',
+      created: createdCount
+    });
+  } catch (error) {
+    console.error('Check recurring contributions error:', error);
+    res.status(500).json({ message: 'Błąd serwera' });
+  }
+});
+
+// PUT /api/goals/:id/recurring-contribution - Update or delete recurring contribution
+router.put('/:id/recurring-contribution', authenticateToken, async (req, res) => {
+  try {
+    const goalId = parseInt(req.params.id);
+    const { action, amount, recurringInterval, recurringUnit, recurringEndDate } = req.body;
+
+    // Check if goal exists and belongs to user
+    const goal = await prisma.goal.findFirst({
+      where: {
+        id: goalId,
+        userId: req.user.id
+      },
+      include: {
+        contributions: {
+          where: {
+            isRecurring: true,
+            parentContributionId: null
+          }
+        }
+      }
+    });
+
+    if (!goal) {
+      return res.status(404).json({ message: 'Cel nie został znaleziony' });
+    }
+
+    const existingRecurring = goal.contributions.find(c => c.isRecurring && !c.parentContributionId);
+
+    if (action === 'delete') {
+      // Delete existing recurring contribution
+      if (existingRecurring) {
+        await prisma.goalContribution.delete({
+          where: { id: existingRecurring.id }
+        });
+        return res.json({ message: 'Cykliczna wpłata została usunięta' });
+      } else {
+        return res.status(404).json({ message: 'Brak cyklicznej wpłaty do usunięcia' });
+      }
+    } else if (action === 'update') {
+      // Update existing or create new recurring contribution
+      if (existingRecurring) {
+        // Update existing
+        const updated = await prisma.goalContribution.update({
+          where: { id: existingRecurring.id },
+          data: {
+            amount: parseFloat(amount),
+            recurringInterval: recurringInterval,
+            recurringUnit: recurringUnit,
+            recurringEndDate: recurringEndDate ? new Date(recurringEndDate) : null
+          }
+        });
+        return res.json({ message: 'Cykliczna wpłata została zaktualizowana', contribution: updated });
+      } else {
+        // Create new
+        const contribution = await prisma.goalContribution.create({
+          data: {
+            goalId: goalId,
+            amount: parseFloat(amount),
+            isRecurring: true,
+            recurringInterval: recurringInterval,
+            recurringUnit: recurringUnit,
+            recurringEndDate: recurringEndDate ? new Date(recurringEndDate) : null
+          }
+        });
+
+        // Update goal's current amount with first contribution
+        await prisma.goal.update({
+          where: { id: goalId },
+          data: {
+            currentAmount: goal.currentAmount + parseFloat(amount)
+          }
+        });
+
+        return res.json({ message: 'Cykliczna wpłata została dodana', contribution });
+      }
+    } else {
+      return res.status(400).json({ message: 'Nieprawidłowa akcja' });
+    }
+  } catch (error) {
+    console.error('Update recurring contribution error:', error);
+    res.status(500).json({ message: 'Błąd serwera' });
+  }
+});
+
 // POST /api/goals/:id/contribute - Add a contribution to a goal
 router.post('/:id/contribute', authenticateToken, async (req, res) => {
   try {
     const goalId = parseInt(req.params.id);
-    const { amount } = ContributeSchema.parse(req.body);
+    const { amount, isRecurring, recurringInterval, recurringUnit, recurringEndDate } = ContributeSchema.parse(req.body);
 
     // Check if goal exists and belongs to user
     const goal = await prisma.goal.findFirst({
@@ -249,11 +504,41 @@ router.post('/:id/contribute', authenticateToken, async (req, res) => {
       return res.status(404).json({ message: 'Cel nie został znaleziony' });
     }
 
+    // Get the system 'Cel' category
+    const goalCategory = await prisma.category.findFirst({
+      where: {
+        userId: req.user.id,
+        name: 'Cel',
+        isSystem: true
+      }
+    });
+
+    if (!goalCategory) {
+      return res.status(500).json({ message: 'Błąd: Brak kategorii systemowej "Cel"' });
+    }
+
     // Create contribution record
-    await prisma.goalContribution.create({
+    const contribution = await prisma.goalContribution.create({
       data: {
         goalId: goalId,
-        amount: amount
+        amount: amount,
+        isRecurring: isRecurring || false,
+        recurringInterval: isRecurring ? recurringInterval : null,
+        recurringUnit: isRecurring ? recurringUnit : null,
+        recurringEndDate: isRecurring && recurringEndDate ? new Date(recurringEndDate) : null
+      }
+    });
+
+    // Create expense record for this contribution
+    await prisma.expense.create({
+      data: {
+        userId: req.user.id,
+        categoryId: goalCategory.id,
+        name: `Wpłata na cel: ${goal.name}`,
+        amount: amount,
+        date: new Date(),
+        description: `Wpłata ${isRecurring ? 'cykliczna' : 'jednorazowa'} na cel oszczędnościowy`,
+        isRecurring: false
       }
     });
 
@@ -278,7 +563,8 @@ router.post('/:id/contribute', authenticateToken, async (req, res) => {
 
     res.json({
       message: 'Wpłata została dodana',
-      goal: updatedGoal
+      goal: updatedGoal,
+      contribution
     });
   } catch (error) {
     console.error('Contribute to goal error:', error);
