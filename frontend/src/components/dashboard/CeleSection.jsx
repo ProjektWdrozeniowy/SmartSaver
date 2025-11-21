@@ -353,6 +353,7 @@ const CeleSection = ({ onGoalChange }) => {
                         boxShadow: '0 4px 12px rgba(199, 125, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
                         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                         textShadow: '0 0 10px rgba(199, 125, 255, 0.5)',
+                        minWidth: '200px',
                         '&:hover': {
                             background: 'linear-gradient(135deg, rgba(199, 125, 255, 0.3), rgba(199, 125, 255, 0.2))',
                             boxShadow: '0 0 12px 3px rgba(199, 125, 255, 0.2)',
@@ -360,7 +361,7 @@ const CeleSection = ({ onGoalChange }) => {
                         },
                     }}
                 >
-                    Nowy cel
+                    Dodaj cel
                 </Button>
             </Box>
 
