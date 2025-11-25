@@ -785,8 +785,7 @@ const CeleSection = ({ onGoalChange }) => {
                                             >
                                                 Wpłać
                                             </Button>
-                                            <IconButton
-                                                size="small"
+                                            <Button
                                                 onClick={() => handleEditGoal(goal)}
                                                 sx={{
                                                     background: 'rgba(0, 240, 255, 0.1)',
@@ -797,6 +796,7 @@ const CeleSection = ({ onGoalChange }) => {
                                                     color: '#00b8d4',
                                                     padding: '6px 16px',
                                                     minHeight: '36px',
+                                                    minWidth: 'auto',
                                                     flexShrink: 0,
                                                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                                     '&:hover': {
@@ -806,9 +806,8 @@ const CeleSection = ({ onGoalChange }) => {
                                                 }}
                                             >
                                                 <EditIcon fontSize="small" />
-                                            </IconButton>
-                                            <IconButton
-                                                size="small"
+                                            </Button>
+                                            <Button
                                                 onClick={() => handleDeleteGoal(goal)}
                                                 sx={{
                                                     background: 'rgba(244, 67, 54, 0.1)',
@@ -819,6 +818,7 @@ const CeleSection = ({ onGoalChange }) => {
                                                     color: '#f44336',
                                                     padding: '6px 16px',
                                                     minHeight: '36px',
+                                                    minWidth: 'auto',
                                                     flexShrink: 0,
                                                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                                     '&:hover': {
@@ -828,7 +828,7 @@ const CeleSection = ({ onGoalChange }) => {
                                                 }}
                                             >
                                                 <DeleteIcon fontSize="small" />
-                                            </IconButton>
+                                            </Button>
                                         </Box>
                                     </CardContent>
                                 </Card>
