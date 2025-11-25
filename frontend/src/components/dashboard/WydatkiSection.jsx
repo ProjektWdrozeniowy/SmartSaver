@@ -1125,7 +1125,7 @@ const WydatkiSection = ({ onExpenseChange }) => {
                             <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary' }}>
                                 Kolor kategorii
                             </Typography>
-                            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', p: 1 }}>
                                 {['#ff6b9d', '#00f0ff', '#a8e6cf', '#ffd93d', '#c77dff', '#ff9a76', '#84dcc6'].map((color) => (
                                     <Box
                                         key={color}
