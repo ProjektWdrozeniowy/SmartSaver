@@ -805,8 +805,21 @@ const AnalizySection = () => {
                                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.1)" />
                                         <XAxis dataKey="week" stroke="#888" />
                                         <YAxis stroke="#888" />
-                                        <Tooltip content={<CustomTooltip />} />
-                                        <Bar dataKey="amount" fill="#00f0ff" name="Wydatki" radius={[8, 8, 0, 0]} />
+                                        <Tooltip
+                                            content={<CustomTooltip />}
+                                            cursor={{ fill: mode === 'dark' ? 'rgba(0, 240, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)' }}
+                                        />
+                                        <Bar
+                                            dataKey="amount"
+                                            fill="#00f0ff"
+                                            name="Wydatki"
+                                            radius={[8, 8, 0, 0]}
+                                            activeBar={{
+                                                fill: mode === 'dark' ? 'rgba(0, 240, 255, 0.8)' : '#00d4e6',
+                                                stroke: '#00f0ff',
+                                                strokeWidth: 2,
+                                            }}
+                                        />
                                     </BarChart>
                                 </ResponsiveContainer>
                             )}
