@@ -39,6 +39,7 @@ import { getNotifications, checkGoalReminders } from '../api/notifications';
 import { checkRecurringExpenses } from '../api/expenses';
 import { checkRecurringIncomes } from '../api/budget';
 import { checkRecurringContributions } from '../api/goals';
+import { useThemeMode } from '../context/ThemeContext';
 
 // Import dashboard sections
 import PulpitSection from '../components/dashboard/PulpitSection';
@@ -53,6 +54,7 @@ const drawerWidth = 260;
 
 const DashboardPage = () => {
     const theme = useTheme();
+    const { mode } = useThemeMode();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const [mobileOpen, setMobileOpen] = useState(false);
     const [selectedMenu, setSelectedMenu] = useState('pulpit');
@@ -370,7 +372,7 @@ const DashboardPage = () => {
                             sx={{
                                 width: 40,
                                 height: 40,
-                                backgroundColor: 'primary.main',
+                                backgroundColor: mode === 'dark' ? 'primary.main' : '#00838f',
                                 cursor: 'pointer',
                             }}
                         >
