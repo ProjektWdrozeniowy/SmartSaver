@@ -292,10 +292,24 @@ const PulpitSection = ({ user, onNavigate }) => {
                                                 sx={{
                                                     px: 0,
                                                     py: 2,
-                                                    '&:hover': {
-                                                        backgroundColor: 'rgba(0, 184, 212, 0.05)',
+                                                    position: 'relative',
+                                                    '&::before': {
+                                                        content: '""',
+                                                        position: 'absolute',
+                                                        top: 0,
+                                                        left: -16,
+                                                        right: -16,
+                                                        bottom: 0,
+                                                        backgroundColor: 'transparent',
                                                         borderRadius: 2,
+                                                        transition: 'background-color 0.2s',
+                                                        zIndex: -1,
+                                                    },
+                                                    '&:hover': {
                                                         cursor: 'pointer',
+                                                        '&::before': {
+                                                            backgroundColor: 'rgba(0, 184, 212, 0.05)',
+                                                        },
                                                     },
                                                 }}
                                             >

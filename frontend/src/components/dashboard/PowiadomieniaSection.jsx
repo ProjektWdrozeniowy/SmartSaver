@@ -171,19 +171,23 @@ const PowiadomieniaSection = ({ onNotificationChange }) => {
                 </Box>
                 <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                     <Button
-                        variant="outlined"
+                        variant="contained"
                         startIcon={<FilterListIcon />}
                         onClick={(e) => setAnchorEl(e.currentTarget)}
                         sx={{
-                            textTransform: 'none',
-                            fontSize: { xs: '0.8rem', sm: '0.875rem' },
-                            padding: { xs: '4px 8px', sm: '6px 16px' },
+                            background: 'linear-gradient(135deg, rgba(255, 154, 118, 0.3), rgba(255, 154, 118, 0.2))',
+                            backdropFilter: 'blur(8px)',
+                            WebkitBackdropFilter: 'blur(8px)',
+                            border: '1px solid rgba(255, 154, 118, 0.5)',
+                            color: '#ffffff',
+                            boxShadow: '0 4px 12px rgba(255, 154, 118, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            textShadow: '0 0 10px rgba(255, 154, 118, 0.5)',
+                            minWidth: '150px',
                             '&:hover': {
+                                background: 'linear-gradient(135deg, rgba(255, 154, 118, 0.3), rgba(255, 154, 118, 0.2))',
+                                boxShadow: '0 0 12px 3px rgba(255, 154, 118, 0.2)',
                                 transform: 'none',
-                                backgroundColor: 'transparent',
-                                color: '#00b8d4',
-                                borderColor: '#00b8d4',
-                                boxShadow: '0 0 12px 3px rgba(0, 184, 212, 0.2)',
                             }
                         }}
                     >
@@ -202,19 +206,23 @@ const PowiadomieniaSection = ({ onNotificationChange }) => {
                     </Menu>
                     {unreadCount > 0 && (
                         <Button
-                            variant="outlined"
+                            variant="contained"
                             startIcon={<DoneAllIcon />}
                             onClick={handleMarkAllAsRead}
                             sx={{
-                                textTransform: 'none',
-                                fontSize: { xs: '0.8rem', sm: '0.875rem' },
-                                padding: { xs: '4px 8px', sm: '6px 16px' },
+                                background: 'linear-gradient(135deg, rgba(255, 154, 118, 0.3), rgba(255, 154, 118, 0.2))',
+                                backdropFilter: 'blur(8px)',
+                                WebkitBackdropFilter: 'blur(8px)',
+                                border: '1px solid rgba(255, 154, 118, 0.5)',
+                                color: '#ffffff',
+                                boxShadow: '0 4px 12px rgba(255, 154, 118, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                textShadow: '0 0 10px rgba(255, 154, 118, 0.5)',
+                                minWidth: '150px',
                                 '&:hover': {
+                                    background: 'linear-gradient(135deg, rgba(255, 154, 118, 0.3), rgba(255, 154, 118, 0.2))',
+                                    boxShadow: '0 0 12px 3px rgba(255, 154, 118, 0.2)',
                                     transform: 'none',
-                                    backgroundColor: 'transparent',
-                                    color: '#00b8d4',
-                                    borderColor: '#00b8d4',
-                                    boxShadow: '0 0 12px 3px rgba(0, 184, 212, 0.2)',
                                 }
                             }}
                         >
@@ -223,20 +231,23 @@ const PowiadomieniaSection = ({ onNotificationChange }) => {
                     )}
                     {notifications.length > 0 && (
                         <Button
-                            variant="outlined"
-                            color="error"
+                            variant="contained"
                             startIcon={<DeleteIcon />}
                             onClick={handleDeleteAll}
                             sx={{
-                                textTransform: 'none',
-                                fontSize: { xs: '0.8rem', sm: '0.875rem' },
-                                padding: { xs: '4px 8px', sm: '6px 16px' },
+                                background: 'linear-gradient(135deg, rgba(244, 67, 54, 0.3), rgba(244, 67, 54, 0.2))',
+                                backdropFilter: 'blur(8px)',
+                                WebkitBackdropFilter: 'blur(8px)',
+                                border: '1px solid rgba(244, 67, 54, 0.5)',
+                                color: '#ffffff',
+                                boxShadow: '0 4px 12px rgba(244, 67, 54, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                textShadow: '0 0 10px rgba(244, 67, 54, 0.5)',
+                                minWidth: '150px',
                                 '&:hover': {
-                                    transform: 'none',
-                                    backgroundColor: 'transparent',
-                                    color: '#f44336',
-                                    borderColor: '#f44336',
+                                    background: 'linear-gradient(135deg, rgba(244, 67, 54, 0.3), rgba(244, 67, 54, 0.2))',
                                     boxShadow: '0 0 12px 3px rgba(244, 67, 54, 0.2)',
+                                    transform: 'none',
                                 }
                             }}
                         >

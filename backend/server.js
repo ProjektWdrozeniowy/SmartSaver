@@ -406,48 +406,29 @@ app.post('/api/reset-password', authLimiter, async (req, res) => {
 });
 
 // Import and use routes
-console.log('Loading routes...');
 const categoriesRouter = require('./routes/categories');
-console.log('✓ Categories router loaded');
 const expensesRouter = require('./routes/expenses');
-console.log('✓ Expenses router loaded');
 const budgetRouter = require('./routes/budget');
-console.log('✓ Budget router loaded');
 const goalsRouter = require('./routes/goals');
-console.log('✓ Goals router loaded');
 const dashboardRouter = require('./routes/dashboard');
-console.log('✓ Dashboard router loaded');
 const analysisRouter = require('./routes/analysis');
-console.log('✓ Analysis router loaded');
 const userRouter = require('./routes/user');
-console.log('✓ User router loaded');
 const notificationsRouter = require('./routes/notifications');
-console.log('✓ Notifications router loaded');
 
-console.log('Registering routes...');
 app.use('/api/categories', categoriesRouter);
-console.log('✓ Registered /api/categories');
 app.use('/api/expenses', expensesRouter);
-console.log('✓ Registered /api/expenses');
 app.use('/api/budget', budgetRouter);
-console.log('✓ Registered /api/budget');
 app.use('/api/goals', goalsRouter);
-console.log('✓ Registered /api/goals');
 app.use('/api/dashboard', dashboardRouter);
-console.log('✓ Registered /api/dashboard');
 app.use('/api/analysis', analysisRouter);
-console.log('✓ Registered /api/analysis');
 app.use('/api/user', userRouter);
-console.log('✓ Registered /api/user');
 app.use('/api/notifications', notificationsRouter);
-console.log('✓ Registered /api/notifications');
-console.log('All routes registered successfully!');
 
 const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, () => {
-  console.log(`✅ Backend działa na http://localhost:${PORT}`);
-  console.log('📊 Połączono z bazą danych MySQL');
+  console.log(`Backend działa na http://localhost:${PORT}`);
+  console.log('Połączono z bazą danych MySQL');
 });
 
 // Graceful shutdown

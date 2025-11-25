@@ -382,8 +382,8 @@ const WydatkiSection = ({ onExpenseChange }) => {
                         },
                     }}
                 >
-                    <CardContent>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+                    <CardContent sx={{ height: '100%', display: 'flex', alignItems: 'center' }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2, width: '100%' }}>
                             <Box>
                                 <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
                                     Suma wydatków
@@ -401,6 +401,7 @@ const WydatkiSection = ({ onExpenseChange }) => {
                                     maxDate={dayjs()}
                                     slotProps={{
                                         textField: {
+                                            size: 'medium',
                                             sx: { minWidth: 200 }
                                         },
                                         popper: {
@@ -479,13 +480,14 @@ const WydatkiSection = ({ onExpenseChange }) => {
                         },
                     }}
                 >
-                    <CardContent>
-                        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                    <CardContent sx={{ height: '100%', display: 'flex', alignItems: 'center' }}>
+                        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center', width: '100%' }}>
                             <TextField
                                 placeholder="Szukaj wydatków..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 sx={{ flex: 1, minWidth: 200 }}
+                                size="medium"
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
@@ -494,7 +496,7 @@ const WydatkiSection = ({ onExpenseChange }) => {
                                     ),
                                 }}
                             />
-                            <FormControl sx={{ minWidth: 180, flex: 1 }}>
+                            <FormControl sx={{ minWidth: 180, flex: 1 }} size="medium">
                                 <InputLabel>Kategoria</InputLabel>
                                 <Select
                                     value={selectedCategory}
@@ -1125,7 +1127,7 @@ const WydatkiSection = ({ onExpenseChange }) => {
                             <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary' }}>
                                 Kolor kategorii
                             </Typography>
-                            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', p: 1 }}>
                                 {['#ff6b9d', '#00f0ff', '#a8e6cf', '#ffd93d', '#c77dff', '#ff9a76', '#84dcc6'].map((color) => (
                                     <Box
                                         key={color}

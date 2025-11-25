@@ -532,8 +532,8 @@ const UstawieniaSection = ({ scrollToSection, onScrollComplete }) => {
                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                             '&:hover': {
                                 background: 'linear-gradient(135deg, rgba(144, 164, 174, 0.4), rgba(144, 164, 174, 0.3))',
-                                transform: 'translateY(-2px)',
-                                boxShadow: '0 6px 16px rgba(144, 164, 174, 0.3)',
+                                transform: 'none',
+                                boxShadow: '0 0 8px 2px rgba(144, 164, 174, 0.12)',
                             },
                         }}
                     >
@@ -739,8 +739,8 @@ const UstawieniaSection = ({ scrollToSection, onScrollComplete }) => {
                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                             '&:hover': {
                                 background: 'linear-gradient(135deg, rgba(144, 164, 174, 0.4), rgba(144, 164, 174, 0.3))',
-                                transform: 'translateY(-2px)',
-                                boxShadow: '0 6px 16px rgba(144, 164, 174, 0.3)',
+                                transform: 'none',
+                                boxShadow: '0 0 8px 2px rgba(144, 164, 174, 0.12)',
                             },
                         }}
                     >
@@ -1044,8 +1044,10 @@ const UstawieniaSection = ({ scrollToSection, onScrollComplete }) => {
                     <Box
                         sx={{
                             display: 'flex',
+                            flexDirection: { xs: 'column', sm: 'row' },
                             justifyContent: 'space-between',
-                            alignItems: 'center',
+                            alignItems: { xs: 'flex-start', sm: 'center' },
+                            gap: { xs: 2, sm: 0 },
                             py: 2,
                         }}
                     >
@@ -1058,22 +1060,23 @@ const UstawieniaSection = ({ scrollToSection, onScrollComplete }) => {
                             </Typography>
                         </Box>
                         <Button
-                            variant="outlined"
+                            variant="contained"
                             startIcon={<DownloadIcon />}
                             onClick={handleExportData}
                             sx={{
-                                background: 'linear-gradient(135deg, rgba(144, 164, 174, 0.15), rgba(144, 164, 174, 0.08))',
+                                minWidth: { xs: 'auto', sm: 169 },
+                                alignSelf: 'flex-start',
+                                background: 'linear-gradient(135deg, rgba(144, 164, 174, 0.3), rgba(144, 164, 174, 0.2))',
                                 backdropFilter: 'blur(8px)',
                                 WebkitBackdropFilter: 'blur(8px)',
-                                border: '1px solid rgba(144, 164, 174, 0.4)',
-                                color: '#90a4ae',
-                                textShadow: '0 0 8px rgba(144, 164, 174, 0.3)',
+                                border: '1px solid rgba(144, 164, 174, 0.5)',
+                                color: '#ffffff',
+                                textShadow: '0 0 10px rgba(144, 164, 174, 0.5)',
                                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                 '&:hover': {
-                                    background: 'linear-gradient(135deg, rgba(144, 164, 174, 0.25), rgba(144, 164, 174, 0.15))',
-                                    transform: 'translateY(-2px)',
-                                    boxShadow: '0 4px 12px rgba(144, 164, 174, 0.2)',
-                                    borderColor: 'rgba(144, 164, 174, 0.5)',
+                                    background: 'linear-gradient(135deg, rgba(144, 164, 174, 0.4), rgba(144, 164, 174, 0.3))',
+                                    transform: 'none',
+                                    boxShadow: '0 0 8px 2px rgba(144, 164, 174, 0.12)',
                                 },
                             }}
                         >
@@ -1087,8 +1090,10 @@ const UstawieniaSection = ({ scrollToSection, onScrollComplete }) => {
                     <Box
                         sx={{
                             display: 'flex',
+                            flexDirection: { xs: 'column', sm: 'row' },
                             justifyContent: 'space-between',
-                            alignItems: 'center',
+                            alignItems: { xs: 'flex-start', sm: 'center' },
+                            gap: { xs: 2, sm: 0 },
                             py: 2,
                         }}
                     >
@@ -1101,22 +1106,23 @@ const UstawieniaSection = ({ scrollToSection, onScrollComplete }) => {
                             </Typography>
                         </Box>
                         <Button
-                            variant="outlined"
+                            variant="contained"
                             startIcon={<DeleteIcon />}
                             onClick={() => setDeleteDialog({ open: true, password: '' })}
                             sx={{
-                                background: 'linear-gradient(135deg, rgba(244, 67, 54, 0.15), rgba(244, 67, 54, 0.08))',
+                                minWidth: { xs: 'auto', sm: 169 },
+                                alignSelf: 'flex-start',
+                                background: 'linear-gradient(135deg, rgba(244, 67, 54, 0.3), rgba(244, 67, 54, 0.2))',
                                 backdropFilter: 'blur(8px)',
                                 WebkitBackdropFilter: 'blur(8px)',
-                                border: '1px solid rgba(244, 67, 54, 0.4)',
-                                color: '#f44336',
-                                textShadow: '0 0 8px rgba(244, 67, 54, 0.3)',
+                                border: '1px solid rgba(244, 67, 54, 0.5)',
+                                color: '#ffffff',
+                                textShadow: '0 0 10px rgba(244, 67, 54, 0.5)',
                                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                 '&:hover': {
-                                    background: 'linear-gradient(135deg, rgba(244, 67, 54, 0.25), rgba(244, 67, 54, 0.15))',
-                                    transform: 'translateY(-2px)',
-                                    boxShadow: '0 4px 12px rgba(244, 67, 54, 0.2)',
-                                    borderColor: 'rgba(244, 67, 54, 0.5)',
+                                    background: 'linear-gradient(135deg, rgba(244, 67, 54, 0.4), rgba(244, 67, 54, 0.3))',
+                                    transform: 'none',
+                                    boxShadow: '0 0 8px 2px rgba(244, 67, 54, 0.12)',
                                 },
                             }}
                         >
