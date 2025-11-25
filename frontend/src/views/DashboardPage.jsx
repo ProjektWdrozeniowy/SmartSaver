@@ -196,7 +196,7 @@ const DashboardPage = () => {
             ),
             color: '#ff9a76'
         }, // Powiadomienia - pomarańczowy
-        { id: 'ustawienia', label: 'Ustawienia', icon: <SettingsIcon />, color: '#78909c' }, // Ustawienia - blue-grey
+        { id: 'ustawienia', label: 'Ustawienia', icon: <SettingsIcon />, color: '#076a99' }, // Ustawienia - deep blue
     ];
 
     // Titles for AppBar (can be different from menu labels)
