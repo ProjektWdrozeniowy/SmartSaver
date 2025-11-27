@@ -130,7 +130,7 @@ const PulpitSection = ({ user, onNavigate }) => {
     }, []);
 
     return (
-        <Box sx={{ width: '100%' }}>
+        <Box sx={{ width: '100%' }} data-tour="pulpit-section">
             {/* Welcome message */}
             <Box sx={{ mb: 4 }}>
                 <Typography variant="h4" sx={{ fontWeight: 600, mb: 1, color: 'text.primary' }}>

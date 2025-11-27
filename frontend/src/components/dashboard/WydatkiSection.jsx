@@ -48,7 +48,7 @@ import { getExpenses, createExpense, updateExpense, deleteExpense } from '../../
 import { getCategories, createCategory } from '../../api/categories';
 import { useThemeMode } from '../../context/ThemeContext';
 
-const WydatkiSection = ({ onExpenseChange }) => {
+const WydatkiSection = ({ onExpenseChange, tutorialData = {} }) => {
     const { mode } = useThemeMode();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -111,6 +111,39 @@ const WydatkiSection = ({ onExpenseChange }) => {
             fetchExpenses();
         }
     }, [selectedMonth]);
+
+    // Handle tutorial
+    useEffect(() => {
+        if (tutorialData.showExpense) {
+            // Open expense dialog for tutorial
+            setOpenExpenseDialog(true);
+            // Set default form with tutorial data
+            setExpenseForm({
+                name: 'Zakupy spożywcze',
+                categoryId: categories.length > 0 ? categories[0].id : '',
+                date: new Date().toISOString().split('T')[0],
+                description: 'Przykładowy wydatek na zakupy',
+                amount: '150.00',
+                isRecurring: false,
+                recurringInterval: 1,
+                recurringUnit: 'month',
+                recurringEndDate: '',
+                hasEndDate: false,
+            });
+            // Add tutorial expense to display
+            const tutorialExpense = {
+                id: 'tutorial-expense',
+                name: 'Zakupy spożywcze',
+                amount: 150.00,
+                date: new Date().toISOString(),
+                category: categories.length > 0 ? categories[0] : { name: 'Jedzenie', color: '#ff6b9d', icon: '🍕' },
+                categoryId: categories.length > 0 ? categories[0].id : 1,
+                description: 'Przykładowy wydatek na zakupy',
+                isRecurring: false,
+            };
+            setExpenses([tutorialExpense]);
+        }
+    }, [tutorialData.showExpense, categories]);
 
     // API functions
     const fetchCategories = async () => {
@@ -305,7 +338,7 @@ const WydatkiSection = ({ onExpenseChange }) => {
     };
 
     return (
-        <Box sx={{ width: '100%' }}>
+        <Box sx={{ width: '100%' }} data-tour="wydatki-section">
             {/* Header */}
             <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
                 <Box>
@@ -338,6 +371,7 @@ const WydatkiSection = ({ onExpenseChange }) => {
                         Dodaj kategorię
                     </Button>
                     <Button
+                        data-tour="add-expense-button"
                         variant="contained"
                         startIcon={<AddIcon />}
                         onClick={handleAddExpense}
@@ -560,11 +594,12 @@ const WydatkiSection = ({ onExpenseChange }) => {
                             </Box>
                         ) : (
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                {filteredExpenses.map((expense) => {
+                                {filteredExpenses.map((expense, index) => {
                                     const category = getCategoryById(expense);
                                     return (
                                         <Card
                                             key={expense.id}
+                                            data-tour={index === 0 ? 'expense-item' : undefined}
                                             sx={{
                                                 background: mode === 'dark'
                                                     ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))'
@@ -682,10 +717,10 @@ const WydatkiSection = ({ onExpenseChange }) => {
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    filteredExpenses.map((expense) => {
+                                    filteredExpenses.map((expense, index) => {
                                         const category = getCategoryById(expense);
                                         return (
-                                            <TableRow key={expense.id} hover>
+                                            <TableRow key={expense.id} hover data-tour={index === 0 ? 'expense-item' : undefined}>
                                                 <TableCell sx={{ color: 'text.primary' }}>{expense.name}</TableCell>
                                                 <TableCell>
                                                     <Chip
@@ -756,7 +791,8 @@ const WydatkiSection = ({ onExpenseChange }) => {
                         boxShadow: mode === 'dark'
                             ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
                             : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
-                    }
+                    },
+                    'data-tour': 'expense-dialog'
                 }}
             >
                 <DialogTitle>
