@@ -1,5 +1,6 @@
 // src/views/SignUpPage.jsx
-import React, { useState } from 'react';
+import { registerUser } from '../api/auth';
+import React, { useState, useMemo } from 'react';
 import {
     Box,
     Container,
@@ -11,12 +12,20 @@ import {
     Checkbox,
     FormControlLabel,
     FormHelperText,
+    List,
+    ListItem,
+    ListItemIcon,
+    ListItemText,
 } from '@mui/material';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
+import AuthModal from '../components/common/AuthModal';
 import phoneImage from '../assets/images/phone.png';
+
 
 const SignUpPage = () => {
     const navigate = useNavigate();
@@ -28,6 +37,12 @@ const SignUpPage = () => {
         terms: false,
     });
     const [errors, setErrors] = useState({});
+    const [modalOpen, setModalOpen] = useState(false);
+    const [modalConfig, setModalConfig] = useState({
+        type: 'success',
+        title: '',
+        message: '',
+    });
 
     const handleChange = (e) => {
         const { name, value, checked, type } = e.target;
@@ -43,6 +58,22 @@ const SignUpPage = () => {
             }));
         }
     };
+
+    // Walidacja wymagań hasła w czasie rzeczywistym
+    const passwordRequirements = useMemo(() => {
+        const password = formData.password;
+        return {
+            minLength: password.length >= 12,
+            hasLowercase: /[a-z]/.test(password),
+            hasUppercase: /[A-Z]/.test(password),
+            hasDigit: /[0-9]/.test(password),
+            hasSpecialChar: /[^A-Za-z0-9]/.test(password),
+        };
+    }, [formData.password]);
+
+    const allPasswordRequirementsMet = useMemo(() => {
+        return Object.values(passwordRequirements).every(Boolean);
+    }, [passwordRequirements]);
 
     const validateForm = () => {
         const newErrors = {};
@@ -64,8 +95,8 @@ const SignUpPage = () => {
         // Walidacja hasła
         if (!formData.password) {
             newErrors.password = 'Hasło jest wymagane';
-        } else if (formData.password.length < 6) {
-            newErrors.password = 'Hasło musi mieć minimum 6 znaków';
+        } else if (!allPasswordRequirementsMet) {
+            newErrors.password = 'Hasło nie spełnia wszystkich wymagań';
         }
 
         // Walidacja potwierdzenia hasła
@@ -84,19 +115,44 @@ const SignUpPage = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-        if (validateForm()) {
-            // TODO: Integracja z backendem
-            console.log('Form submitted:', formData);
+  // Usuń focus z przycisku aby uniknąć problemów z aria-hidden
+  if (document.activeElement instanceof HTMLElement) {
+    document.activeElement.blur();
+  }
 
-            // Tymczasowo: przekierowanie do strony logowania
-            // navigate('/signin');
+  if (validateForm()) {
+    try {
+      const { username, email, password } = formData;
 
-            alert('Rejestracja - integracja z backendem będzie dodana później');
-        }
-    };
+      // wysyłamy dane do backendu (http://localhost:4000/api/register)
+      const data = await registerUser({ username, email, password });
+
+      // registerUser już sprawdza res.ok i rzuca błąd jeśli !res.ok
+      // więc tutaj wiemy że wszystko ok
+      setModalConfig({
+        type: 'success',
+        title: 'Konto utworzone!',
+        message: `Witaj ${username}! Twoje konto zostało pomyślnie utworzone. Możesz teraz się zalogować.`,
+      });
+      setModalOpen(true);
+
+      // Po 2 sekundach przekieruj do strony logowania
+      setTimeout(() => {
+        navigate('/signin');
+      }, 2000);
+    } catch (err) {
+      setModalConfig({
+        type: 'error',
+        title: 'Błąd rejestracji',
+        message: err.message || 'Wystąpił błąd podczas rejestracji. Spróbuj ponownie.',
+      });
+      setModalOpen(true);
+    }
+  }
+};
 
     const fadeIn = {
         hidden: { opacity: 0, y: 20 },
@@ -154,15 +210,17 @@ const SignUpPage = () => {
                             }}
                         >
                             <Paper
-                                elevation={3}
                                 sx={{
                                     maxWidth: '450px',
                                     width: '100%',
                                     p: { xs: 3, sm: 4 },
-                                    backgroundColor: 'background.paper',
+                                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                                    backdropFilter: 'blur(10px)',
+                                    WebkitBackdropFilter: 'blur(10px)',
                                     border: '1px solid',
-                                    borderColor: 'divider',
+                                    borderColor: 'rgba(255, 255, 255, 0.1)',
                                     borderRadius: 3,
+                                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                                 }}
                             >
                                 {/* Title */}
@@ -287,6 +345,113 @@ const SignUpPage = () => {
                                                 },
                                             }}
                                         />
+
+                                        {/* Password Requirements Indicator */}
+                                        {formData.password && (
+                                            <Box
+                                                sx={{
+                                                    mt: 1.5,
+                                                    p: 1.5,
+                                                    backgroundColor: 'rgba(255, 255, 255, 0.02)',
+                                                    borderRadius: 1,
+                                                    border: '1px solid',
+                                                    borderColor: 'rgba(255, 255, 255, 0.05)',
+                                                }}
+                                            >
+                                                <Typography
+                                                    sx={{
+                                                        fontSize: '0.85rem',
+                                                        fontWeight: 600,
+                                                        mb: 1,
+                                                        color: 'text.secondary',
+                                                    }}
+                                                >
+                                                    Wymagania dotyczące hasła:
+                                                </Typography>
+                                                <List dense sx={{ py: 0 }}>
+                                                    <ListItem sx={{ py: 0.3, px: 0 }}>
+                                                        <ListItemIcon sx={{ minWidth: 32 }}>
+                                                            {passwordRequirements.minLength ? (
+                                                                <CheckCircleIcon sx={{ fontSize: 18, color: 'success.main' }} />
+                                                            ) : (
+                                                                <CancelIcon sx={{ fontSize: 18, color: 'text.disabled' }} />
+                                                            )}
+                                                        </ListItemIcon>
+                                                        <ListItemText
+                                                            primary="Minimum 12 znaków"
+                                                            primaryTypographyProps={{
+                                                                fontSize: '0.8rem',
+                                                                color: passwordRequirements.minLength ? 'success.main' : 'text.secondary',
+                                                            }}
+                                                        />
+                                                    </ListItem>
+                                                    <ListItem sx={{ py: 0.3, px: 0 }}>
+                                                        <ListItemIcon sx={{ minWidth: 32 }}>
+                                                            {passwordRequirements.hasLowercase ? (
+                                                                <CheckCircleIcon sx={{ fontSize: 18, color: 'success.main' }} />
+                                                            ) : (
+                                                                <CancelIcon sx={{ fontSize: 18, color: 'text.disabled' }} />
+                                                            )}
+                                                        </ListItemIcon>
+                                                        <ListItemText
+                                                            primary="Przynajmniej jedna mała litera (a-z)"
+                                                            primaryTypographyProps={{
+                                                                fontSize: '0.8rem',
+                                                                color: passwordRequirements.hasLowercase ? 'success.main' : 'text.secondary',
+                                                            }}
+                                                        />
+                                                    </ListItem>
+                                                    <ListItem sx={{ py: 0.3, px: 0 }}>
+                                                        <ListItemIcon sx={{ minWidth: 32 }}>
+                                                            {passwordRequirements.hasUppercase ? (
+                                                                <CheckCircleIcon sx={{ fontSize: 18, color: 'success.main' }} />
+                                                            ) : (
+                                                                <CancelIcon sx={{ fontSize: 18, color: 'text.disabled' }} />
+                                                            )}
+                                                        </ListItemIcon>
+                                                        <ListItemText
+                                                            primary="Przynajmniej jedna wielka litera (A-Z)"
+                                                            primaryTypographyProps={{
+                                                                fontSize: '0.8rem',
+                                                                color: passwordRequirements.hasUppercase ? 'success.main' : 'text.secondary',
+                                                            }}
+                                                        />
+                                                    </ListItem>
+                                                    <ListItem sx={{ py: 0.3, px: 0 }}>
+                                                        <ListItemIcon sx={{ minWidth: 32 }}>
+                                                            {passwordRequirements.hasDigit ? (
+                                                                <CheckCircleIcon sx={{ fontSize: 18, color: 'success.main' }} />
+                                                            ) : (
+                                                                <CancelIcon sx={{ fontSize: 18, color: 'text.disabled' }} />
+                                                            )}
+                                                        </ListItemIcon>
+                                                        <ListItemText
+                                                            primary="Przynajmniej jedna cyfra (0-9)"
+                                                            primaryTypographyProps={{
+                                                                fontSize: '0.8rem',
+                                                                color: passwordRequirements.hasDigit ? 'success.main' : 'text.secondary',
+                                                            }}
+                                                        />
+                                                    </ListItem>
+                                                    <ListItem sx={{ py: 0.3, px: 0 }}>
+                                                        <ListItemIcon sx={{ minWidth: 32 }}>
+                                                            {passwordRequirements.hasSpecialChar ? (
+                                                                <CheckCircleIcon sx={{ fontSize: 18, color: 'success.main' }} />
+                                                            ) : (
+                                                                <CancelIcon sx={{ fontSize: 18, color: 'text.disabled' }} />
+                                                            )}
+                                                        </ListItemIcon>
+                                                        <ListItemText
+                                                            primary="Przynajmniej jeden znak specjalny (!@#$%^&*...)"
+                                                            primaryTypographyProps={{
+                                                                fontSize: '0.8rem',
+                                                                color: passwordRequirements.hasSpecialChar ? 'success.main' : 'text.secondary',
+                                                            }}
+                                                        />
+                                                    </ListItem>
+                                                </List>
+                                            </Box>
+                                        )}
                                     </Box>
 
                                     {/* Confirm Password Field */}
@@ -347,7 +512,7 @@ const SignUpPage = () => {
                                                     Akceptuję{' '}
                                                     <MuiLink
                                                         component={Link}
-                                                        to="/regulamin"
+                                                        to="/terms"
                                                         target="_blank"
                                                         sx={{
                                                             color: 'primary.main',
@@ -360,7 +525,7 @@ const SignUpPage = () => {
                                                     i{' '}
                                                     <MuiLink
                                                         component={Link}
-                                                        to="/pp"
+                                                        to="/privacy-policy"
                                                         target="_blank"
                                                         sx={{
                                                             color: 'primary.main',
@@ -390,6 +555,10 @@ const SignUpPage = () => {
                                         sx={{
                                             mt: 1,
                                             py: 1.2,
+                                            '&:hover': {
+                                                transform: 'none',
+                                                boxShadow: '0 0 12px 3px rgba(0, 240, 255, 0.2)',
+                                            },
                                         }}
                                     >
                                         Zarejestruj się
@@ -431,7 +600,7 @@ const SignUpPage = () => {
                             initial="hidden"
                             animate="visible"
                             sx={{
-                                display: { xs: 'flex', sm: 'flex' },
+                                display: { xs: 'none', md: 'flex' },
                                 justifyContent: 'center',
                                 alignItems: 'center',
                                 order: { xs: 1, md: 2 },
@@ -447,7 +616,6 @@ const SignUpPage = () => {
                                     height: 'auto',
                                     borderRadius: 2,
                                     objectFit: 'contain',
-                                    filter: 'drop-shadow(0 10px 30px rgba(0, 240, 255, 0.2))',
                                 }}
                             />
                         </Box>
@@ -456,6 +624,15 @@ const SignUpPage = () => {
             </Box>
 
             <Footer />
+
+            {/* Auth Modal */}
+            <AuthModal
+                open={modalOpen}
+                onClose={() => setModalOpen(false)}
+                type={modalConfig.type}
+                title={modalConfig.title}
+                message={modalConfig.message}
+            />
         </Box>
     );
 };

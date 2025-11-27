@@ -30,7 +30,6 @@ const Navbar = () => {
         { label: 'Start', href: '#hero' },
         { label: 'Funkcje', href: '#features' },
         { label: 'Jak to działa?', href: '#how-it-works' },
-        { label: 'Opinie', href: '#testimonials' },
     ];
 
     // Smooth scroll do sekcji
@@ -108,15 +107,17 @@ const Navbar = () => {
             {/* Action Buttons (mobile) */}
             <Box sx={{ px: 3, pt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
                 <Button
-                    variant="text"
+                    variant="outlined"
                     onClick={() => {
                         setDrawerOpen(false);
                         navigate('/signin');
                     }}
                     sx={{
                         color: 'text.secondary',
+                        borderColor: 'text.secondary',
                         '&:hover': {
                             color: 'text.primary',
+                            borderColor: 'text.primary',
                         },
                     }}
                 >
@@ -127,6 +128,12 @@ const Navbar = () => {
                     onClick={() => {
                         setDrawerOpen(false);
                         navigate('/signup');
+                    }}
+                    sx={{
+                        '&:hover': {
+                            transform: 'none',
+                            boxShadow: '0 0 12px 3px rgba(0, 240, 255, 0.2)',
+                        },
                     }}
                 >
                     Zarejestruj się
@@ -240,8 +247,7 @@ const Navbar = () => {
                                             width: 0,
                                             height: '2px',
                                             bottom: '4px',
-                                            left: '50%',
-                                            transform: 'translateX(-50%)',
+                                            left: 0,
                                             backgroundColor: 'primary.main',
                                             transition: 'width 0.3s ease',
                                         },
@@ -249,7 +255,7 @@ const Navbar = () => {
                                             backgroundColor: 'transparent',
                                             color: 'text.primary',
                                             '&::after': {
-                                                width: '80%',
+                                                width: '100%',
                                             },
                                         },
                                     }}
@@ -259,6 +265,12 @@ const Navbar = () => {
                                 <Button
                                     variant="contained"
                                     onClick={() => navigate('/signup')}
+                                    sx={{
+                                        '&:hover': {
+                                            transform: 'none',
+                                            boxShadow: '0 0 8px 2px rgba(0, 240, 255, 0.15)',
+                                        },
+                                    }}
                                 >
                                     Zarejestruj się
                                 </Button>

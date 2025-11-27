@@ -1,4 +1,5 @@
 // src/views/SignInPage.jsx
+import { loginUser } from '../api/auth';
 import React, { useState } from 'react';
 import {
     Box,
@@ -13,6 +14,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
+import AuthModal from '../components/common/AuthModal';
 import phoneImage from '../assets/images/phone.png';
 
 const SignInPage = () => {
@@ -22,6 +24,12 @@ const SignInPage = () => {
         password: '',
     });
     const [errors, setErrors] = useState({});
+    const [modalOpen, setModalOpen] = useState(false);
+    const [modalConfig, setModalConfig] = useState({
+        type: 'success',
+        title: '',
+        message: '',
+    });
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -41,39 +49,57 @@ const SignInPage = () => {
     const validateForm = () => {
         const newErrors = {};
 
-        // Walidacja email
+        // Walidacja email - sprawdzamy tylko czy pole nie jest puste
         if (!formData.email) {
             newErrors.email = 'Email jest wymagany';
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = 'Nieprawidłowy format email';
         }
 
-        // Walidacja hasła
+        // Walidacja hasła - sprawdzamy tylko czy pole nie jest puste
+        // NIE sprawdzamy długości ani innych wymagań, aby nie ujawniać informacji o wymaganiach
         if (!formData.password) {
             newErrors.password = 'Hasło jest wymagane';
-        } else if (formData.password.length < 6) {
-            newErrors.password = 'Hasło musi mieć minimum 6 znaków';
         }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
+        // Usuń focus z przycisku aby uniknąć problemów z aria-hidden
+        if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur();
+        }
+
         if (validateForm()) {
-            // TODO: Integracja z backendem
-            console.log('Form submitted:', formData);
+            try {
+                const { email, password } = formData;
 
-            // Tymczasowo - tylko komunikat
-            alert('Logowanie - integracja z backendem będzie dodana później');
+                // wysyłamy dane do backendu (http://localhost:4000/api/login)
+                const data = await loginUser({ email, password });
 
-            // Po integracji z backendem będzie:
-            // const response = await fetch('/api/login', { ... });
-            // if (response.ok) {
-            //   navigate('/dashboard');
-            // }
+                // loginUser już sprawdza res.ok i rzuca błąd jeśli !res.ok
+                // więc tutaj wiemy że wszystko ok
+                setModalConfig({
+                    type: 'success',
+                    title: 'Zalogowano pomyślnie!',
+                    message: `Witaj ${data.user.username}! Logowanie przebiegło pomyślnie. Za chwilę zostaniesz przekierowany do Pulpitu.`,
+                });
+                setModalOpen(true);
+
+                // Po 2 sekundach przekieruj do dashboardu
+                setTimeout(() => {
+                    navigate('/dashboard');
+                }, 2000);
+            } catch (err) {
+                setModalConfig({
+                    type: 'error',
+                    title: 'Błąd logowania',
+                    message: err.message || 'Wystąpił błąd podczas logowania. Sprawdź swoje dane i spróbuj ponownie.',
+                });
+                setModalOpen(true);
+            }
         }
     };
 
@@ -133,15 +159,17 @@ const SignInPage = () => {
                             }}
                         >
                             <Paper
-                                elevation={3}
                                 sx={{
                                     maxWidth: '450px',
                                     width: '100%',
                                     p: { xs: 3, sm: 4 },
-                                    backgroundColor: 'background.paper',
+                                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+                                    backdropFilter: 'blur(10px)',
+                                    WebkitBackdropFilter: 'blur(10px)',
                                     border: '1px solid',
-                                    borderColor: 'divider',
+                                    borderColor: 'rgba(255, 255, 255, 0.1)',
                                     borderRadius: 3,
+                                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                                 }}
                             >
                                 {/* Title */}
@@ -180,7 +208,7 @@ const SignInPage = () => {
                                             id="email"
                                             name="email"
                                             type="email"
-                                            placeholder="wpisz swój email"
+                                            placeholder="Wpisz swój email"
                                             value={formData.email}
                                             onChange={handleChange}
                                             error={!!errors.email}
@@ -216,7 +244,7 @@ const SignInPage = () => {
                                             id="password"
                                             name="password"
                                             type="password"
-                                            placeholder="wpisz swoje hasło"
+                                            placeholder="Wpisz swoje hasło"
                                             value={formData.password}
                                             onChange={handleChange}
                                             error={!!errors.password}
@@ -260,6 +288,10 @@ const SignInPage = () => {
                                         sx={{
                                             mt: 1,
                                             py: 1.2,
+                                            '&:hover': {
+                                                transform: 'none',
+                                                boxShadow: '0 0 12px 3px rgba(0, 240, 255, 0.2)',
+                                            },
                                         }}
                                     >
                                         Zaloguj się
@@ -301,7 +333,7 @@ const SignInPage = () => {
                             initial="hidden"
                             animate="visible"
                             sx={{
-                                display: { xs: 'flex', sm: 'flex' },
+                                display: { xs: 'none', md: 'flex' },
                                 justifyContent: 'center',
                                 alignItems: 'center',
                                 order: { xs: 1, md: 2 },
@@ -317,7 +349,6 @@ const SignInPage = () => {
                                     height: 'auto',
                                     borderRadius: 2,
                                     objectFit: 'contain',
-                                    filter: 'drop-shadow(0 10px 30px rgba(0, 240, 255, 0.2))',
                                 }}
                             />
                         </Box>
@@ -326,6 +357,15 @@ const SignInPage = () => {
             </Box>
 
             <Footer />
+
+            {/* Auth Modal */}
+            <AuthModal
+                open={modalOpen}
+                onClose={() => setModalOpen(false)}
+                type={modalConfig.type}
+                title={modalConfig.title}
+                message={modalConfig.message}
+            />
         </Box>
     );
 };
