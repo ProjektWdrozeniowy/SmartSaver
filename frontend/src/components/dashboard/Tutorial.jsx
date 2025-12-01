@@ -2,9 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import Joyride, { ACTIONS, EVENTS, STATUS } from 'react-joyride';
 import { useThemeMode } from '../../context/ThemeContext';
+import { useMediaQuery, useTheme } from '@mui/material';
 
 const Tutorial = ({ run, onFinish, onNavigate }) => {
     const { mode } = useThemeMode();
+    const theme = useTheme();
+    const isDesktop = useMediaQuery(theme.breakpoints.up('md')); // md = 900px
     const [stepIndex, setStepIndex] = useState(0);
     const [isNavigating, setIsNavigating] = useState(false);
 
@@ -294,7 +297,7 @@ const Tutorial = ({ run, onFinish, onNavigate }) => {
     return (
         <Joyride
             steps={steps}
-            run={run && !isNavigating}
+            run={run && !isNavigating && isDesktop}
             stepIndex={stepIndex}
             continuous
             scrollToFirstStep={false}

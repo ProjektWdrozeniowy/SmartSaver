@@ -110,6 +110,11 @@ const DashboardPage = () => {
 
     const checkTutorialStatus = async () => {
         try {
+            // Don't show tutorial on mobile devices
+            if (isMobile) {
+                return;
+            }
+
             // Check localStorage flag for testing
             const forceTutorial = localStorage.getItem('forceTutorial') === 'true';
 
