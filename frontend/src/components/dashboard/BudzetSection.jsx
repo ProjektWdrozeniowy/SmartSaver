@@ -334,7 +334,9 @@ const BudzetSection = ({ tutorialData = {} }) => {
             </Box>
 
             {/* Budget Summary Cards */}
-            <Box sx={{
+            <Box
+                data-tour="budzet-cards"
+                sx={{
                 display: 'flex',
                 gap: 2,
                 mb: 4,
@@ -599,7 +601,9 @@ const BudzetSection = ({ tutorialData = {} }) => {
                 }}
             >
                 <CardContent>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+                    <Box
+                        data-tour="income-list-header"
+                        sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
                         <Typography variant="h6" sx={{ color: 'text.primary', fontWeight: 600 }}>
                             Lista przychodów
                         </Typography>

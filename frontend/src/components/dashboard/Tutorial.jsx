@@ -95,7 +95,7 @@ const Tutorial = ({ run, onFinish, onNavigate }) => {
             disableBeacon: true,
         },
         {
-            target: '[data-tour="budzet-section"]',
+            target: '[data-tour="budzet-cards"]',
             content: addStepCounter('Sekcja Budżet pozwala zarządzać przychodami. Tutaj możesz dodawać swoje przychody, śledzić miesięczny budżet i monitorować wydatki w stosunku do przychodów.', 4, 19),
             placement: 'bottom',
             disableBeacon: true,
@@ -207,7 +207,7 @@ const Tutorial = ({ run, onFinish, onNavigate }) => {
                 const nextStep = steps[nextIndex];
 
                 // Navigate to different sections and wait for render
-                if (nextStep.target === '[data-tour="budzet-section"]') {
+                if (nextStep.target === '[data-tour="budzet-section"]' || nextStep.target === '[data-tour="budzet-cards"]') {
                     setIsNavigating(true);
                     onNavigate('budzet');
                     setTimeout(() => {
