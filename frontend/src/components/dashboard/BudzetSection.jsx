@@ -854,7 +854,7 @@ const BudzetSection = ({ tutorialData = {} }) => {
             {/* Dialog - Add/Edit Income */}
             <Dialog
                 open={openIncomeDialog}
-                onClose={() => setOpenIncomeDialog(false)}
+                onClose={tutorialData.showIncome && !editingIncome ? undefined : () => setOpenIncomeDialog(false)}
                 maxWidth="sm"
                 fullWidth
                 PaperProps={{
@@ -909,10 +909,12 @@ const BudzetSection = ({ tutorialData = {} }) => {
                                 label="Data"
                                 value={dayjs(incomeForm.date)}
                                 onChange={(newValue) => setIncomeForm({ ...incomeForm, date: newValue ? newValue.format('YYYY-MM-DD') : '' })}
+                                disabled={tutorialData.showIncome && !editingIncome}
                                 slotProps={{
                                     textField: {
                                         fullWidth: true,
                                         required: true,
+                                        disabled: tutorialData.showIncome && !editingIncome,
                                     },
                                     popper: {
                                         sx: {
@@ -968,6 +970,7 @@ const BudzetSection = ({ tutorialData = {} }) => {
                             onChange={(e) => setIncomeForm({ ...incomeForm, amount: e.target.value })}
                             fullWidth
                             required
+                            disabled={tutorialData.showIncome && !editingIncome}
                             inputProps={{ step: '0.01', min: '0' }}
                             InputProps={{
                                 endAdornment: <InputAdornment position="end">zł</InputAdornment>,
@@ -990,6 +993,7 @@ const BudzetSection = ({ tutorialData = {} }) => {
                             multiline
                             rows={3}
                             placeholder="Dodatkowe informacje o przychodzie"
+                            disabled={tutorialData.showIncome && !editingIncome}
                         />
 
                         {/* Recurring Income Section */}
@@ -999,6 +1003,7 @@ const BudzetSection = ({ tutorialData = {} }) => {
                                     <Checkbox
                                         checked={incomeForm.isRecurring}
                                         onChange={(e) => setIncomeForm({ ...incomeForm, isRecurring: e.target.checked })}
+                                        disabled={tutorialData.showIncome && !editingIncome}
                                         sx={{
                                             color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
                                             '&.Mui-checked': {
@@ -1020,6 +1025,7 @@ const BudzetSection = ({ tutorialData = {} }) => {
                                                 value={incomeForm.recurringInterval}
                                                 onChange={(e) => setIncomeForm({ ...incomeForm, recurringInterval: parseInt(e.target.value) || 1 })}
                                                 fullWidth
+                                                disabled={tutorialData.showIncome && !editingIncome}
                                                 inputProps={{ min: 1 }}
                                                 sx={{
                                                     '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
@@ -1036,6 +1042,7 @@ const BudzetSection = ({ tutorialData = {} }) => {
                                                     value={incomeForm.recurringUnit}
                                                     label="Jednostka"
                                                     onChange={(e) => setIncomeForm({ ...incomeForm, recurringUnit: e.target.value })}
+                                                    disabled={tutorialData.showIncome && !editingIncome}
                                                 >
                                                     <MenuItem value="day">dzień</MenuItem>
                                                     <MenuItem value="week">tydzień</MenuItem>
@@ -1051,6 +1058,7 @@ const BudzetSection = ({ tutorialData = {} }) => {
                                             <Switch
                                                 checked={!incomeForm.hasEndDate}
                                                 onChange={(e) => setIncomeForm({ ...incomeForm, hasEndDate: !e.target.checked })}
+                                                disabled={tutorialData.showIncome && !editingIncome}
                                                 sx={{
                                                     '& .MuiSwitch-switchBase.Mui-checked': {
                                                         color: '#66bb6a',
@@ -1071,9 +1079,11 @@ const BudzetSection = ({ tutorialData = {} }) => {
                                                 value={incomeForm.recurringEndDate ? dayjs(incomeForm.recurringEndDate) : null}
                                                 onChange={(newValue) => setIncomeForm({ ...incomeForm, recurringEndDate: newValue ? newValue.format('YYYY-MM-DD') : '' })}
                                                 minDate={dayjs(incomeForm.date).add(1, 'day')}
+                                                disabled={tutorialData.showIncome && !editingIncome}
                                                 slotProps={{
                                                     textField: {
                                                         fullWidth: true,
+                                                        disabled: tutorialData.showIncome && !editingIncome,
                                                     },
                                                     popper: {
                                                         sx: {
@@ -1129,13 +1139,13 @@ const BudzetSection = ({ tutorialData = {} }) => {
                     </Box>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setOpenIncomeDialog(false)}>
+                    <Button onClick={() => setOpenIncomeDialog(false)} disabled={tutorialData.showIncome && !editingIncome}>
                         Anuluj
                     </Button>
                     <Button
                         onClick={handleSaveIncome}
                         variant="contained"
-                        disabled={!incomeForm.name || !incomeForm.amount || saving}
+                        disabled={!incomeForm.name || !incomeForm.amount || saving || (tutorialData.showIncome && !editingIncome)}
                         sx={{
                             '&:hover': {
                                 transform: 'none',
