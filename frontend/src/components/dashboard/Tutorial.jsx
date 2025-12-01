@@ -125,7 +125,7 @@ const Tutorial = ({ run, onFinish, onNavigate }) => {
             disableBeacon: true,
         },
         {
-            target: '[data-tour="wydatki-section"]',
+            target: '[data-tour="wydatki-cards"]',
             content: addStepCounter('W sekcji Wydatki zarządzasz swoimi wydatkami. Możesz kategoryzować wydatki, śledzić swoje wydatki i analizować, na co wydajesz najwięcej pieniędzy.', 9, 19),
             placement: 'bottom',
             disableBeacon: true,
@@ -215,7 +215,7 @@ const Tutorial = ({ run, onFinish, onNavigate }) => {
                         setIsNavigating(false);
                     }, 300);
                     return;
-                } else if (nextStep.target === '[data-tour="wydatki-section"]') {
+                } else if (nextStep.target === '[data-tour="wydatki-section"]' || nextStep.target === '[data-tour="wydatki-cards"]') {
                     setIsNavigating(true);
                     onNavigate('wydatki');
                     setTimeout(() => {

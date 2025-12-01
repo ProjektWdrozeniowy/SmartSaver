@@ -400,7 +400,9 @@ const WydatkiSection = ({ onExpenseChange, tutorialData = {} }) => {
             </Box>
 
             {/* Summary and Filters Row */}
-            <Box sx={{ display: 'flex', gap: 2, mb: 3, flexDirection: { xs: 'column', md: 'row' } }}>
+            <Box
+                data-tour="wydatki-cards"
+                sx={{ display: 'flex', gap: 2, mb: 3, flexDirection: { xs: 'column', md: 'row' } }}>
                 {/* Summary Card - 50% width */}
                 <Card
                     sx={{
