@@ -349,11 +349,14 @@ const Tutorial = ({ run, onFinish, onNavigate }) => {
                     fontWeight: 500,
                 },
                 buttonBack: {
-                    color: mode === 'dark' ? '#ffffff' : '#2c2c2c',
+                    color: mode === 'dark' ? '#aaaaaa' : '#666666',
                     marginRight: 10,
+                    fontSize: 14,
+                    padding: '6px 12px',
                 },
                 buttonSkip: {
                     color: mode === 'dark' ? '#aaaaaa' : '#666666',
+                    fontSize: 13,
                 },
                 spotlight: {
                     borderRadius: 4,
