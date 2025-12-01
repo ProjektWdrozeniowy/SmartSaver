@@ -1,10 +1,20 @@
 // src/components/dashboard/Tutorial.jsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Joyride, { ACTIONS, EVENTS, STATUS } from 'react-joyride';
 import { useThemeMode } from '../../context/ThemeContext';
 
 const Tutorial = ({ run, onFinish, onNavigate }) => {
     const { mode } = useThemeMode();
+    const [stepIndex, setStepIndex] = useState(0);
+    const [isNavigating, setIsNavigating] = useState(false);
+
+    // Reset step index when tutorial starts
+    useEffect(() => {
+        if (run) {
+            setStepIndex(0);
+            setIsNavigating(false);
+        }
+    }, [run]);
 
     const steps = [
         {
@@ -27,11 +37,9 @@ const Tutorial = ({ run, onFinish, onNavigate }) => {
         },
         {
             target: '[data-tour="menu-budzet"]',
-            content: 'Kliknij w przycisk "Budżet" w lewym menu, aby przejść do następnej sekcji.',
+            content: 'Teraz przejdziemy do sekcji "Budżet", gdzie możesz zarządzać swoimi przychodami. Kliknij "Dalej", aby kontynuować.',
             placement: 'right',
             disableBeacon: true,
-            spotlightClicks: true,
-            hideFooter: true,
         },
         {
             target: '[data-tour="budzet-section"]',
@@ -41,16 +49,14 @@ const Tutorial = ({ run, onFinish, onNavigate }) => {
         },
         {
             target: '[data-tour="add-income-button"]',
-            content: 'Kliknij przycisk "Dodaj przychód", aby dodać swój pierwszy przychód.',
+            content: 'To jest przycisk do dodawania nowych przychodów. Za chwilę zobaczysz formularz, w którym możesz wprowadzić nazwę, kwotę, datę i opis przychodu. Kliknij "Dalej".',
             placement: 'bottom',
             disableBeacon: true,
-            spotlightClicks: true,
-            hideFooter: true,
         },
         {
             target: '[data-tour="income-dialog"]',
             content: 'To jest formularz dodawania przychodu. Możesz tutaj wpisać nazwę przychodu (np. wynagrodzenie), kwotę, datę oraz opcjonalny opis. Możesz również ustawić przychód jako cykliczny. Na potrzeby samouczka formularz jest zablokowany. Kliknij "Dalej", aby kontynuować.',
-            placement: 'center',
+            placement: 'right',
             disableBeacon: true,
         },
         {
@@ -61,11 +67,9 @@ const Tutorial = ({ run, onFinish, onNavigate }) => {
         },
         {
             target: '[data-tour="menu-wydatki"]',
-            content: 'Teraz kliknij w przycisk "Wydatki" w lewym menu.',
+            content: 'Przejdziemy teraz do sekcji "Wydatki", gdzie możesz śledzić swoje wydatki. Kliknij "Dalej".',
             placement: 'right',
             disableBeacon: true,
-            spotlightClicks: true,
-            hideFooter: true,
         },
         {
             target: '[data-tour="wydatki-section"]',
@@ -75,16 +79,14 @@ const Tutorial = ({ run, onFinish, onNavigate }) => {
         },
         {
             target: '[data-tour="add-expense-button"]',
-            content: 'Kliknij przycisk "Dodaj wydatek".',
+            content: 'Przycisk "Dodaj wydatek" pozwala rejestrować nowe wydatki. Za chwilę zobaczysz formularz, w którym możesz wybrać kategorię i wpisać szczegóły wydatku. Kliknij "Dalej".',
             placement: 'bottom',
             disableBeacon: true,
-            spotlightClicks: true,
-            hideFooter: true,
         },
         {
             target: '[data-tour="expense-dialog"]',
             content: 'Formularz wydatku jest podobny do formularza przychodu. Możesz wybrać kategorię, wpisać nazwę, kwotę, datę i opis. Wydatki mogą być również cykliczne. Formularz jest zablokowany na potrzeby samouczka.',
-            placement: 'center',
+            placement: 'right',
             disableBeacon: true,
         },
         {
@@ -95,11 +97,9 @@ const Tutorial = ({ run, onFinish, onNavigate }) => {
         },
         {
             target: '[data-tour="menu-cele"]',
-            content: 'Kliknij w przycisk "Cele" w lewym menu.',
+            content: 'Przejdziemy do sekcji "Cele", gdzie możesz planować swoje cele finansowe. Kliknij "Dalej".',
             placement: 'right',
             disableBeacon: true,
-            spotlightClicks: true,
-            hideFooter: true,
         },
         {
             target: '[data-tour="cele-section"]',
@@ -109,16 +109,14 @@ const Tutorial = ({ run, onFinish, onNavigate }) => {
         },
         {
             target: '[data-tour="add-goal-button"]',
-            content: 'Kliknij przycisk "Dodaj Cel".',
+            content: 'Przycisk "Dodaj Cel" służy do tworzenia nowych celów oszczędnościowych. Za chwilę zobaczysz formularz, w którym możesz określić nazwę celu, docelową kwotę i termin. Kliknij "Dalej".',
             placement: 'bottom',
             disableBeacon: true,
-            spotlightClicks: true,
-            hideFooter: true,
         },
         {
             target: '[data-tour="goal-dialog"]',
             content: 'W formularzu celu możesz określić nazwę celu, docelową kwotę, termin osiągnięcia i opcjonalny opis. SmartSaver pomoże Ci śledzić postęp i przypomni o zbliżającym się terminie.',
-            placement: 'center',
+            placement: 'right',
             disableBeacon: true,
         },
         {
@@ -129,11 +127,9 @@ const Tutorial = ({ run, onFinish, onNavigate }) => {
         },
         {
             target: '[data-tour="menu-powiadomienia"]',
-            content: 'Kliknij w przycisk "Powiadomienia" w lewym menu.',
+            content: 'Na koniec przejdziemy do sekcji "Powiadomienia". Kliknij "Dalej".',
             placement: 'right',
             disableBeacon: true,
-            spotlightClicks: true,
-            hideFooter: true,
         },
         {
             target: '[data-tour="powiadomienia-section"]',
@@ -147,43 +143,109 @@ const Tutorial = ({ run, onFinish, onNavigate }) => {
         const { action, index, status, type } = data;
 
         if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status)) {
-            // Tutorial finished or skipped
             onFinish();
-        } else if (type === EVENTS.STEP_AFTER || type === EVENTS.TARGET_NOT_FOUND) {
+            setStepIndex(0);
+        } else if (type === EVENTS.STEP_AFTER && action === ACTIONS.NEXT) {
             const currentStep = steps[index];
+            const nextIndex = index + 1;
 
-            // Handle navigation based on step
-            if (currentStep.target === '[data-tour="menu-budzet"]' && action === ACTIONS.NEXT) {
-                // User clicked on Budget menu
-                onNavigate('budzet');
-            } else if (currentStep.target === '[data-tour="add-income-button"]' && action === ACTIONS.NEXT) {
-                // User clicked on Add Income button - trigger dialog
-                onNavigate('add-income');
-            } else if (currentStep.target === '[data-tour="menu-wydatki"]' && action === ACTIONS.NEXT) {
-                // User clicked on Expenses menu
-                onNavigate('wydatki');
-            } else if (currentStep.target === '[data-tour="add-expense-button"]' && action === ACTIONS.NEXT) {
-                // User clicked on Add Expense button - trigger dialog
-                onNavigate('add-expense');
-            } else if (currentStep.target === '[data-tour="menu-cele"]' && action === ACTIONS.NEXT) {
-                // User clicked on Goals menu
-                onNavigate('cele');
-            } else if (currentStep.target === '[data-tour="add-goal-button"]' && action === ACTIONS.NEXT) {
-                // User clicked on Add Goal button - trigger dialog
-                onNavigate('add-goal');
-            } else if (currentStep.target === '[data-tour="menu-powiadomienia"]' && action === ACTIONS.NEXT) {
-                // User clicked on Notifications menu
-                onNavigate('powiadomienia');
+            // Check if next step requires navigation
+            if (nextIndex < steps.length) {
+                const nextStep = steps[nextIndex];
+
+                // Navigate to different sections and wait for render
+                if (nextStep.target === '[data-tour="budzet-section"]') {
+                    setIsNavigating(true);
+                    onNavigate('budzet');
+                    setTimeout(() => {
+                        setStepIndex(nextIndex);
+                        setIsNavigating(false);
+                    }, 300);
+                    return;
+                } else if (nextStep.target === '[data-tour="wydatki-section"]') {
+                    setIsNavigating(true);
+                    onNavigate('wydatki');
+                    setTimeout(() => {
+                        setStepIndex(nextIndex);
+                        setIsNavigating(false);
+                    }, 300);
+                    return;
+                } else if (nextStep.target === '[data-tour="cele-section"]') {
+                    setIsNavigating(true);
+                    onNavigate('cele');
+                    setTimeout(() => {
+                        setStepIndex(nextIndex);
+                        setIsNavigating(false);
+                    }, 300);
+                    return;
+                } else if (nextStep.target === '[data-tour="powiadomienia-section"]') {
+                    setIsNavigating(true);
+                    onNavigate('powiadomienia');
+                    setTimeout(() => {
+                        setStepIndex(nextIndex);
+                        setIsNavigating(false);
+                    }, 300);
+                    return;
+                }
+
+                // Handle dialog opening with delay
+                if (currentStep.target === '[data-tour="add-income-button"]') {
+                    setIsNavigating(true);
+                    setTimeout(() => {
+                        onNavigate('add-income');
+                        setTimeout(() => {
+                            setStepIndex(nextIndex);
+                            setIsNavigating(false);
+                        }, 500); // Wait for dialog to open
+                    }, 100);
+                    return;
+                } else if (currentStep.target === '[data-tour="add-expense-button"]') {
+                    setIsNavigating(true);
+                    setTimeout(() => {
+                        onNavigate('add-expense');
+                        setTimeout(() => {
+                            setStepIndex(nextIndex);
+                            setIsNavigating(false);
+                        }, 500);
+                    }, 100);
+                    return;
+                } else if (currentStep.target === '[data-tour="add-goal-button"]') {
+                    setIsNavigating(true);
+                    setTimeout(() => {
+                        onNavigate('add-goal');
+                        setTimeout(() => {
+                            setStepIndex(nextIndex);
+                            setIsNavigating(false);
+                        }, 500);
+                    }, 100);
+                    return;
+                }
+
+                // Handle dialog closing
+                if (currentStep.target === '[data-tour="income-dialog"]') {
+                    onNavigate('close-income-dialog');
+                } else if (currentStep.target === '[data-tour="expense-dialog"]') {
+                    onNavigate('close-expense-dialog');
+                } else if (currentStep.target === '[data-tour="goal-dialog"]') {
+                    onNavigate('close-goal-dialog');
+                }
             }
+
+            // Normal step progression
+            setStepIndex(nextIndex);
+        } else if (type === EVENTS.STEP_AFTER && action === ACTIONS.PREV) {
+            setStepIndex(Math.max(0, index - 1));
         }
     };
 
     return (
         <Joyride
             steps={steps}
-            run={run}
+            run={run && !isNavigating}
+            stepIndex={stepIndex}
             continuous
-            scrollToFirstStep
+            scrollToFirstStep={false}
+            disableScrolling={true}
             showProgress
             showSkipButton
             callback={handleJoyrideCallback}

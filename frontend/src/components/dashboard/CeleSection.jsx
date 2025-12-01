@@ -110,6 +110,9 @@ const CeleSection = ({ onGoalChange, tutorialData = {} }) => {
                 updatedAt: new Date().toISOString(),
             };
             setGoals([tutorialGoal]);
+        } else if (tutorialData.showGoal === false) {
+            // Close goal dialog when tutorial moves on
+            setOpenGoalDialog(false);
         }
     }, [tutorialData.showGoal]);
 

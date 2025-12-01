@@ -130,6 +130,9 @@ const BudzetSection = ({ tutorialData = {} }) => {
                 recurringUnit: 'month',
             };
             setIncomes([tutorialIncome]);
+        } else if (tutorialData.showIncome === false) {
+            // Close income dialog when tutorial moves on
+            setOpenIncomeDialog(false);
         }
     }, [tutorialData.showIncome]);
 
@@ -895,6 +898,7 @@ const BudzetSection = ({ tutorialData = {} }) => {
                             fullWidth
                             required
                             placeholder="np. Wynagrodzenie"
+                            disabled={tutorialData.showIncome && !editingIncome}
                         />
                         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
                             <DatePicker

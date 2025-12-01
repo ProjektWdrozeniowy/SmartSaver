@@ -160,17 +160,26 @@ const DashboardPage = () => {
             case 'add-income':
                 setTutorialData({ ...tutorialData, showIncome: true });
                 break;
+            case 'close-income-dialog':
+                setTutorialData({ ...tutorialData, showIncome: false });
+                break;
             case 'wydatki':
                 setSelectedMenu('wydatki');
                 break;
             case 'add-expense':
                 setTutorialData({ ...tutorialData, showExpense: true });
                 break;
+            case 'close-expense-dialog':
+                setTutorialData({ ...tutorialData, showExpense: false });
+                break;
             case 'cele':
                 setSelectedMenu('cele');
                 break;
             case 'add-goal':
                 setTutorialData({ ...tutorialData, showGoal: true });
+                break;
+            case 'close-goal-dialog':
+                setTutorialData({ ...tutorialData, showGoal: false });
                 break;
             case 'powiadomienia':
                 setSelectedMenu('powiadomienia');

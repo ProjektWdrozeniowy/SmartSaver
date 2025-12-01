@@ -142,6 +142,9 @@ const WydatkiSection = ({ onExpenseChange, tutorialData = {} }) => {
                 isRecurring: false,
             };
             setExpenses([tutorialExpense]);
+        } else if (tutorialData.showExpense === false) {
+            // Close expense dialog when tutorial moves on
+            setOpenExpenseDialog(false);
         }
     }, [tutorialData.showExpense, categories]);
 
