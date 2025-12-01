@@ -290,7 +290,122 @@ const Tutorial = ({ run, onFinish, onNavigate }) => {
             // Normal step progression
             setStepIndex(nextIndex);
         } else if (type === EVENTS.STEP_AFTER && action === ACTIONS.PREV) {
-            setStepIndex(Math.max(0, index - 1));
+            const prevIndex = Math.max(0, index - 1);
+            const prevStep = steps[prevIndex];
+            const currentStep = steps[index];
+
+            // Handle navigation between sections when going back
+            if (prevStep.target === '[data-tour="pulpit-stats-cards"]') {
+                // Going back to Pulpit section (from menu-budzet to pulpit-stats-cards)
+                setIsNavigating(true);
+                setTimeout(() => {
+                    onNavigate('pulpit');
+                    setTimeout(() => {
+                        setStepIndex(prevIndex);
+                        setIsNavigating(false);
+                    }, 400);
+                }, 100);
+                return;
+            } else if (prevStep.target === '[data-tour="income-item"]') {
+                // Going back to Budzet section (from Wydatki to Budzet)
+                setIsNavigating(true);
+                setTimeout(() => {
+                    onNavigate('budzet');
+                    setTimeout(() => {
+                        setStepIndex(prevIndex);
+                        setIsNavigating(false);
+                    }, 400);
+                }, 100);
+                return;
+            } else if (prevStep.target === '[data-tour="expense-item"]') {
+                // Going back to Wydatki section (from Cele to Wydatki)
+                setIsNavigating(true);
+                setTimeout(() => {
+                    onNavigate('wydatki');
+                    setTimeout(() => {
+                        setStepIndex(prevIndex);
+                        setIsNavigating(false);
+                    }, 400);
+                }, 100);
+                return;
+            } else if (prevStep.target === '[data-tour="goal-item"]') {
+                // Going back to Cele section (from Powiadomienia to Cele)
+                setIsNavigating(true);
+                setTimeout(() => {
+                    onNavigate('cele');
+                    setTimeout(() => {
+                        setStepIndex(prevIndex);
+                        setIsNavigating(false);
+                    }, 400);
+                }, 100);
+                return;
+            }
+
+            // Handle going back to dialog steps
+            if (prevStep.target === '[data-tour="income-dialog"]') {
+                // Going back to income dialog (from step 7 to 6)
+                setIsNavigating(true);
+                setTimeout(() => {
+                    onNavigate('add-income');
+                    setTimeout(() => {
+                        setStepIndex(prevIndex);
+                        setIsNavigating(false);
+                    }, 500);
+                }, 100);
+                return;
+            } else if (prevStep.target === '[data-tour="expense-dialog"]') {
+                // Going back to expense dialog (from step 12 to 11)
+                setIsNavigating(true);
+                setTimeout(() => {
+                    onNavigate('add-expense');
+                    setTimeout(() => {
+                        setStepIndex(prevIndex);
+                        setIsNavigating(false);
+                    }, 500);
+                }, 100);
+                return;
+            } else if (prevStep.target === '[data-tour="goal-dialog"]') {
+                // Going back to goal dialog (from step 17 to 16)
+                setIsNavigating(true);
+                setTimeout(() => {
+                    onNavigate('add-goal');
+                    setTimeout(() => {
+                        setStepIndex(prevIndex);
+                        setIsNavigating(false);
+                    }, 500);
+                }, 100);
+                return;
+            }
+
+            // Handle closing dialogs when going back from them
+            if (currentStep.target === '[data-tour="income-dialog"]') {
+                setIsNavigating(true);
+                onNavigate('close-income-dialog');
+                setTimeout(() => {
+                    setStepIndex(prevIndex);
+                    setIsNavigating(false);
+                }, 400);
+                return;
+            } else if (currentStep.target === '[data-tour="expense-dialog"]') {
+                setIsNavigating(true);
+                onNavigate('close-expense-dialog');
+                setTimeout(() => {
+                    setStepIndex(prevIndex);
+                    setIsNavigating(false);
+                }, 400);
+                return;
+            } else if (currentStep.target === '[data-tour="goal-dialog"]') {
+                setIsNavigating(true);
+                onNavigate('close-goal-dialog');
+                setTimeout(() => {
+                    setStepIndex(prevIndex);
+                    setIsNavigating(false);
+                }, 400);
+                return;
+            }
+
+            // Normal backward step progression
+            setStepIndex(prevIndex);
         }
     };
 
