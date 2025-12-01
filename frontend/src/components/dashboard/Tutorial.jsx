@@ -301,6 +301,8 @@ const Tutorial = ({ run, onFinish, onNavigate }) => {
             disableScrolling={true}
             showProgress={false}
             showSkipButton
+            spotlightClicks={false}
+            disableOverlayClose={true}
             callback={handleJoyrideCallback}
             locale={{
                 back: 'Wstecz',
