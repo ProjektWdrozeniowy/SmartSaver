@@ -149,7 +149,9 @@ const PulpitSection = ({ user, onNavigate }) => {
             )}
 
             {/* Stats Cards */}
-            <Box sx={{
+            <Box
+                data-tour="pulpit-stats-cards"
+                sx={{
                 display: 'flex',
                 gap: 2,
                 mb: 4,

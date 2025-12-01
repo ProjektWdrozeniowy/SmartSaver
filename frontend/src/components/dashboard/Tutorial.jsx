@@ -83,7 +83,7 @@ const Tutorial = ({ run, onFinish, onNavigate }) => {
             }
         },
         {
-            target: '[data-tour="pulpit-section"]',
+            target: '[data-tour="pulpit-stats-cards"]',
             content: addStepCounter('To jest sekcja Pulpit. Tutaj znajdziesz podsumowanie swoich finansów, w tym aktualne saldo, przychody, wydatki i postęp w realizacji celów. W tym miejscu możesz szybko zobaczyć stan swoich finansów.', 2, 19),
             placement: 'bottom',
             disableBeacon: true,
