@@ -155,7 +155,7 @@ const Tutorial = ({ run, onFinish, onNavigate }) => {
             disableBeacon: true,
         },
         {
-            target: '[data-tour="cele-section"]',
+            target: '[data-tour="cele-cards"]',
             content: addStepCounter('Sekcja Cele pomaga Ci oszczędzać na konkretne cele finansowe. Możesz ustawić cel oszczędnościowy, śledzić postęp i dodawać wpłaty na ten cel.', 14, 19),
             placement: 'bottom',
             disableBeacon: true,
@@ -223,7 +223,7 @@ const Tutorial = ({ run, onFinish, onNavigate }) => {
                         setIsNavigating(false);
                     }, 300);
                     return;
-                } else if (nextStep.target === '[data-tour="cele-section"]') {
+                } else if (nextStep.target === '[data-tour="cele-section"]' || nextStep.target === '[data-tour="cele-cards"]') {
                     setIsNavigating(true);
                     onNavigate('cele');
                     setTimeout(() => {

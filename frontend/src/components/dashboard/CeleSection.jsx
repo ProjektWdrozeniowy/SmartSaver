@@ -398,7 +398,9 @@ const CeleSection = ({ onGoalChange, tutorialData = {} }) => {
             </Box>
 
             {/* Statistics Cards */}
-            <Box sx={{
+            <Box
+                data-tour="cele-cards"
+                sx={{
                 display: 'flex',
                 gap: 2,
                 mb: 4,
