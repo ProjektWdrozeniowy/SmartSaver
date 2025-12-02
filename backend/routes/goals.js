@@ -265,8 +265,8 @@ router.post('/check-recurring-contributions', authenticateToken, async (req, res
     const now = new Date();
     let createdCount = 0;
 
-    // Get the system 'Cel' category
-    const goalCategory = await prisma.category.findFirst({
+    // Get or create the system 'Cel' category
+    let goalCategory = await prisma.category.findFirst({
       where: {
         userId: req.user.id,
         name: 'Cel',
@@ -275,7 +275,16 @@ router.post('/check-recurring-contributions', authenticateToken, async (req, res
     });
 
     if (!goalCategory) {
-      return res.status(500).json({ message: 'Błąd: Brak kategorii systemowej "Cel"' });
+      // Auto-create the system category if it doesn't exist
+      goalCategory = await prisma.category.create({
+        data: {
+          userId: req.user.id,
+          name: 'Cel',
+          color: '#ab47bc',
+          icon: '🎯',
+          isSystem: true
+        }
+      });
     }
 
     // Get all recurring contributions for the user (parent contributions only)
@@ -504,8 +513,8 @@ router.post('/:id/contribute', authenticateToken, async (req, res) => {
       return res.status(404).json({ message: 'Cel nie został znaleziony' });
     }
 
-    // Get the system 'Cel' category
-    const goalCategory = await prisma.category.findFirst({
+    // Get or create the system 'Cel' category
+    let goalCategory = await prisma.category.findFirst({
       where: {
         userId: req.user.id,
         name: 'Cel',
@@ -514,7 +523,16 @@ router.post('/:id/contribute', authenticateToken, async (req, res) => {
     });
 
     if (!goalCategory) {
-      return res.status(500).json({ message: 'Błąd: Brak kategorii systemowej "Cel"' });
+      // Auto-create the system category if it doesn't exist
+      goalCategory = await prisma.category.create({
+        data: {
+          userId: req.user.id,
+          name: 'Cel',
+          color: '#ab47bc',
+          icon: '🎯',
+          isSystem: true
+        }
+      });
     }
 
     // Create contribution record

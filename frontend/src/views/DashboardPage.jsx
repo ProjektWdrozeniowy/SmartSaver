@@ -39,6 +39,7 @@ import { getNotifications, checkGoalReminders } from '../api/notifications';
 import { checkRecurringExpenses } from '../api/expenses';
 import { checkRecurringIncomes } from '../api/budget';
 import { checkRecurringContributions } from '../api/goals';
+import { getTutorialStatus, completeTutorial } from '../api/tutorial';
 import { useThemeMode } from '../context/ThemeContext';
 
 // Import dashboard sections
@@ -49,6 +50,7 @@ import CeleSection from '../components/dashboard/CeleSection';
 import AnalizySection from '../components/dashboard/AnalizySection';
 import UstawieniaSection from '../components/dashboard/UstawieniaSection';
 import PowiadomieniaSection from '../components/dashboard/PowiadomieniaSection';
+import Tutorial from '../components/dashboard/Tutorial';
 
 const drawerWidth = 260;
 
@@ -62,6 +64,13 @@ const DashboardPage = () => {
     const [unreadCount, setUnreadCount] = useState(0);
     const [avatarMenuAnchor, setAvatarMenuAnchor] = useState(null);
     const [settingsScrollTo, setSettingsScrollTo] = useState(null);
+    const [runTutorial, setRunTutorial] = useState(false);
+    const [tutorialData, setTutorialData] = useState({
+        showIncome: false,
+        showExpense: false,
+        showGoal: false,
+        showNotification: false,
+    });
     const navigate = useNavigate();
     const hasCheckedReminders = useRef(false);
 
@@ -77,6 +86,9 @@ const DashboardPage = () => {
 
         // Pobierz liczbę nieprzeczytanych powiadomień
         fetchUnreadCount();
+
+        // Sprawdź status samouczka
+        checkTutorialStatus();
 
         // Sprawdź przypomnienia o celach, cykliczne wydatki, cykliczne przychody i cykliczne wpłaty tylko raz
         if (!hasCheckedReminders.current) {
@@ -95,6 +107,96 @@ const DashboardPage = () => {
             });
         }
     }, []);
+
+    const checkTutorialStatus = async () => {
+        try {
+            // Don't show tutorial on mobile devices
+            if (isMobile) {
+                return;
+            }
+
+            // Check localStorage flag for testing
+            const forceTutorial = localStorage.getItem('forceTutorial') === 'true';
+
+            if (forceTutorial) {
+                // Force tutorial for testing
+                setRunTutorial(true);
+                setSelectedMenu('pulpit');
+                return;
+            }
+
+            // Check database status
+            const data = await getTutorialStatus();
+            if (!data.tutorialCompleted) {
+                setRunTutorial(true);
+                setSelectedMenu('pulpit');
+            }
+        } catch (error) {
+            console.error('Error checking tutorial status:', error);
+        }
+    };
+
+    const handleTutorialFinish = async () => {
+        try {
+            // Remove localStorage test flag if it exists
+            localStorage.removeItem('forceTutorial');
+
+            // Mark tutorial as completed in database
+            await completeTutorial();
+            setRunTutorial(false);
+
+            // Clean up temporary tutorial data
+            setTutorialData({
+                showIncome: false,
+                showExpense: false,
+                showGoal: false,
+                showNotification: false,
+            });
+
+            // Navigate to pulpit section after tutorial
+            setSelectedMenu('pulpit');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } catch (error) {
+            console.error('Error completing tutorial:', error);
+        }
+    };
+
+    const handleTutorialNavigate = (action) => {
+        switch (action) {
+            case 'budzet':
+                setSelectedMenu('budzet');
+                break;
+            case 'add-income':
+                setTutorialData({ ...tutorialData, showIncome: true });
+                break;
+            case 'close-income-dialog':
+                setTutorialData({ ...tutorialData, showIncome: false });
+                break;
+            case 'wydatki':
+                setSelectedMenu('wydatki');
+                break;
+            case 'add-expense':
+                setTutorialData({ ...tutorialData, showExpense: true });
+                break;
+            case 'close-expense-dialog':
+                setTutorialData({ ...tutorialData, showExpense: false });
+                break;
+            case 'cele':
+                setSelectedMenu('cele');
+                break;
+            case 'add-goal':
+                setTutorialData({ ...tutorialData, showGoal: true });
+                break;
+            case 'close-goal-dialog':
+                setTutorialData({ ...tutorialData, showGoal: false });
+                break;
+            case 'powiadomienia':
+                setSelectedMenu('powiadomienia');
+                break;
+            default:
+                break;
+        }
+    };
 
     const fetchUnreadCount = async () => {
         try {
@@ -216,15 +318,15 @@ const DashboardPage = () => {
             case 'pulpit':
                 return <PulpitSection user={user} onNavigate={handleNavigate} />;
             case 'wydatki':
-                return <WydatkiSection onExpenseChange={fetchUnreadCount} />;
+                return <WydatkiSection onExpenseChange={fetchUnreadCount} tutorialData={tutorialData} />;
             case 'budzet':
-                return <BudzetSection />;
+                return <BudzetSection tutorialData={tutorialData} />;
             case 'cele':
-                return <CeleSection onGoalChange={handleGoalChange} />;
+                return <CeleSection onGoalChange={handleGoalChange} tutorialData={tutorialData} />;
             case 'analizy':
                 return <AnalizySection />;
             case 'powiadomienia':
-                return <PowiadomieniaSection onNotificationChange={fetchUnreadCount} />;
+                return <PowiadomieniaSection onNotificationChange={fetchUnreadCount} tutorialData={tutorialData} />;
             case 'ustawienia':
                 return <UstawieniaSection scrollToSection={settingsScrollTo} onScrollComplete={() => setSettingsScrollTo(null)} />;
             default:
@@ -264,6 +366,7 @@ const DashboardPage = () => {
                 {menuItems.map((item) => (
                     <ListItem key={item.id} disablePadding sx={{ px: 1.5, mb: 0.5 }}>
                         <ListItemButton
+                            data-tour={`menu-${item.id}`}
                             selected={selectedMenu === item.id}
                             onClick={() => handleMenuSelect(item.id)}
                             sx={{
@@ -507,6 +610,13 @@ const DashboardPage = () => {
                     {renderContent()}
                 </Box>
             </Box>
+
+            {/* Tutorial */}
+            <Tutorial
+                run={runTutorial}
+                onFinish={handleTutorialFinish}
+                onNavigate={handleTutorialNavigate}
+            />
         </Box>
     );
 };

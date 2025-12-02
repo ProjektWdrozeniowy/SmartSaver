@@ -321,4 +321,40 @@ router.delete('/delete', authenticateToken, async (req, res) => {
   }
 });
 
+// GET /api/user/tutorial-status - Get tutorial completion status
+router.get('/tutorial-status', authenticateToken, async (req, res) => {
+  try {
+    const user = await prisma.account.findUnique({
+      where: { id: req.user.id },
+      select: {
+        tutorialCompleted: true
+      }
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: 'Użytkownik nie znaleziony' });
+    }
+
+    res.json({ tutorialCompleted: user.tutorialCompleted });
+  } catch (error) {
+    console.error('Get tutorial status error:', error);
+    res.status(500).json({ message: 'Błąd serwera' });
+  }
+});
+
+// PUT /api/user/complete-tutorial - Mark tutorial as completed
+router.put('/complete-tutorial', authenticateToken, async (req, res) => {
+  try {
+    await prisma.account.update({
+      where: { id: req.user.id },
+      data: { tutorialCompleted: true }
+    });
+
+    res.json({ message: 'Samouczek został ukończony' });
+  } catch (error) {
+    console.error('Complete tutorial error:', error);
+    res.status(500).json({ message: 'Błąd serwera' });
+  }
+});
+
 module.exports = router;
