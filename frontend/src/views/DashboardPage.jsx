@@ -152,6 +152,10 @@ const DashboardPage = () => {
                 showGoal: false,
                 showNotification: false,
             });
+
+            // Navigate to pulpit section after tutorial
+            setSelectedMenu('pulpit');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (error) {
             console.error('Error completing tutorial:', error);
         }
