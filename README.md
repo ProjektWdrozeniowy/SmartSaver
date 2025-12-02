@@ -14,6 +14,7 @@ Aplikacja do zarządzania finansami osobistymi z zaawansowanymi funkcjami analiz
 - 🎨 **Tryb ciemny/jasny** - Dostosowanie wyglądu do preferencji
 - 📱 **Responsywny design** - Pełna obsługa urządzeń mobilnych
 - 🔐 **Bezpieczna autentykacja** - JWT + Argon2 hashing
+- 📖 **Interaktywny samouczek** - Przewodnik po aplikacji dla nowych użytkowników (19 kroków)
 
 ## 🚀 Szybki start
 
@@ -110,12 +111,17 @@ SmartSaver/
 │   │   ├── components/
 │   │   │   ├── common/         # Komponenty wspólne
 │   │   │   ├── dashboard/      # Sekcje dashboardu
+│   │   │   │   └── Tutorial.jsx # Interaktywny samouczek (React Joyride)
 │   │   │   └── landing/        # Strona landing page
 │   │   ├── views/              # Strony aplikacji
 │   │   ├── context/            # Context API (Theme)
 │   │   ├── assets/             # Zasoby statyczne
 │   │   ├── App.jsx             # Główny komponent
 │   │   └── main.jsx            # Entry point
+│   ├── e2e/                    # Testy E2E (Playwright)
+│   │   ├── landing.spec.js     # Testy strony landing page
+│   │   └── navigation.spec.js  # Testy nawigacji
+│   ├── playwright.config.js    # Konfiguracja Playwright
 │   └── package.json
 ├── backend/                     # Serwer Express + Prisma
 │   ├── middleware/
@@ -172,6 +178,12 @@ npm run prisma:studio
 
 # Zainstaluj wszystkie zależności
 npm install
+
+# Uruchom testy E2E
+npm run test:e2e --workspace=frontend
+
+# Uruchom testy jednostkowe
+npm run test --workspace=frontend
 ```
 
 ### Komendy dla workspace'ów:
@@ -195,9 +207,12 @@ npm run migrate --workspace=backend
 - **Recharts 3** - Wykresy i wizualizacje
 - **React Router 7** - Routing
 - **Framer Motion 12** - Animacje
+- **React Joyride 2** - Interaktywny samouczek i przewodnik po aplikacji
 - **Day.js** - Manipulacja datami
 - **React TSParticles** - Efekty wizualne (particles)
 - **Fetch API** - Komunikacja z backend
+- **Playwright** - Testy end-to-end (E2E)
+- **Vitest** - Testy jednostkowe
 
 ### Backend:
 - **Node.js** - Runtime środowisko
@@ -307,6 +322,23 @@ Pełna dokumentacja API znajduje się w pliku [API_DOCUMENTATION.md](./API_DOCUM
 - Eksport danych do JSON
 - Usuwanie konta
 
+### 8. Interaktywny samouczek
+- **19-krokowy przewodnik** po wszystkich funkcjach aplikacji
+- **Automatyczne przewijanie** do odpowiednich sekcji podczas samouczka
+- **Wsparcie dla trybów ciemnego i jasnego** - Dynamiczne dostosowanie kolorów tooltipów
+- **Responsywność** - Samouczek wyłączony na urządzeniach mobilnych (ekrany < 900px)
+- **Biblioteka:** React Joyride - zaawansowane tooltips z nawigacją
+- **Uruchomienie:** Dostępne z menu użytkownika w prawym górnym rogu (ikona pomocy)
+- **Kroki samouczka obejmują:**
+  - Witanie i przegląd aplikacji
+  - Nawigacja po sekcjach (Wydatki, Budżet, Cele, Analizy)
+  - Dodawanie wydatków i przychodów
+  - Zarządzanie celami oszczędnościami
+  - Przeglądanie statystyk i analiz
+  - Zarządzanie kategoriami
+  - Powiadomienia i alerty
+  - Ustawienia konta
+
 ## 🔐 Bezpieczeństwo
 
 ### Zaimplementowane zabezpieczenia:
@@ -362,10 +394,74 @@ npm start
 
 ## 🧪 Testowanie
 
+Projekt wykorzystuje dwa typy testów: testy jednostkowe (Vitest) i testy end-to-end (Playwright).
+
+### Testy E2E (Playwright)
+
+Testy end-to-end weryfikują funkcjonalność aplikacji z perspektywy użytkownika.
+
+**Dostępne testy:**
+- `frontend/e2e/landing.spec.js` - Testy strony landing page
+  - Ładowanie strony głównej
+  - Widoczność elementów nawigacji
+  - Funkcjonalność stopki i linków
+  - Nawigacja do podstron (Regulamin, Kontakt)
+  - Branding aplikacji
+
+- `frontend/e2e/navigation.spec.js` - Testy nawigacji
+  - Nawigacja między stronami przez linki w stopce
+  - Obsługa przycisku "Wstecz" przeglądarki
+  - Spójność layoutu na wszystkich stronach
+  - Wyświetlanie aktualnego roku w copyright
+
+**Uruchamianie testów E2E:**
+
 ```bash
-# TODO: Dodać testy jednostkowe (Jest)
-# TODO: Dodać testy E2E (Playwright/Cypress)
+# Uruchom wszystkie testy E2E (w trybie headless)
+cd frontend
+npm run test:e2e
+
+# Uruchom testy E2E w trybie UI (interaktywny)
+npm run test:e2e:ui
+
+# Zobacz raport z ostatnich testów
+npm run test:e2e:report
 ```
+
+**Konfiguracja:**
+- Plik konfiguracyjny: `frontend/playwright.config.js`
+- Testy uruchamiane na przeglądarce Chromium
+- Automatyczne uruchamianie dev servera przed testami
+- Bazowy URL: `http://localhost:5173`
+- Raport HTML generowany automatycznie
+
+### Testy jednostkowe (Vitest)
+
+Framework Vitest jest skonfigurowany do testów jednostkowych komponentów React.
+
+**Uruchamianie testów jednostkowych:**
+
+```bash
+cd frontend
+
+# Uruchom testy w trybie watch
+npm run test
+
+# Uruchom testy z interfejsem UI
+npm run test:ui
+
+# Uruchom testy jednokrotnie (CI mode)
+npm run test:run
+
+# Uruchom testy z coverage
+npm run test:coverage
+```
+
+**Dodatkowe narzędzia:**
+- `@testing-library/react` - Testy komponentów React
+- `@testing-library/jest-dom` - Matchery dla Vitest
+- `@testing-library/user-event` - Symulacja interakcji użytkownika
+- `jsdom` - Środowisko DOM dla testów
 
 ## 📄 Licencja
 
@@ -394,6 +490,6 @@ Zgłaszaj problemy na [GitHub Issues](https://github.com/ProjektWdrozeniowy/Smar
 
 ---
 
-**Ostatnia aktualizacja:** Listopad 2025
+**Ostatnia aktualizacja:** Grudzień 2025
 
 ⭐ Jeśli podoba Ci się projekt, zostaw gwiazdkę na GitHubie!
