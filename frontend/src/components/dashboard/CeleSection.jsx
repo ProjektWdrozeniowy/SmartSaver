@@ -1067,7 +1067,7 @@ const CeleSection = ({ onGoalChange, tutorialData = {} }) => {
                                         />
 
                                         <Grid container spacing={2}>
-                                            <Grid item xs={6}>
+                                            <Grid size={6}>
                                                 <TextField
                                                     label="Powtarzaj co"
                                                     type="number"
@@ -1084,7 +1084,7 @@ const CeleSection = ({ onGoalChange, tutorialData = {} }) => {
                                                     }}
                                                 />
                                             </Grid>
-                                            <Grid item xs={6}>
+                                            <Grid size={6}>
                                                 <FormControl fullWidth>
                                                     <InputLabel>Jednostka</InputLabel>
                                                     <Select

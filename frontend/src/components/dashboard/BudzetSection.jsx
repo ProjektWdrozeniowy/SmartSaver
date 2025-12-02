@@ -1018,7 +1018,7 @@ const BudzetSection = ({ tutorialData = {} }) => {
                             {incomeForm.isRecurring && (
                                 <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
                                     <Grid container spacing={2}>
-                                        <Grid item xs={6}>
+                                        <Grid size={6}>
                                             <TextField
                                                 label="Powtarzaj co"
                                                 type="number"
@@ -1035,7 +1035,7 @@ const BudzetSection = ({ tutorialData = {} }) => {
                                                 }}
                                             />
                                         </Grid>
-                                        <Grid item xs={6}>
+                                        <Grid size={6}>
                                             <FormControl fullWidth>
                                                 <InputLabel>Jednostka</InputLabel>
                                                 <Select
