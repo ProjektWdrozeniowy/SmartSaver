@@ -62,12 +62,18 @@ const authLimiter = rateLimit({
 
 // ===== END SECURITY MIDDLEWARE =====
 
-// Elastyczna konfiguracja CORS dla development
+// Elastyczna konfiguracja CORS dla development i production
 app.use(cors({
   origin: (origin, callback) => {
     // Pozwól na requesty bez origin (np. Postman, curl)
     if (!origin) return callback(null, true);
-    // Pozwól na wszystkie localhost i 127.0.0.1 na dowolnym porcie
+
+    // Sprawdź APP_ORIGIN z .env dla produkcji
+    if (process.env.APP_ORIGIN && origin === process.env.APP_ORIGIN) {
+      return callback(null, true);
+    }
+
+    // Pozwól na wszystkie localhost i 127.0.0.1 na dowolnym porcie (development)
     if (origin.match(/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/)) {
       return callback(null, true);
     }

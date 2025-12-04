@@ -1,7 +1,7 @@
 // src/api/tutorial.js
 const BASE_URL =
   (import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.replace(/\/+$/, '')) ||
-  'http://localhost:4000';
+  '';
 
 import { getToken } from './auth';
 

@@ -110,7 +110,7 @@ const ContactPage = () => {
         if (validateForm()) {
             try {
                 // Wyślij dane do backendu
-                const response = await fetch('http://localhost:4000/api/mail/contact', {
+                const response = await fetch('/api/mail/contact', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

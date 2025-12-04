@@ -1,7 +1,7 @@
 // src/api/auth.js
 const BASE_URL =
   (import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.replace(/\/+$/, '')) ||
-  'http://localhost:4000';
+  '';
 
 // Funkcje pomocnicze do zarządzania tokenem
 export function saveToken(token) {
