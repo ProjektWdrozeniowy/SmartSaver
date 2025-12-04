@@ -3,7 +3,7 @@ import { getToken } from './auth';
 
 const BASE_URL =
   (import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.replace(/\/+$/, '')) ||
-  'http://localhost:4000';
+  '';
 
 /**
  * Pobiera listę wydatków (opcjonalnie filtrowane po miesiącu)

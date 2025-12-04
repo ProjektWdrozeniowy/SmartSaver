@@ -31,7 +31,7 @@ import {
     deleteAllNotifications,
 } from '../../api/notifications';
 
-const PowiadomieniaSection = ({ onNotificationChange }) => {
+const PowiadomieniaSection = ({ onNotificationChange, tutorialData = {} }) => {
     const { mode } = useThemeMode();
     const [notifications, setNotifications] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
@@ -65,6 +65,37 @@ const PowiadomieniaSection = ({ onNotificationChange }) => {
     useEffect(() => {
         fetchNotifications();
     }, []);
+
+    // Handle tutorial - show example notifications
+    useEffect(() => {
+        if (tutorialData.showNotification) {
+            const tutorialNotifications = [
+                {
+                    id: 'tutorial-notif-1',
+                    type: 'budget_exceeded',
+                    message: 'Przekroczono próg budżetu! Twoje wydatki wynoszą 85% założonego budżetu.',
+                    isRead: false,
+                    createdAt: new Date().toISOString(),
+                },
+                {
+                    id: 'tutorial-notif-2',
+                    type: 'goal_achieved',
+                    message: 'Gratulacje! Osiągnąłeś cel "Nowy laptop".',
+                    isRead: false,
+                    createdAt: new Date(Date.now() - 3600000).toISOString(),
+                },
+                {
+                    id: 'tutorial-notif-3',
+                    type: 'goal_reminder',
+                    message: 'Przypomnienie: Cel "Wakacje" zbliża się do terminu. Zostało 30 dni.',
+                    isRead: true,
+                    createdAt: new Date(Date.now() - 86400000).toISOString(),
+                }
+            ];
+            setNotifications(tutorialNotifications);
+            setUnreadCount(2);
+        }
+    }, [tutorialData.showNotification]);
 
     const handleMarkAsRead = async (notificationId) => {
         try {
@@ -161,7 +192,7 @@ const PowiadomieniaSection = ({ onNotificationChange }) => {
     };
 
     return (
-        <Box sx={{ width: '100%' }}>
+        <Box sx={{ width: '100%' }} data-tour="powiadomienia-section">
             {/* Header */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3, flexWrap: 'wrap', gap: 2 }}>
                 <Box>

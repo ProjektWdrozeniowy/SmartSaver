@@ -27,6 +27,49 @@ const TermsOfServicePage = () => {
     >
       <Navbar />
 
+      {/* Hero Section */}
+      <Box
+        sx={{
+          background: 'linear-gradient(135deg, #0d1a2a 0%, #1a0d1f 100%)',
+          py: { xs: 8, md: 10 },
+          px: 2,
+          textAlign: 'center',
+        }}
+      >
+        <Container maxWidth="md">
+          <Typography
+            component={motion.h1}
+            variants={fadeIn}
+            initial="hidden"
+            animate="visible"
+            variant="h1"
+            sx={{
+              fontSize: { xs: '2.5rem', sm: '3.5rem' },
+              mb: 2,
+              color: 'text.primary',
+              fontWeight: 700,
+            }}
+          >
+            Warunki Usługi
+          </Typography>
+          <Typography
+            component={motion.p}
+            variants={fadeIn}
+            initial="hidden"
+            animate="visible"
+            variant="body1"
+            sx={{
+              fontSize: { xs: '1rem', sm: '1.2rem' },
+              color: 'text.secondary',
+              maxWidth: '600px',
+              margin: '0 auto',
+            }}
+          >
+            Przejrzyste zasady współpracy
+          </Typography>
+        </Container>
+      </Box>
+
       {/* Main Content */}
       <Box
         component="main"
@@ -51,127 +94,95 @@ const TermsOfServicePage = () => {
               borderColor: 'rgba(255, 255, 255, 0.1)',
               borderRadius: 2,
               boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+              '& section:not(:last-child)': {
+                mb: 5,
+              },
             }}
           >
-            {/* Title */}
-            <Typography
-              variant="h1"
-              component="h1"
-              sx={{
-                fontSize: { xs: '2rem', sm: '2.5rem' },
-                mb: 2,
-                color: 'text.primary',
-                fontWeight: 700,
-              }}
-            >
-              Warunki Usługi
-            </Typography>
 
-            <Typography
-              variant="body2"
-              sx={{
-                mb: 4,
-                color: 'text.secondary',
-                fontStyle: 'italic',
-              }}
-            >
-              Ostatnia aktualizacja: {new Date().toLocaleDateString('pl-PL')}
-            </Typography>
 
-            {/* Content - Placeholder */}
-            <Box sx={{ '& > *:not(:last-child)': { mb: 3 } }}>
-              <Typography variant="h2" sx={{ fontSize: '1.5rem', color: 'text.primary', mb: 2 }}>
-                1. Akceptacja warunków
+            {/* 1. Akceptacja Warunków */}
+            <Box component="section">
+              <Typography variant="h2" sx={{ fontSize: '1.5rem', color: 'text.primary', mb: 2, fontWeight: 600 }}>
+                1. Akceptacja Warunków
               </Typography>
               <Typography variant="body1" sx={{ color: 'text.secondary', lineHeight: 1.8 }}>
-                Korzystając z aplikacji SmartSaver, akceptujesz niniejsze Warunki Usługi.
-                Jeśli nie zgadzasz się z tymi warunkami, nie korzystaj z naszych usług.
+                Korzystając z aplikacji Smart$aver, użytkownik akceptuje niniejsze Warunki Usługi. Jeśli nie zgadza się z ich treścią, powinien zaprzestać korzystania z aplikacji.
               </Typography>
+            </Box>
 
-              <Typography variant="h2" sx={{ fontSize: '1.5rem', color: 'text.primary', mb: 2 }}>
-                2. Opis usługi
+            {/* 2. Zakres działania */}
+            <Box component="section">
+              <Typography variant="h2" sx={{ fontSize: '1.5rem', color: 'text.primary', mb: 2, fontWeight: 600 }}>
+                2. Zakres działania
               </Typography>
               <Typography variant="body1" sx={{ color: 'text.secondary', lineHeight: 1.8 }}>
-                SmartSaver to aplikacja do zarządzania finansami osobistymi, która umożliwia
-                użytkownikom śledzenie wydatków, planowanie budżetu oraz generowanie raportów
-                finansowych.
+                Smart$aver to aplikacja do zarządzania finansami osobistymi w formie wirtualnej. Użytkownik może dodawać środki, wydatki, tworzyć kategorie oraz ustawiać cele oszczędnościowe. Aplikacja nie operuje prawdziwymi pieniędzmi i nie wykonuje żadnych realnych transakcji.
               </Typography>
+            </Box>
 
-              <Typography variant="h2" sx={{ fontSize: '1.5rem', color: 'text.primary', mb: 2 }}>
-                3. Rejestracja konta
+            {/* 3. Dane wprowadzane przez użytkownika */}
+            <Box component="section">
+              <Typography variant="h2" sx={{ fontSize: '1.5rem', color: 'text.primary', mb: 2, fontWeight: 600 }}>
+                3. Dane wprowadzane przez użytkownika
               </Typography>
               <Typography variant="body1" sx={{ color: 'text.secondary', lineHeight: 1.8 }}>
-                Aby korzystać z pełnych funkcjonalności, musisz utworzyć konto. Zobowiązujesz
-                się podać prawdziwe, aktualne i kompletne informacje oraz chronić swoje dane
-                logowania.
+                Wszystkie obliczenia i zestawienia bazują wyłącznie na informacjach wprowadzonych przez użytkownika. Użytkownik ponosi odpowiedzialność za dokładność i kompletność danych.
               </Typography>
+            </Box>
 
-              <Typography variant="h2" sx={{ fontSize: '1.5rem', color: 'text.primary', mb: 2 }}>
-                4. Odpowiedzialność użytkownika
+            {/* 4. Bezpieczeństwo */}
+            <Box component="section">
+              <Typography variant="h2" sx={{ fontSize: '1.5rem', color: 'text.primary', mb: 2, fontWeight: 600 }}>
+                4. Bezpieczeństwo
               </Typography>
               <Typography variant="body1" sx={{ color: 'text.secondary', lineHeight: 1.8 }}>
-                Jesteś odpowiedzialny za:
-                <br />
-                - Zachowanie poufności danych logowania
-                <br />
-                - Wszystkie działania wykonane na Twoim koncie
-                <br />
-                - Prawidłowość wprowadzanych danych finansowych
-                <br />- Korzystanie z usługi zgodnie z obowiązującym prawem
+                Użytkownik odpowiada za swoje dane logowania oraz za zachowanie poufności hasła. Usługodawca stosuje odpowiednie środki techniczne mające na celu ochronę danych, zgodnie z Polityką Prywatności.
               </Typography>
+            </Box>
 
-              <Typography variant="h2" sx={{ fontSize: '1.5rem', color: 'text.primary', mb: 2 }}>
-                5. Ograniczenia usługi
+            {/* 5. Ograniczenia odpowiedzialności */}
+            <Box component="section">
+              <Typography variant="h2" sx={{ fontSize: '1.5rem', color: 'text.primary', mb: 2, fontWeight: 600 }}>
+                5. Ograniczenia odpowiedzialności
               </Typography>
               <Typography variant="body1" sx={{ color: 'text.secondary', lineHeight: 1.8 }}>
-                SmartSaver nie ponosi odpowiedzialności za:
-                <br />
-                - Decyzje finansowe podejmowane na podstawie danych z aplikacji
-                <br />
-                - Utratę danych w wyniku awarii sprzętu lub oprogramowania
-                <br />- Przerwy w dostępie do usługi z przyczyn technicznych
+                Smart$aver nie udziela porad finansowych ani inwestycyjnych. Wyniki w aplikacji mają charakter poglądowy i służą jedynie do organizacji budżetu. Usługodawca nie ponosi odpowiedzialności za skutki wykorzystania danych z aplikacji.
               </Typography>
+            </Box>
 
-              <Typography variant="h2" sx={{ fontSize: '1.5rem', color: 'text.primary', mb: 2 }}>
-                6. Własność intelektualna
+            {/* 6. Zmiany w Usłudze */}
+            <Box component="section">
+              <Typography variant="h2" sx={{ fontSize: '1.5rem', color: 'text.primary', mb: 2, fontWeight: 600 }}>
+                6. Zmiany w Usłudze
               </Typography>
               <Typography variant="body1" sx={{ color: 'text.secondary', lineHeight: 1.8 }}>
-                Wszystkie prawa do aplikacji SmartSaver, w tym kod źródłowy, design, logo i
-                treści, są własnością SmartSaver. Nie możesz kopiować, modyfikować ani
-                dystrybuować naszych materiałów bez zgody.
+                Usługodawca może wprowadzać aktualizacje, dodawać nowe funkcje lub modyfikować istniejące. Aktualizacja Warunków Usługi może nastąpić w dowolnym momencie.
               </Typography>
+            </Box>
 
-              <Typography variant="h2" sx={{ fontSize: '1.5rem', color: 'text.primary', mb: 2 }}>
-                7. Rozwiązanie umowy
+            {/* 7. Kontakt */}
+            <Box component="section">
+              <Typography variant="h2" sx={{ fontSize: '1.5rem', color: 'text.primary', mb: 2, fontWeight: 600 }}>
+                7. Kontakt
               </Typography>
               <Typography variant="body1" sx={{ color: 'text.secondary', lineHeight: 1.8 }}>
-                Możesz zakończyć korzystanie z usługi w dowolnym momencie, usuwając swoje
-                konto. Zastrzegamy sobie prawo do zawieszenia lub zakończenia dostępu do
-                usługi w przypadku naruszenia niniejszych warunków.
-              </Typography>
-
-              <Typography variant="h2" sx={{ fontSize: '1.5rem', color: 'text.primary', mb: 2 }}>
-                8. Zmiany warunków
-              </Typography>
-              <Typography variant="body1" sx={{ color: 'text.secondary', lineHeight: 1.8 }}>
-                Zastrzegamy sobie prawo do modyfikacji tych Warunków Usługi. O istotnych
-                zmianach poinformujemy użytkowników z odpowiednim wyprzedzeniem.
-              </Typography>
-
-              <Typography variant="h2" sx={{ fontSize: '1.5rem', color: 'text.primary', mb: 2 }}>
-                9. Prawo właściwe
-              </Typography>
-              <Typography variant="body1" sx={{ color: 'text.secondary', lineHeight: 1.8 }}>
-                Niniejsze Warunki Usługi podlegają prawu polskiemu. Wszelkie spory będą
-                rozstrzygane przez właściwe sądy w Polsce.
-              </Typography>
-
-              <Typography variant="h2" sx={{ fontSize: '1.5rem', color: 'text.primary', mb: 2 }}>
-                10. Kontakt
-              </Typography>
-              <Typography variant="body1" sx={{ color: 'text.secondary', lineHeight: 1.8 }}>
-                W przypadku pytań dotyczących Warunków Usługi, skontaktuj się z nami:
-                [email kontaktowy].
+                W sprawach dotyczących aplikacji lub niniejszych Warunków należy kontaktować się pod adresem:{' '}
+                <Box
+                  component="a"
+                  href="mailto:kontakt@smartsaver.pl"
+                  sx={{
+                    color: 'primary.main',
+                    textDecoration: 'none',
+                    fontWeight: 600,
+                    '&:hover': {
+                      textDecoration: 'underline',
+                    },
+                  }}
+                >
+                  kontakt@smartsaver.pl
+                </Box>
+                .
               </Typography>
             </Box>
           </Paper>

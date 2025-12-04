@@ -48,7 +48,7 @@ import { getExpenses, createExpense, updateExpense, deleteExpense } from '../../
 import { getCategories, createCategory } from '../../api/categories';
 import { useThemeMode } from '../../context/ThemeContext';
 
-const WydatkiSection = ({ onExpenseChange }) => {
+const WydatkiSection = ({ onExpenseChange, tutorialData = {} }) => {
     const { mode } = useThemeMode();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -111,6 +111,42 @@ const WydatkiSection = ({ onExpenseChange }) => {
             fetchExpenses();
         }
     }, [selectedMonth]);
+
+    // Handle tutorial
+    useEffect(() => {
+        if (tutorialData.showExpense) {
+            // Open expense dialog for tutorial
+            setOpenExpenseDialog(true);
+            // Set default form with tutorial data
+            setExpenseForm({
+                name: 'Zakupy spożywcze',
+                categoryId: categories.length > 0 ? categories[0].id : '',
+                date: new Date().toISOString().split('T')[0],
+                description: 'Przykładowy wydatek na zakupy',
+                amount: '150.00',
+                isRecurring: false,
+                recurringInterval: 1,
+                recurringUnit: 'month',
+                recurringEndDate: '',
+                hasEndDate: false,
+            });
+            // Add tutorial expense to display
+            const tutorialExpense = {
+                id: 'tutorial-expense',
+                name: 'Zakupy spożywcze',
+                amount: 150.00,
+                date: new Date().toISOString(),
+                category: categories.length > 0 ? categories[0] : { name: 'Jedzenie', color: '#ff6b9d', icon: '🍕' },
+                categoryId: categories.length > 0 ? categories[0].id : 1,
+                description: 'Przykładowy wydatek na zakupy',
+                isRecurring: false,
+            };
+            setExpenses([tutorialExpense]);
+        } else if (tutorialData.showExpense === false) {
+            // Close expense dialog when tutorial moves on
+            setOpenExpenseDialog(false);
+        }
+    }, [tutorialData.showExpense, categories]);
 
     // API functions
     const fetchCategories = async () => {
@@ -305,7 +341,7 @@ const WydatkiSection = ({ onExpenseChange }) => {
     };
 
     return (
-        <Box sx={{ width: '100%' }}>
+        <Box sx={{ width: '100%' }} data-tour="wydatki-section">
             {/* Header */}
             <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
                 <Box>
@@ -338,6 +374,7 @@ const WydatkiSection = ({ onExpenseChange }) => {
                         Dodaj kategorię
                     </Button>
                     <Button
+                        data-tour="add-expense-button"
                         variant="contained"
                         startIcon={<AddIcon />}
                         onClick={handleAddExpense}
@@ -363,7 +400,9 @@ const WydatkiSection = ({ onExpenseChange }) => {
             </Box>
 
             {/* Summary and Filters Row */}
-            <Box sx={{ display: 'flex', gap: 2, mb: 3, flexDirection: { xs: 'column', md: 'row' } }}>
+            <Box
+                data-tour="wydatki-cards"
+                sx={{ display: 'flex', gap: 2, mb: 3, flexDirection: { xs: 'column', md: 'row' } }}>
                 {/* Summary Card - 50% width */}
                 <Card
                     sx={{
@@ -560,11 +599,12 @@ const WydatkiSection = ({ onExpenseChange }) => {
                             </Box>
                         ) : (
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                {filteredExpenses.map((expense) => {
+                                {filteredExpenses.map((expense, index) => {
                                     const category = getCategoryById(expense);
                                     return (
                                         <Card
                                             key={expense.id}
+                                            data-tour={index === 0 ? 'expense-item' : undefined}
                                             sx={{
                                                 background: mode === 'dark'
                                                     ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))'
@@ -682,10 +722,10 @@ const WydatkiSection = ({ onExpenseChange }) => {
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    filteredExpenses.map((expense) => {
+                                    filteredExpenses.map((expense, index) => {
                                         const category = getCategoryById(expense);
                                         return (
-                                            <TableRow key={expense.id} hover>
+                                            <TableRow key={expense.id} hover data-tour={index === 0 ? 'expense-item' : undefined}>
                                                 <TableCell sx={{ color: 'text.primary' }}>{expense.name}</TableCell>
                                                 <TableCell>
                                                     <Chip
@@ -741,7 +781,7 @@ const WydatkiSection = ({ onExpenseChange }) => {
             {/* Dialog - Add/Edit Expense */}
             <Dialog
                 open={openExpenseDialog}
-                onClose={() => setOpenExpenseDialog(false)}
+                onClose={tutorialData.showExpense && !editingExpense ? undefined : () => setOpenExpenseDialog(false)}
                 maxWidth="sm"
                 fullWidth
                 PaperProps={{
@@ -756,7 +796,8 @@ const WydatkiSection = ({ onExpenseChange }) => {
                         boxShadow: mode === 'dark'
                             ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
                             : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
-                    }
+                    },
+                    'data-tour': 'expense-dialog'
                 }}
             >
                 <DialogTitle>
@@ -787,6 +828,7 @@ const WydatkiSection = ({ onExpenseChange }) => {
                             onChange={(e) => setExpenseForm({ ...expenseForm, name: e.target.value })}
                             fullWidth
                             required
+                            disabled={tutorialData.showExpense && !editingExpense}
                         />
                         <FormControl fullWidth required>
                             <InputLabel>Kategoria</InputLabel>
@@ -794,6 +836,7 @@ const WydatkiSection = ({ onExpenseChange }) => {
                                 value={expenseForm.categoryId}
                                 label="Kategoria"
                                 onChange={(e) => setExpenseForm({ ...expenseForm, categoryId: e.target.value })}
+                                disabled={tutorialData.showExpense && !editingExpense}
                                 MenuProps={{
                                     PaperProps: {
                                         sx: {
@@ -823,10 +866,12 @@ const WydatkiSection = ({ onExpenseChange }) => {
                                 label="Data"
                                 value={dayjs(expenseForm.date)}
                                 onChange={(newValue) => setExpenseForm({ ...expenseForm, date: newValue ? newValue.format('YYYY-MM-DD') : '' })}
+                                disabled={tutorialData.showExpense && !editingExpense}
                                 slotProps={{
                                     textField: {
                                         fullWidth: true,
                                         required: true,
+                                        disabled: tutorialData.showExpense && !editingExpense,
                                     },
                                     popper: {
                                         sx: {
@@ -881,6 +926,7 @@ const WydatkiSection = ({ onExpenseChange }) => {
                             onChange={(e) => setExpenseForm({ ...expenseForm, amount: e.target.value })}
                             fullWidth
                             required
+                            disabled={tutorialData.showExpense && !editingExpense}
                             inputProps={{ step: '0.01', min: '0' }}
                             InputProps={{
                                 endAdornment: <InputAdornment position="end">zł</InputAdornment>,
@@ -902,6 +948,7 @@ const WydatkiSection = ({ onExpenseChange }) => {
                             fullWidth
                             multiline
                             rows={3}
+                            disabled={tutorialData.showExpense && !editingExpense}
                         />
 
                         {/* Recurring Expense Section */}
@@ -911,6 +958,7 @@ const WydatkiSection = ({ onExpenseChange }) => {
                                     <Checkbox
                                         checked={expenseForm.isRecurring}
                                         onChange={(e) => setExpenseForm({ ...expenseForm, isRecurring: e.target.checked })}
+                                        disabled={tutorialData.showExpense && !editingExpense}
                                         sx={{
                                             color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
                                             '&.Mui-checked': {
@@ -925,13 +973,14 @@ const WydatkiSection = ({ onExpenseChange }) => {
                             {expenseForm.isRecurring && (
                                 <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
                                     <Grid container spacing={2}>
-                                        <Grid item xs={6}>
+                                        <Grid size={6}>
                                             <TextField
                                                 label="Powtarzaj co"
                                                 type="number"
                                                 value={expenseForm.recurringInterval}
                                                 onChange={(e) => setExpenseForm({ ...expenseForm, recurringInterval: parseInt(e.target.value) || 1 })}
                                                 fullWidth
+                                                disabled={tutorialData.showExpense && !editingExpense}
                                                 inputProps={{ min: 1 }}
                                                 sx={{
                                                     '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
@@ -941,13 +990,14 @@ const WydatkiSection = ({ onExpenseChange }) => {
                                                 }}
                                             />
                                         </Grid>
-                                        <Grid item xs={6}>
+                                        <Grid size={6}>
                                             <FormControl fullWidth>
                                                 <InputLabel>Jednostka</InputLabel>
                                                 <Select
                                                     value={expenseForm.recurringUnit}
                                                     label="Jednostka"
                                                     onChange={(e) => setExpenseForm({ ...expenseForm, recurringUnit: e.target.value })}
+                                                    disabled={tutorialData.showExpense && !editingExpense}
                                                 >
                                                     <MenuItem value="day">dzień</MenuItem>
                                                     <MenuItem value="week">tydzień</MenuItem>
@@ -963,6 +1013,7 @@ const WydatkiSection = ({ onExpenseChange }) => {
                                             <Switch
                                                 checked={!expenseForm.hasEndDate}
                                                 onChange={(e) => setExpenseForm({ ...expenseForm, hasEndDate: !e.target.checked })}
+                                                disabled={tutorialData.showExpense && !editingExpense}
                                                 sx={{
                                                     '& .MuiSwitch-switchBase.Mui-checked': {
                                                         color: '#66bb6a',
@@ -983,9 +1034,11 @@ const WydatkiSection = ({ onExpenseChange }) => {
                                                 value={expenseForm.recurringEndDate ? dayjs(expenseForm.recurringEndDate) : null}
                                                 onChange={(newValue) => setExpenseForm({ ...expenseForm, recurringEndDate: newValue ? newValue.format('YYYY-MM-DD') : '' })}
                                                 minDate={dayjs(expenseForm.date).add(1, 'day')}
+                                                disabled={tutorialData.showExpense && !editingExpense}
                                                 slotProps={{
                                                     textField: {
                                                         fullWidth: true,
+                                                        disabled: tutorialData.showExpense && !editingExpense,
                                                     },
                                                     popper: {
                                                         sx: {
@@ -1041,13 +1094,13 @@ const WydatkiSection = ({ onExpenseChange }) => {
                     </Box>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setOpenExpenseDialog(false)}>
+                    <Button onClick={() => setOpenExpenseDialog(false)} disabled={tutorialData.showExpense && !editingExpense}>
                         Anuluj
                     </Button>
                     <Button
                         onClick={handleSaveExpense}
                         variant="contained"
-                        disabled={!expenseForm.name || !expenseForm.categoryId || !expenseForm.amount || saving}
+                        disabled={!expenseForm.name || !expenseForm.categoryId || !expenseForm.amount || saving || (tutorialData.showExpense && !editingExpense)}
                         sx={{
                             '&:hover': {
                                 transform: 'none',

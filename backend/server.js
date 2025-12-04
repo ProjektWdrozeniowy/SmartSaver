@@ -62,12 +62,18 @@ const authLimiter = rateLimit({
 
 // ===== END SECURITY MIDDLEWARE =====
 
-// Elastyczna konfiguracja CORS dla development
+// Elastyczna konfiguracja CORS dla development i production
 app.use(cors({
   origin: (origin, callback) => {
     // Pozwól na requesty bez origin (np. Postman, curl)
     if (!origin) return callback(null, true);
-    // Pozwól na wszystkie localhost i 127.0.0.1 na dowolnym porcie
+
+    // Sprawdź APP_ORIGIN z .env dla produkcji
+    if (process.env.APP_ORIGIN && origin === process.env.APP_ORIGIN) {
+      return callback(null, true);
+    }
+
+    // Pozwól na wszystkie localhost i 127.0.0.1 na dowolnym porcie (development)
     if (origin.match(/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/)) {
       return callback(null, true);
     }
@@ -151,11 +157,12 @@ app.post('/api/register', authLimiter, async (req, res) => {
 
     // Create default categories for the new user
     const defaultCategories = [
-      { name: 'Jedzenie', color: '#ff6b9d', icon: '🍕' },
-      { name: 'Transport', color: '#00f0ff', icon: '🚗' },
-      { name: 'Rozrywka', color: '#a8e6cf', icon: '🎬' },
-      { name: 'Rachunki', color: '#ffd93d', icon: '⚡' },
-      { name: 'Zakupy', color: '#c77dff', icon: '🛒' }
+      { name: 'Jedzenie', color: '#ff6b9d', icon: '🍕', isSystem: false },
+      { name: 'Transport', color: '#00f0ff', icon: '🚗', isSystem: false },
+      { name: 'Rozrywka', color: '#a8e6cf', icon: '🎬', isSystem: false },
+      { name: 'Rachunki', color: '#ffd93d', icon: '⚡', isSystem: false },
+      { name: 'Zakupy', color: '#c77dff', icon: '🛒', isSystem: false },
+      { name: 'Cel', color: '#ab47bc', icon: '🎯', isSystem: true }
     ];
 
     await prisma.category.createMany({

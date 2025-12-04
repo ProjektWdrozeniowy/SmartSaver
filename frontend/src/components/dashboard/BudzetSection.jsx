@@ -50,7 +50,7 @@ import { getNotificationSettings } from '../../api/settings';
 import { getExpenses } from '../../api/expenses';
 import { useThemeMode } from '../../context/ThemeContext';
 
-const BudzetSection = () => {
+const BudzetSection = ({ tutorialData = {} }) => {
     const { mode } = useThemeMode();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -100,6 +100,41 @@ const BudzetSection = () => {
             fetchCurrentExpenses();
         }
     }, [selectedMonth]);
+
+    // Handle tutorial
+    useEffect(() => {
+        if (tutorialData.showIncome) {
+            // Open income dialog for tutorial
+            setOpenIncomeDialog(true);
+            // Set default form with tutorial data
+            setIncomeForm({
+                name: 'Wynagrodzenie',
+                date: new Date().toISOString().split('T')[0],
+                description: 'Miesięczne wynagrodzenie',
+                amount: '4500.00',
+                isRecurring: true,
+                recurringInterval: 1,
+                recurringUnit: 'month',
+                recurringEndDate: '',
+                hasEndDate: false,
+            });
+            // Add tutorial income to display
+            const tutorialIncome = {
+                id: 'tutorial-income',
+                name: 'Wynagrodzenie',
+                amount: 4500.00,
+                date: new Date().toISOString(),
+                description: 'Miesięczne wynagrodzenie',
+                isRecurring: true,
+                recurringInterval: 1,
+                recurringUnit: 'month',
+            };
+            setIncomes([tutorialIncome]);
+        } else if (tutorialData.showIncome === false) {
+            // Close income dialog when tutorial moves on
+            setOpenIncomeDialog(false);
+        }
+    }, [tutorialData.showIncome]);
 
     // API functions
     const fetchIncomes = async () => {
@@ -267,13 +302,14 @@ const BudzetSection = () => {
     };
 
     return (
-        <Box sx={{ width: '100%' }}>
+        <Box sx={{ width: '100%' }} data-tour="budzet-section">
             {/* Header */}
             <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
                 <Typography variant="body1" sx={{ color: 'text.secondary' }}>
                     Zarządzaj swoim budżetem i przychodami
                 </Typography>
                 <Button
+                    data-tour="add-income-button"
                     variant="contained"
                     startIcon={<AddIcon />}
                     onClick={handleAddIncome}
@@ -298,7 +334,9 @@ const BudzetSection = () => {
             </Box>
 
             {/* Budget Summary Cards */}
-            <Box sx={{
+            <Box
+                data-tour="budzet-cards"
+                sx={{
                 display: 'flex',
                 gap: 2,
                 mb: 4,
@@ -563,7 +601,9 @@ const BudzetSection = () => {
                 }}
             >
                 <CardContent>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+                    <Box
+                        data-tour="income-list-header"
+                        sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
                         <Typography variant="h6" sx={{ color: 'text.primary', fontWeight: 600 }}>
                             Lista przychodów
                         </Typography>
@@ -668,9 +708,10 @@ const BudzetSection = () => {
                             </Box>
                         ) : (
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                {incomes.map((income) => (
+                                {incomes.map((income, index) => (
                                     <Card
                                         key={income.id}
+                                        data-tour={index === 0 ? 'income-item' : undefined}
                                         sx={{
                                             background: mode === 'dark'
                                                 ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))'
@@ -773,8 +814,8 @@ const BudzetSection = () => {
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    incomes.map((income) => (
-                                        <TableRow key={income.id} hover>
+                                    incomes.map((income, index) => (
+                                        <TableRow key={income.id} hover data-tour={index === 0 ? 'income-item' : undefined}>
                                             <TableCell sx={{ color: 'text.primary', fontWeight: 500 }}>{income.name}</TableCell>
                                             <TableCell sx={{ color: 'text.secondary' }}>
                                                 {new Date(income.date).toLocaleDateString('pl-PL')}
@@ -813,7 +854,7 @@ const BudzetSection = () => {
             {/* Dialog - Add/Edit Income */}
             <Dialog
                 open={openIncomeDialog}
-                onClose={() => setOpenIncomeDialog(false)}
+                onClose={tutorialData.showIncome && !editingIncome ? undefined : () => setOpenIncomeDialog(false)}
                 maxWidth="sm"
                 fullWidth
                 PaperProps={{
@@ -828,7 +869,8 @@ const BudzetSection = () => {
                         boxShadow: mode === 'dark'
                             ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
                             : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
-                    }
+                    },
+                    'data-tour': 'income-dialog'
                 }}
             >
                 <DialogTitle>
@@ -860,16 +902,19 @@ const BudzetSection = () => {
                             fullWidth
                             required
                             placeholder="np. Wynagrodzenie"
+                            disabled={tutorialData.showIncome && !editingIncome}
                         />
                         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pl">
                             <DatePicker
                                 label="Data"
                                 value={dayjs(incomeForm.date)}
                                 onChange={(newValue) => setIncomeForm({ ...incomeForm, date: newValue ? newValue.format('YYYY-MM-DD') : '' })}
+                                disabled={tutorialData.showIncome && !editingIncome}
                                 slotProps={{
                                     textField: {
                                         fullWidth: true,
                                         required: true,
+                                        disabled: tutorialData.showIncome && !editingIncome,
                                     },
                                     popper: {
                                         sx: {
@@ -925,6 +970,7 @@ const BudzetSection = () => {
                             onChange={(e) => setIncomeForm({ ...incomeForm, amount: e.target.value })}
                             fullWidth
                             required
+                            disabled={tutorialData.showIncome && !editingIncome}
                             inputProps={{ step: '0.01', min: '0' }}
                             InputProps={{
                                 endAdornment: <InputAdornment position="end">zł</InputAdornment>,
@@ -947,6 +993,7 @@ const BudzetSection = () => {
                             multiline
                             rows={3}
                             placeholder="Dodatkowe informacje o przychodzie"
+                            disabled={tutorialData.showIncome && !editingIncome}
                         />
 
                         {/* Recurring Income Section */}
@@ -956,6 +1003,7 @@ const BudzetSection = () => {
                                     <Checkbox
                                         checked={incomeForm.isRecurring}
                                         onChange={(e) => setIncomeForm({ ...incomeForm, isRecurring: e.target.checked })}
+                                        disabled={tutorialData.showIncome && !editingIncome}
                                         sx={{
                                             color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
                                             '&.Mui-checked': {
@@ -970,13 +1018,14 @@ const BudzetSection = () => {
                             {incomeForm.isRecurring && (
                                 <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
                                     <Grid container spacing={2}>
-                                        <Grid item xs={6}>
+                                        <Grid size={6}>
                                             <TextField
                                                 label="Powtarzaj co"
                                                 type="number"
                                                 value={incomeForm.recurringInterval}
                                                 onChange={(e) => setIncomeForm({ ...incomeForm, recurringInterval: parseInt(e.target.value) || 1 })}
                                                 fullWidth
+                                                disabled={tutorialData.showIncome && !editingIncome}
                                                 inputProps={{ min: 1 }}
                                                 sx={{
                                                     '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
@@ -986,13 +1035,14 @@ const BudzetSection = () => {
                                                 }}
                                             />
                                         </Grid>
-                                        <Grid item xs={6}>
+                                        <Grid size={6}>
                                             <FormControl fullWidth>
                                                 <InputLabel>Jednostka</InputLabel>
                                                 <Select
                                                     value={incomeForm.recurringUnit}
                                                     label="Jednostka"
                                                     onChange={(e) => setIncomeForm({ ...incomeForm, recurringUnit: e.target.value })}
+                                                    disabled={tutorialData.showIncome && !editingIncome}
                                                 >
                                                     <MenuItem value="day">dzień</MenuItem>
                                                     <MenuItem value="week">tydzień</MenuItem>
@@ -1008,6 +1058,7 @@ const BudzetSection = () => {
                                             <Switch
                                                 checked={!incomeForm.hasEndDate}
                                                 onChange={(e) => setIncomeForm({ ...incomeForm, hasEndDate: !e.target.checked })}
+                                                disabled={tutorialData.showIncome && !editingIncome}
                                                 sx={{
                                                     '& .MuiSwitch-switchBase.Mui-checked': {
                                                         color: '#66bb6a',
@@ -1028,9 +1079,11 @@ const BudzetSection = () => {
                                                 value={incomeForm.recurringEndDate ? dayjs(incomeForm.recurringEndDate) : null}
                                                 onChange={(newValue) => setIncomeForm({ ...incomeForm, recurringEndDate: newValue ? newValue.format('YYYY-MM-DD') : '' })}
                                                 minDate={dayjs(incomeForm.date).add(1, 'day')}
+                                                disabled={tutorialData.showIncome && !editingIncome}
                                                 slotProps={{
                                                     textField: {
                                                         fullWidth: true,
+                                                        disabled: tutorialData.showIncome && !editingIncome,
                                                     },
                                                     popper: {
                                                         sx: {
@@ -1086,13 +1139,13 @@ const BudzetSection = () => {
                     </Box>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setOpenIncomeDialog(false)}>
+                    <Button onClick={() => setOpenIncomeDialog(false)} disabled={tutorialData.showIncome && !editingIncome}>
                         Anuluj
                     </Button>
                     <Button
                         onClick={handleSaveIncome}
                         variant="contained"
-                        disabled={!incomeForm.name || !incomeForm.amount || saving}
+                        disabled={!incomeForm.name || !incomeForm.amount || saving || (tutorialData.showIncome && !editingIncome)}
                         sx={{
                             '&:hover': {
                                 transform: 'none',

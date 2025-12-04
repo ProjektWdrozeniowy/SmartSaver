@@ -43,7 +43,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { getGoals, createGoal, updateGoal, deleteGoal, contributeToGoal, updateRecurringContribution } from '../../api/goals';
 import { useThemeMode } from '../../context/ThemeContext';
 
-const CeleSection = ({ onGoalChange }) => {
+const CeleSection = ({ onGoalChange, tutorialData = {} }) => {
     const { mode } = useThemeMode();
 
     // Data states
@@ -84,6 +84,37 @@ const CeleSection = ({ onGoalChange }) => {
     useEffect(() => {
         fetchGoals();
     }, []);
+
+    // Handle tutorial
+    useEffect(() => {
+        if (tutorialData.showGoal) {
+            // Open goal dialog for tutorial
+            setOpenGoalDialog(true);
+            // Set default form with tutorial data
+            setGoalForm({
+                name: 'Wakacje',
+                targetAmount: '5000.00',
+                currentAmount: '1200.00',
+                dueDate: dayjs().add(6, 'month').format('YYYY-MM-DD'),
+                description: 'Oszczędzanie na wymarzone wakacje',
+            });
+            // Add tutorial goal to display
+            const tutorialGoal = {
+                id: 'tutorial-goal',
+                name: 'Wakacje',
+                targetAmount: 5000.00,
+                currentAmount: 1200.00,
+                dueDate: dayjs().add(6, 'month').toISOString(),
+                description: 'Oszczędzanie na wymarzone wakacje',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+            };
+            setGoals([tutorialGoal]);
+        } else if (tutorialData.showGoal === false) {
+            // Close goal dialog when tutorial moves on
+            setOpenGoalDialog(false);
+        }
+    }, [tutorialData.showGoal]);
 
     // API functions
     const fetchGoals = async () => {
@@ -334,13 +365,14 @@ const CeleSection = ({ onGoalChange }) => {
     };
 
     return (
-        <Box sx={{ width: '100%' }}>
+        <Box sx={{ width: '100%' }} data-tour="cele-section">
             {/* Header */}
             <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
                 <Typography variant="body1" sx={{ color: 'text.secondary' }}>
                     Planuj i realizuj swoje cele finansowe
                 </Typography>
                 <Button
+                    data-tour="add-goal-button"
                     variant="contained"
                     startIcon={<AddIcon />}
                     onClick={handleAddGoal}
@@ -366,7 +398,9 @@ const CeleSection = ({ onGoalChange }) => {
             </Box>
 
             {/* Statistics Cards */}
-            <Box sx={{
+            <Box
+                data-tour="cele-cards"
+                sx={{
                 display: 'flex',
                 gap: 2,
                 mb: 4,
@@ -617,7 +651,7 @@ const CeleSection = ({ onGoalChange }) => {
                     width: '100%',
                     flexWrap: 'wrap'
                 }}>
-                    {goals.map((goal) => {
+                    {goals.map((goal, index) => {
                         const progress = calculateProgress(goal.currentAmount, goal.targetAmount);
                         const daysRemaining = calculateDaysRemaining(goal.dueDate);
                         const isCompleted = isGoalCompleted(goal);
@@ -631,6 +665,7 @@ const CeleSection = ({ onGoalChange }) => {
                                 }}
                             >
                                 <Card
+                                    data-tour={index === 0 ? 'goal-item' : undefined}
                                     sx={{
                                         background: isCompleted
                                             ? 'linear-gradient(135deg, rgba(76, 175, 80, 0.15), rgba(76, 175, 80, 0.05))'
@@ -841,7 +876,7 @@ const CeleSection = ({ onGoalChange }) => {
             {/* Dialog - Add/Edit Goal */}
             <Dialog
                 open={openGoalDialog}
-                onClose={() => setOpenGoalDialog(false)}
+                onClose={tutorialData.showGoal && !editingGoal ? undefined : () => setOpenGoalDialog(false)}
                 maxWidth="sm"
                 fullWidth
                 PaperProps={{
@@ -856,7 +891,8 @@ const CeleSection = ({ onGoalChange }) => {
                         boxShadow: mode === 'dark'
                             ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
                             : '0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
-                    }
+                    },
+                    'data-tour': 'goal-dialog'
                 }}
             >
                 <DialogTitle>
@@ -871,6 +907,7 @@ const CeleSection = ({ onGoalChange }) => {
                             fullWidth
                             required
                             placeholder="np. Wakacje 2026"
+                            disabled={tutorialData.showGoal && !editingGoal}
                         />
                         <TextField
                             label="Kwota docelowa"
@@ -879,6 +916,7 @@ const CeleSection = ({ onGoalChange }) => {
                             onChange={(e) => setGoalForm({ ...goalForm, targetAmount: e.target.value })}
                             fullWidth
                             required
+                            disabled={tutorialData.showGoal && !editingGoal}
                             inputProps={{ step: '0.01', min: '0' }}
                             InputProps={{
                                 endAdornment: <InputAdornment position="end">zł</InputAdornment>,
@@ -900,6 +938,7 @@ const CeleSection = ({ onGoalChange }) => {
                             onChange={(e) => setGoalForm({ ...goalForm, currentAmount: e.target.value })}
                             fullWidth
                             required
+                            disabled={tutorialData.showGoal && !editingGoal}
                             inputProps={{ step: '0.01', min: '0' }}
                             InputProps={{
                                 endAdornment: <InputAdornment position="end">zł</InputAdornment>,
@@ -919,10 +958,12 @@ const CeleSection = ({ onGoalChange }) => {
                                 label="Termin realizacji"
                                 value={goalForm.dueDate ? dayjs(goalForm.dueDate) : null}
                                 onChange={(newValue) => setGoalForm({ ...goalForm, dueDate: newValue ? newValue.format('YYYY-MM-DD') : '' })}
+                                disabled={tutorialData.showGoal && !editingGoal}
                                 slotProps={{
                                     textField: {
                                         fullWidth: true,
                                         required: true,
+                                        disabled: tutorialData.showGoal && !editingGoal,
                                     },
                                     popper: {
                                         sx: {
@@ -978,6 +1019,7 @@ const CeleSection = ({ onGoalChange }) => {
                             multiline
                             rows={3}
                             placeholder="Dodaj opis swojego celu"
+                            disabled={tutorialData.showGoal && !editingGoal}
                         />
 
                         {/* Recurring Contribution Section */}
@@ -987,6 +1029,7 @@ const CeleSection = ({ onGoalChange }) => {
                                         <Checkbox
                                             checked={goalForm.hasRecurringContribution}
                                             onChange={(e) => setGoalForm({ ...goalForm, hasRecurringContribution: e.target.checked })}
+                                            disabled={tutorialData.showGoal && !editingGoal}
                                             sx={{
                                                 color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
                                                 '&.Mui-checked': {
@@ -1007,6 +1050,7 @@ const CeleSection = ({ onGoalChange }) => {
                                             onChange={(e) => setGoalForm({ ...goalForm, recurringAmount: e.target.value })}
                                             fullWidth
                                             required
+                                            disabled={tutorialData.showGoal && !editingGoal}
                                             inputProps={{ step: '0.01', min: '0.01' }}
                                             InputProps={{
                                                 endAdornment: <InputAdornment position="end">zł</InputAdornment>,
@@ -1023,13 +1067,14 @@ const CeleSection = ({ onGoalChange }) => {
                                         />
 
                                         <Grid container spacing={2}>
-                                            <Grid item xs={6}>
+                                            <Grid size={6}>
                                                 <TextField
                                                     label="Powtarzaj co"
                                                     type="number"
                                                     value={goalForm.recurringInterval}
                                                     onChange={(e) => setGoalForm({ ...goalForm, recurringInterval: parseInt(e.target.value) || 1 })}
                                                     fullWidth
+                                                    disabled={tutorialData.showGoal && !editingGoal}
                                                     inputProps={{ min: 1 }}
                                                     sx={{
                                                         '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
@@ -1039,13 +1084,14 @@ const CeleSection = ({ onGoalChange }) => {
                                                     }}
                                                 />
                                             </Grid>
-                                            <Grid item xs={6}>
+                                            <Grid size={6}>
                                                 <FormControl fullWidth>
                                                     <InputLabel>Jednostka</InputLabel>
                                                     <Select
                                                         value={goalForm.recurringUnit}
                                                         label="Jednostka"
                                                         onChange={(e) => setGoalForm({ ...goalForm, recurringUnit: e.target.value })}
+                                                        disabled={tutorialData.showGoal && !editingGoal}
                                                     >
                                                         <MenuItem value="day">dzień</MenuItem>
                                                         <MenuItem value="week">tydzień</MenuItem>
@@ -1061,6 +1107,7 @@ const CeleSection = ({ onGoalChange }) => {
                                                 <Switch
                                                     checked={!goalForm.hasRecurringEndDate}
                                                     onChange={(e) => setGoalForm({ ...goalForm, hasRecurringEndDate: !e.target.checked })}
+                                                    disabled={tutorialData.showGoal && !editingGoal}
                                                     sx={{
                                                         '& .MuiSwitch-switchBase.Mui-checked': {
                                                             color: '#ab47bc',
@@ -1081,9 +1128,11 @@ const CeleSection = ({ onGoalChange }) => {
                                                     value={goalForm.recurringEndDate ? dayjs(goalForm.recurringEndDate) : null}
                                                     onChange={(newValue) => setGoalForm({ ...goalForm, recurringEndDate: newValue ? newValue.format('YYYY-MM-DD') : '' })}
                                                     minDate={dayjs().add(1, 'day')}
+                                                    disabled={tutorialData.showGoal && !editingGoal}
                                                     slotProps={{
                                                         textField: {
                                                             fullWidth: true,
+                                                            disabled: tutorialData.showGoal && !editingGoal,
                                                         },
                                                         popper: {
                                                             sx: {
@@ -1138,13 +1187,13 @@ const CeleSection = ({ onGoalChange }) => {
                     </Box>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setOpenGoalDialog(false)}>
+                    <Button onClick={() => setOpenGoalDialog(false)} disabled={tutorialData.showGoal && !editingGoal}>
                         Anuluj
                     </Button>
                     <Button
                         onClick={handleSaveGoal}
                         variant="contained"
-                        disabled={!goalForm.name || !goalForm.targetAmount || !goalForm.dueDate || saving}
+                        disabled={!goalForm.name || !goalForm.targetAmount || !goalForm.dueDate || saving || (tutorialData.showGoal && !editingGoal)}
                         sx={{
                             '&:hover': {
                                 transform: 'none',

@@ -41,9 +41,6 @@ yarn-error.log*
 *.sqlite
 *.db
 
-# Prisma
-backend/prisma/migrations/*_*/
-
 # Temporary files
 *.tmp
 .cache/

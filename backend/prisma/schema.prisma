@@ -8,17 +8,18 @@ datasource db {
 }
 
 model Account {
-  id            Int             @id @default(autoincrement())
-  username      String
-  email         String          @unique
-  passwordHash  String          @map("password")
-  createdAt     DateTime        @default(now())
-  categories    Category[]
-  expenses      Expense[]
-  goals         Goal[]
-  incomes       Income[]
-  settings      UserSettings?
-  notifications Notification[]
+  id                Int             @id @default(autoincrement())
+  username          String
+  email             String          @unique
+  passwordHash      String          @map("password")
+  tutorialCompleted Boolean         @default(false)
+  createdAt         DateTime        @default(now())
+  categories        Category[]
+  expenses          Expense[]
+  goals             Goal[]
+  incomes           Income[]
+  settings          UserSettings?
+  notifications     Notification[]
 
   @@map("accounts")
 }
