@@ -40,13 +40,17 @@ To zainstaluje zależności w root oraz w obu workspace'ach (frontend i backend)
 
 3. **Skonfiguruj backend:**
 
-Utwórz plik `backend/.env` z następującą zawartością:
+Przykładowa zawartość `backend/.env`:
 ```env
 PORT=4000
 APP_ORIGIN=http://localhost:5173
 DATABASE_URL="mysql://user:password@localhost:3306/smartsaver"
 JWT_SECRET="your-super-secret-jwt-key-change-this-in-production"
 JWT_EXPIRES_IN="7d"
+EMAIL_ADDRESS=your-email@gmail.com
+EMAIL_APP_PASSWORD=your-app-password
+FRONTEND_BASE_URL=http://localhost:5173
+NODE_ENV=development
 ```
 
 **Uwaga:** Zmień `user` i `password` na swoje dane dostępowe do MySQL.
@@ -230,11 +234,13 @@ npm run migrate --workspace=backend
 ## 📝 Zmienne środowiskowe
 
 ### Backend (`backend/.env`):
+
+**Development (lokalnie):**
 ```env
 # Port na którym działa backend
 PORT=4000
 
-# URL aplikacji frontendowej (CORS)
+# URL aplikacji frontendowej (CORS) - localhost dla developmentu
 APP_ORIGIN=http://localhost:5173
 
 # Connection string do MySQL
@@ -244,23 +250,69 @@ DATABASE_URL="mysql://user:password@localhost:3306/smartsaver"
 JWT_SECRET="your-super-secret-jwt-key-change-this-in-production"
 
 # Ważność tokenu JWT
-JWT_EXPIRES_IN=7d
+JWT_EXPIRES_IN="7d"
 
-# Opcjonalne - konfiguracja email (Nodemailer)
-# EMAIL_HOST=smtp.gmail.com
-# EMAIL_PORT=587
-# EMAIL_USER=your-email@gmail.com
-# EMAIL_PASS=your-app-password
+# Email Configuration (Gmail SMTP)
+EMAIL_ADDRESS=your-email@gmail.com
+EMAIL_APP_PASSWORD=your-app-password
+
+# URL frontendu (używany w linkach resetowania hasła)
+FRONTEND_BASE_URL=http://localhost:5173
+
+# Środowisko
+NODE_ENV=development
 ```
+
+**Production (na serwerze):**
+```env
+PORT=4000
+
+# WAŻNE: Użyj prawdziwej domeny/IP z SSL
+APP_ORIGIN=https://your-domain.com
+
+# MySQL na produkcji - zakoduj znaki specjalne w haśle!
+DATABASE_URL="mysql://user:encoded_password@localhost:3306/smartsaver"
+
+# ZMIEŃ na silny losowy klucz w produkcji!
+JWT_SECRET="super-secure-random-key-generated-for-production"
+JWT_EXPIRES_IN="7d"
+
+# Email Configuration
+EMAIL_ADDRESS=your-email@gmail.com
+EMAIL_APP_PASSWORD=your-app-password
+
+# URL frontendu na produkcji
+FRONTEND_BASE_URL=https://your-domain.com
+
+NODE_ENV=production
+```
+
+**Uwagi:**
+- Plik `.env` **NIE jest commitowany** do repozytorium (znajduje się w `.gitignore`)
+- Każde środowisko (dev/prod) ma swój własny plik `.env`
+- Backend akceptuje zarówno `www.domain.com` jak i `domain.com` dzięki elastycznej konfiguracji CORS
+- Jeśli hasło do MySQL zawiera znaki specjalne (`@`, `:`, `/`, etc.), zakoduj je URL-encode
+- Użyj `node -e "console.log(encodeURIComponent('TwojeHasło'))"` do zakodowania hasła
 
 ### Frontend:
-Frontend używa zmiennych z `import.meta.env`:
-- `VITE_API_URL` - URL backendu (opcjonalne, domyślnie `http://localhost:4000`)
 
-Utwórz plik `frontend/.env.local` jeśli potrzebujesz nadpisać domyślne wartości:
-```env
-VITE_API_URL=http://localhost:4000
+Frontend używa **Vite proxy** w development i bezpośrednich wywołań `/api/*` w production.
+
+**Development (`vite.config.js`):**
+```javascript
+server: {
+  proxy: {
+    '/api': {
+      target: 'http://localhost:4000',
+      changeOrigin: true,
+    }
+  }
+}
 ```
+
+**Production:**
+- Nginx przekierowuje `/api/*` na backend (`http://localhost:4000`)
+- Frontend nie potrzebuje znać URL backendu
 
 ## 📚 Dokumentacja API
 
@@ -357,7 +409,11 @@ Pełna dokumentacja API znajduje się w pliku [API_DOCUMENTATION.md](./API_DOCUM
   - 20 prób logowania/rejestracji na 15 minut na IP
   - `skipSuccessfulRequests: true` - liczymy tylko nieudane próby
 - **Helmet:** Dodatkowe zabezpieczenia HTTP headers (Content-Security-Policy, X-Frame-Options, etc.)
-- **CORS:** Konfiguracja dla bezpiecznej komunikacji frontend-backend z credentials support
+- **CORS:** Elastyczna konfiguracja dla bezpiecznej komunikacji frontend-backend:
+  - Akceptuje `APP_ORIGIN` z pliku `.env` (produkcja)
+  - Akceptuje `localhost` na dowolnym porcie (development)
+  - Automatyczne wsparcie dla `www` i bez `www` (np. `www.domain.com` i `domain.com`)
+  - Credentials support dla ciasteczek i autoryzacji
 - **Walidacja wejścia:** Zod schemas dla wszystkich input'ów z dokładnymi komunikatami błędów
 - **SQL Injection:** Ochrona poprzez Prisma ORM (prepared statements)
 - **Ochrona przed information disclosure:**
@@ -371,26 +427,120 @@ Pełna dokumentacja API znajduje się w pliku [API_DOCUMENTATION.md](./API_DOCUM
 - [ ] Migracja z localStorage do httpOnly cookies dla tokenów JWT (lepsza ochrona przed XSS)
 - [ ] Content Security Policy (CSP) headers na produkcji
 
+## 🔄 Development vs Production
+
+### Development (lokalnie):
+```bash
+# Frontend: http://localhost:5173
+npm run dev
+
+# Backend: http://localhost:4000
+# - CORS akceptuje localhost
+# - Vite proxy przekierowuje /api/* na backend
+# - Hot reload dla szybkiego developmentu
+```
+
+### Production (na serwerze):
+```bash
+# Frontend: dist/ (statyczne pliki)
+# Backend: PM2 process manager
+
+# - Nginx jako reverse proxy
+# - CORS akceptuje domenę z APP_ORIGIN
+# - Optimized production build
+# - Process monitoring z PM2
+# - SSL/TLS (HTTPS) z Let's Encrypt
+```
+
+**Kluczowe różnice:**
+- **Development:** Vite proxy, localhost CORS, hot reload
+- **Production:** Nginx proxy, domain CORS, optimized builds, SSL, PM2
+
 ## 🌐 Deployment
 
-### Frontend (Vercel/Netlify):
+### Deployment na VPS (Rekomendowane)
+
+SmartSaver jest zoptymalizowane do wdrożenia na własnym serwerze VPS z Nginx, PM2 i MySQL.
+
+**Kompletna dokumentacja deployment:**
+- 📖 [VPS Setup Guide](./deployment/VPS_SETUP_GUIDE.md) - Pełny przewodnik wdrożenia
+- ✅ [Deployment Checklist](./deployment/CHECKLIST.md) - Lista kontrolna
+- 🔧 [Troubleshooting Guide](./deployment/TROUBLESHOOTING.md) - Rozwiązywanie problemów
+- 📝 [Code Changes for Production](./deployment/CODE_CHANGES_FOR_PRODUCTION.md) - Zmiany w kodzie
+
+**Szybki start deployment:**
+
+1. **Przygotuj serwer VPS** (Ubuntu 22.04 LTS):
+```bash
+# Zaloguj się na serwer
+ssh root@YOUR_IP
+
+# Uruchom automatyczny skrypt instalacji
+bash <(curl -s https://raw.githubusercontent.com/ProjektWdrozeniowy/SmartSaver/main/deployment/server-setup.sh)
+```
+
+2. **Konfiguracja Nginx:**
+```bash
+# Skopiuj odpowiednią konfigurację
+sudo cp ~/SmartSaver/deployment/nginx-no-ssl.conf /etc/nginx/sites-available/smartsaver
+
+# Dla SSL/domeny użyj:
+# sudo cp ~/SmartSaver/deployment/nginx.conf /etc/nginx/sites-available/smartsaver
+
+sudo ln -s /etc/nginx/sites-available/smartsaver /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+3. **Skonfiguruj zmienne środowiskowe:**
+```bash
+nano /var/www/SmartSaver/backend/.env
+# Ustaw APP_ORIGIN, DATABASE_URL, FRONTEND_BASE_URL, etc.
+```
+
+4. **Uruchom backend z PM2:**
+```bash
+pm2 start /var/www/SmartSaver/deployment/ecosystem.config.js
+pm2 save
+pm2 startup
+```
+
+**Stack technologiczny na produkcji:**
+- **Nginx** - Reverse proxy i serwer statyczny
+- **PM2** - Process manager dla Node.js
+- **MySQL 8** - Baza danych
+- **Certbot** - Darmowe certyfikaty SSL (Let's Encrypt)
+
+### Alternatywne platformy
+
+#### Frontend (Vercel/Netlify):
 ```bash
 cd frontend
 npm run build
 # Deploy folder 'dist'
 ```
 
-### Backend (Railway/Render/Heroku):
+**Uwaga:** Musisz skonfigurować rewrites dla SPA routing:
+```json
+{
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
+```
+
+#### Backend (Railway/Render/Heroku):
 ```bash
 cd backend
 # Ustaw zmienne środowiskowe na platformie
-# DATABASE_URL, JWT_SECRET, etc.
+# DATABASE_URL, JWT_SECRET, APP_ORIGIN, FRONTEND_BASE_URL
 npm start
 ```
 
 ### Baza danych:
-- Lokalna: MySQL 8
-- Produkcja: PlanetScale, Railway MySQL, lub Amazon RDS
+- **Lokalna:** MySQL 8
+- **Produkcja VPS:** MySQL 8 na tym samym serwerze
+- **Cloud:** PlanetScale, Railway MySQL, Amazon RDS, lub DigitalOcean Managed MySQL
 
 ## 🧪 Testowanie
 
